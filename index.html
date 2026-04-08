@@ -1595,45 +1595,61 @@ function setLanguage(event, lang) {
   playSound('click', 700);
 }
 function updateUI() {
-  document.getElementById('intro-headline').textContent = getText('headline');
-  document.getElementById('intro-tag').textContent = getText('introTag');
-  document.getElementById('intro-sub').textContent = getText('subheadline');
-  document.getElementById('intro-vp1').innerHTML = getText('introVP1');
-  document.getElementById('intro-vp2').innerHTML = getText('introVP2');
-  document.getElementById('intro-vp3').innerHTML = getText('introVP3');
-  document.getElementById('btn-start').textContent = getText('btnStart');
-  document.getElementById('intro-note').textContent = getText('noteTime');
-  document.getElementById('form-title').textContent = getText('formTitle');
-  document.getElementById('form-sub').textContent = getText('formSub');
-  document.getElementById('label-name').textContent = getText('labelName');
-  document.getElementById('label-email').textContent = getText('labelEmail');
-  document.getElementById('label-phone').textContent = getText('labelPhone');
-  document.getElementById('label-age').textContent = getText('labelAge');
-  document.getElementById('label-gender').textContent = getText('labelGender');
+  const setText = (id, value) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+  };
+
+  const setHTML = (id, value) => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = value;
+  };
+
+  setText('intro-headline', getText('headline'));
+  setText('intro-tag', getText('introTag'));
+  setText('intro-sub', getText('subheadline'));
+  setHTML('intro-vp1', getText('introVP1'));
+  setHTML('intro-vp2', getText('introVP2'));
+  setHTML('intro-vp3', getText('introVP3'));
+  setText('btn-start', getText('btnStart'));
+  setText('intro-note', getText('noteTime'));
+
+  setText('form-title', getText('formTitle'));
+  setText('form-sub', getText('formSub'));
+  setText('label-name', getText('labelName'));
+  setText('label-email', getText('labelEmail'));
+  setText('label-phone', getText('labelPhone'));
+  setText('label-age', getText('labelAge'));
+  setText('label-gender', getText('labelGender'));
+
   updateLocalizedSelect('f-age', getText('agePlaceholder'), getText('ageOptions'));
   updateLocalizedSelect('f-gender', getText('genderPlaceholder'), getText('genderOptions'));
-  document.getElementById('btn-reveal').textContent = getText('btnReveal');
-  document.getElementById('privacy-note').textContent = getText('privacyNote');
-  document.getElementById('cta-title').textContent = getText('ctaTitle');
-  document.getElementById('cta-sub').textContent = getText('ctaSub');
-  document.getElementById('btn-join').textContent = getText('btnJoin');
-  document.getElementById('hybrid-badge').textContent = getText('hybridBadge');
-  document.getElementById('hybrid-title').innerHTML = getText('hybridTitle');
-  document.getElementById('hybrid-sub').textContent = getText('hybridSub');
+
+  setText('btn-reveal', getText('btnReveal'));
+  setText('privacy-note', getText('privacyNote'));
+
+  setText('hybrid-badge', getText('hybridBadge'));
+  setHTML('hybrid-title', getText('hybridTitle'));
+  setText('hybrid-sub', getText('hybridSub'));
+
   const hybridFeatures = getText('hybridFeatures');
-  if (hybridFeatures && Array.isArray(hybridFeatures)) {
-    document.getElementById('hybrid-features').innerHTML = hybridFeatures.map(f => `<div class="hybrid-feature"><span>${f}</span></div>`).join('');
+  const hybridFeaturesEl = document.getElementById('hybrid-features');
+  if (hybridFeaturesEl && hybridFeatures && Array.isArray(hybridFeatures)) {
+    hybridFeaturesEl.innerHTML = hybridFeatures
+      .map(f => `<div class="hybrid-feature"><span>${f}</span></div>`)
+      .join('');
   }
-  document.getElementById('btn-hybrid').textContent = getText('btnHybrid');
-  document.getElementById('btn-share').textContent = getText('btnShare');
-  document.getElementById('btn-copy').textContent = getText('btnCopy');
-  document.getElementById('btn-download-pdf').textContent = getText('btnDownloadPdf');
-  document.getElementById('btn-retry').textContent = getText('btnRetry');
-  document.getElementById('match-label').textContent = getText('matchLabel');
-  document.getElementById('result-eyebrow').textContent = getText('resultEyebrow');
-  document.getElementById('mix-label').textContent = getText('mixLabel');
-  document.getElementById('btn-next').textContent = getText('nextBtn');
-  document.getElementById('btn-prev').textContent = getText('backBtn');
+
+  setText('btn-hybrid', getText('btnHybrid'));
+  setText('btn-share', getText('btnShare'));
+  setText('btn-copy', getText('btnCopy'));
+  setText('btn-download-pdf', getText('btnDownloadPdf'));
+  setText('btn-retry', getText('btnRetry'));
+  setText('match-label', getText('matchLabel'));
+  setText('result-eyebrow', getText('resultEyebrow'));
+  setText('mix-label', getText('mixLabel'));
+  setText('btn-next', getText('nextBtn'));
+  setText('btn-prev', getText('backBtn'));
 }
 function updateLocalizedSelect(id, placeholder, options) {
   const select = document.getElementById(id);
