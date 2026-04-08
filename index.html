@@ -2131,6 +2131,7 @@ function fallbackCopy(text) {
 function getReportPayload() {
   const dominant = getDominantPersonality();
   const percentages = getPersonalityPercentages();
+  const matchType = bestMatches[dominant]?.personality || '';
 
   return {
     userName: userName || '',
@@ -2144,6 +2145,12 @@ function getReportPayload() {
     stepLabel: getText('stepLabel') || 'Your Next Step',
     stepText: getPersonalityText(dominant, 'step') || '',
     mixLabel: getText('mixLabel') || 'Your Personality Mix',
+    characterImage: document.getElementById('character-img')?.src || '',
+    personalityColor: characterColors[dominant] || '#FFD700',
+    bestMatchName: getPersonalityText(matchType, 'name') || '',
+    bestMatchReason: bestMatches[dominant]?.reason?.[currentLanguage]
+      || bestMatches[dominant]?.reason?.en
+      || '',
     percentages: [
       { label: getPersonalityText('saver', 'name') || 'Saver', value: Number(percentages.saver || 0) },
       { label: getPersonalityText('spender', 'name') || 'Spender', value: Number(percentages.spender || 0) },
@@ -2173,7 +2180,10 @@ async function downloadResultPDF() {
     if (!response.ok) {
       const errorText = await response.text();
       console.error('API error:', response.status, errorText);
-      alert(`PDF generation failed.\nStatus: ${response.status}\n\n${errorText}`);
+      alert(`PDF generation failed.
+Status: ${response.status}
+
+${errorText}`);
       return;
     }
 
@@ -2182,7 +2192,7 @@ async function downloadResultPDF() {
 
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${payload.personalityName || 'Money_Personality_Report'}.pdf`;
+    a.download = `${payload.userName ? payload.userName + '_' : ''}${payload.personalityName || 'Money_Personality_Report'}.pdf`;
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -2190,7 +2200,9 @@ async function downloadResultPDF() {
     window.URL.revokeObjectURL(url);
   } catch (error) {
     console.error('Download failed:', error);
-    alert(`Sorry, the PDF could not be generated right now.\n\n${error.message}`);
+    alert(`Sorry, the PDF could not be generated right now.
+
+${error.message}`);
   } finally {
     btn.textContent = originalText;
     btn.disabled = false;
