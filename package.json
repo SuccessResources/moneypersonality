@@ -2,6 +2,7 @@
   "name": "money-personality-report",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "dependencies": {
     "pdf-lib": "1.17.1"
   }
