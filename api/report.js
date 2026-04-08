@@ -122,7 +122,7 @@ export default async function handler(req, res) {
     });
 
     page.drawText(
-      userName ? `${userName}, here is your personalized result` : 'Here is your personalized result',
+      userName ? `${userName}, this is your Money Personality profile` : 'This is your Money Personality profile',
       {
         x: 40,
         y: height - 68,
