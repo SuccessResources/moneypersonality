@@ -1303,7 +1303,6 @@ footer a:hover { color: var(--gold); }
   </div>
   <div style="margin-top:12px">Copyright © 2026 Success Resources · All Rights Reserved</div>
 </footer>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
 let currentLanguage = 'en';
 let xp = 0;
@@ -2045,30 +2044,69 @@ function fallbackCopy(text) {
   }
   document.body.removeChild(temp);
 }
-function downloadResultPDF() {
+function getReportPayload() {
   const dominant = getDominantPersonality();
-  const personalityName = getPersonalityText(dominant, 'name') || 'Money Personality';
-  const resultHTML = `<div style="background:linear-gradient(135deg,#0a2f1f,#0f3d28);color:#FFFFFF;font-family:Arial,sans-serif;padding:40px;min-height:100vh;"><div style="text-align:center;margin-bottom:30px;"><img src="${document.getElementById('character-img').src}" style="width:220px;height:220px;object-fit:cover;border-radius:20px;display:block;margin:0 auto 20px;"><div style="font-size:12px;letter-spacing:3px;text-transform:uppercase;color:#A8C5B8;margin-bottom:10px;">${document.getElementById('result-eyebrow').textContent}</div><h1 style="font-size:42px;margin:0 0 14px;color:${characterColors[dominant]};font-family:Arial,sans-serif;">${document.getElementById('r-name').textContent}</h1><p style="font-size:16px;line-height:1.7;color:#FFFFFF;max-width:700px;margin:0 auto;">${document.getElementById('r-description').textContent}</p></div><div style="border:1px solid rgba(34,197,94,.3);border-radius:16px;padding:20px;margin-bottom:20px;background:rgba(34,197,94,.08);text-align:center;"><div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#A8C5B8;margin-bottom:10px;">${document.getElementById('match-label').textContent}</div><div style="font-size:28px;font-weight:bold;margin-bottom:10px;color:${characterColors[bestMatches[dominant].personality]};">${document.getElementById('match-icon').textContent} ${document.getElementById('match-name').textContent}</div><div style="font-size:14px;line-height:1.7;color:#FFFFFF;">${document.getElementById('match-reason').textContent}</div></div><div style="display:flex;flex-direction:column;gap:14px;margin-bottom:24px;">${Array.from(document.querySelectorAll('#insights .ins-card')).map(card => { const icon = card.querySelector('.ins-icon')?.textContent || ''; const label = card.querySelector('.ins-label')?.textContent || ''; const text = card.querySelector('.ins-text')?.textContent || ''; return `<div style="background:rgba(30,98,68,.5);border:1px solid rgba(34,197,94,.25);border-radius:16px;padding:20px;display:flex;gap:14px;align-items:flex-start;"><div style="font-size:28px;line-height:1;">${icon}</div><div><div style="font-size:10px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;color:#A8C5B8;margin-bottom:8px;">${label}</div><div style="font-size:14px;line-height:1.7;color:#FFFFFF;">${text}</div></div></div>`; }).join('')}</div><div style="border-top:1px solid rgba(34,197,94,.1);margin-top:20px;padding-top:20px;text-align:center;font-size:12px;color:#A8C5B8;">Millionaire Mind × Success Resources</div></div>`;
-  const wrapper = document.createElement('div');
-  wrapper.style.position = 'fixed';
-  wrapper.style.left = '-99999px';
-  wrapper.style.top = '0';
-  wrapper.style.width = '800px';
-  wrapper.innerHTML = resultHTML;
-  document.body.appendChild(wrapper);
-  const safeName = personalityName.replace(/[^\p{L}\p{N}\s_-]/gu, '').replace(/\s+/g, '_');
-  const opt = {
-    margin: 0.5,
-    filename: `${safeName || 'Money_Personality'}_Result.pdf`,
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#0a2f1f' },
-    jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+  const percentages = getPersonalityPercentages();
+
+  return {
+    userName: userName,
+    language: currentLanguage,
+    personalityName: getPersonalityText(dominant, 'name'),
+    description: getPersonalityText(dominant, 'desc'),
+    strengthLabel: getText('strengthLabel'),
+    strengthText: getPersonalityText(dominant, 'strength'),
+    shadowLabel: getText('shadowLabel'),
+    shadowText: getPersonalityText(dominant, 'shadow'),
+    stepLabel: getText('stepLabel'),
+    stepText: getPersonalityText(dominant, 'step'),
+    mixLabel: getText('mixLabel'),
+    percentages: [
+      { label: getPersonalityText('saver', 'name'), value: percentages.saver || 0 },
+      { label: getPersonalityText('spender', 'name'), value: percentages.spender || 0 },
+      { label: getPersonalityText('monk', 'name'), value: percentages.monk || 0 },
+      { label: getPersonalityText('avoider', 'name'), value: percentages.avoider || 0 }
+    ]
   };
-  html2pdf().set(opt).from(wrapper).save().then(() => {
-    document.body.removeChild(wrapper);
-  }).catch(() => {
-    document.body.removeChild(wrapper);
-  });
+}
+
+async function downloadResultPDF() {
+  const btn = document.getElementById('btn-download-pdf');
+  const originalText = btn.textContent;
+
+  try {
+    btn.textContent = '⏳ Generating PDF...';
+    btn.disabled = true;
+
+    const payload = getReportPayload();
+
+    const response = await fetch('/api/report', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to generate PDF');
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${payload.personalityName || 'Money_Personality_Report'}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error('Download failed:', error);
+    alert('Sorry, the PDF could not be generated right now.');
+  } finally {
+    btn.textContent = originalText;
+    btn.disabled = false;
+  }
 }
 function restartQuiz() {
   playSound('click', 700);
