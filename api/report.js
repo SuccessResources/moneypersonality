@@ -1,6 +1,16 @@
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 
-function wrapText(text, maxCharsPerLine = 80) {
+function hexToRgb(hex) {
+  const clean = String(hex || '#FFD700').replace('#', '');
+  const bigint = parseInt(clean, 16);
+  return rgb(
+    ((bigint >> 16) & 255) / 255,
+    ((bigint >> 8) & 255) / 255,
+    (bigint & 255) / 255
+  );
+}
+
+function wrapTextByWidth(text, font, fontSize, maxWidth) {
   if (!text) return [''];
   const words = String(text).split(/\s+/);
   const lines = [];
@@ -8,11 +18,13 @@ function wrapText(text, maxCharsPerLine = 80) {
 
   for (const word of words) {
     const test = current ? `${current} ${word}` : word;
-    if (test.length > maxCharsPerLine) {
+    const width = font.widthOfTextAtSize(test, fontSize);
+
+    if (width <= maxWidth) {
+      current = test;
+    } else {
       if (current) lines.push(current);
       current = word;
-    } else {
-      current = test;
     }
   }
 
@@ -20,20 +32,25 @@ function wrapText(text, maxCharsPerLine = 80) {
   return lines;
 }
 
-function drawParagraph(page, text, x, y, options = {}) {
+function drawWrappedText(page, text, x, y, width, options = {}) {
   const {
     font,
     size = 12,
     color = rgb(1, 1, 1),
-    lineHeight = 18,
-    maxCharsPerLine = 80
+    lineHeight = 18
   } = options;
 
-  const lines = wrapText(text, maxCharsPerLine);
+  const lines = wrapTextByWidth(text, font, size, width);
   let currentY = y;
 
   for (const line of lines) {
-    page.drawText(line, { x, y: currentY, size, font, color });
+    page.drawText(line, {
+      x,
+      y: currentY,
+      size,
+      font,
+      color
+    });
     currentY -= lineHeight;
   }
 
@@ -56,11 +73,20 @@ async function embedImageFromUrl(pdfDoc, url) {
   const bytes = await response.arrayBuffer();
   const contentType = response.headers.get('content-type') || '';
 
-  if (contentType.includes('png')) {
-    return await pdfDoc.embedPng(bytes);
-  }
-
+  if (contentType.includes('png')) return await pdfDoc.embedPng(bytes);
   return await pdfDoc.embedJpg(bytes);
+}
+
+function drawCard(page, x, y, w, h, fillColor, borderColor = null) {
+  page.drawRectangle({
+    x,
+    y,
+    width: w,
+    height: h,
+    color: fillColor,
+    borderColor: borderColor || fillColor,
+    borderWidth: borderColor ? 1 : 0
+  });
 }
 
 export default async function handler(req, res) {
@@ -73,7 +99,6 @@ export default async function handler(req, res) {
 
     const {
       userName = '',
-      language = 'en',
       personalityName = 'Money Personality',
       description = '',
       strengthLabel = 'Your Strengths',
@@ -91,141 +116,126 @@ export default async function handler(req, res) {
     } = body || {};
 
     const pdfDoc = await PDFDocument.create();
-    let page = pdfDoc.addPage([595.28, 841.89]);
-    const { width, height } = page.getSize();
+    const page1 = pdfDoc.addPage([595.28, 841.89]); // A4
+    const page2 = pdfDoc.addPage([595.28, 841.89]);
 
     const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
     const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
+    const width = 595.28;
+    const height = 841.89;
+
+    const bg = rgb(0.04, 0.18, 0.12);
+    const card = rgb(0.09, 0.28, 0.19);
+    const cardSoft = rgb(0.11, 0.31, 0.21);
     const gold = rgb(1, 0.84, 0);
     const white = rgb(1, 1, 1);
     const softWhite = rgb(0.92, 0.96, 0.94);
-    const greenDark = rgb(0.04, 0.18, 0.12);
-    const card = rgb(0.09, 0.28, 0.19);
-    const barBg = rgb(0.18, 0.22, 0.20);
-    const barFill = rgb(0.13, 0.77, 0.37);
+    const muted = rgb(0.72, 0.80, 0.75);
+    const accent = hexToRgb(personalityColor);
+    const barBg = rgb(0.16, 0.22, 0.19);
 
-    page.drawRectangle({
-      x: 0,
-      y: 0,
-      width,
-      height,
-      color: greenDark
-    });
+    // ===== PAGE 1 =====
+    page1.drawRectangle({ x: 0, y: 0, width, height, color: bg });
 
-    page.drawText('Millionaire Mind × Success Resources', {
+    // top brand line
+    page1.drawText('MILLIONAIRE MIND x SUCCESS RESOURCES', {
       x: 40,
-      y: height - 40,
-      size: 11,
+      y: 795,
+      size: 10,
       font: fontBold,
       color: gold
     });
 
-    page.drawText(
-      userName ? `${userName}, this is your Money Personality profile` : 'This is your Money Personality profile',
+    page1.drawText(
+      userName ? `${userName}, this is your formal Money Personality report` : 'Your formal Money Personality report',
       {
         x: 40,
-        y: height - 68,
+        y: 765,
         size: 18,
         font: fontBold,
         color: white
       }
     );
 
-    let imageTopY = height - 110;
+    // hero card
+    drawCard(page1, 40, 470, 515, 255, card, accent);
 
+    // character image
     try {
-      const embeddedImage = await embedImageFromUrl(pdfDoc, characterImage);
-      if (embeddedImage) {
-        const imgWidth = 150;
-        const imgHeight = 150;
-        page.drawImage(embeddedImage, {
-          x: (width - imgWidth) / 2,
-          y: imageTopY - imgHeight,
-          width: imgWidth,
-          height: imgHeight
+      const img = await embedImageFromUrl(pdfDoc, characterImage);
+      if (img) {
+        const imgW = 150;
+        const imgH = 150;
+        page1.drawImage(img, {
+          x: (width - imgW) / 2,
+          y: 545,
+          width: imgW,
+          height: imgH
         });
       }
     } catch (err) {
-      console.error('Character image embed failed:', err);
+      console.error('Character image failed:', err);
     }
 
-    page.drawText(personalityName, {
+    page1.drawText(personalityName, {
       x: 40,
-      y: 510,
-      size: 28,
+      y: 520,
+      size: 30,
       font: fontBold,
-      color: gold
+      color: accent
     });
 
-    let y = 480;
-    y = drawParagraph(page, description, 40, y, {
+    drawWrappedText(page1, description, 40, 490, 515, {
       font: fontRegular,
       size: 12,
       color: softWhite,
-      lineHeight: 18,
-      maxCharsPerLine: 78
+      lineHeight: 18
     });
 
-    y -= 15;
+    // best match box
+    drawCard(page1, 40, 365, 515, 80, cardSoft, gold);
 
-    page.drawRectangle({
-      x: 40,
-      y: y - 85,
-      width: width - 80,
-      height: 75,
-      color: card
-    });
-
-    page.drawText('Best Compatible Personality', {
+    page1.drawText('BEST COMPATIBLE PERSONALITY', {
       x: 55,
-      y: y - 24,
-      size: 12,
+      y: 425,
+      size: 10,
       font: fontBold,
       color: gold
     });
 
-    page.drawText(bestMatchName || '-', {
+    page1.drawText(bestMatchName || '-', {
       x: 55,
-      y: y - 46,
-      size: 16,
+      y: 398,
+      size: 18,
       font: fontBold,
       color: white
     });
 
-    drawParagraph(page, bestMatchReason || '', 200, y - 28, {
+    drawWrappedText(page1, bestMatchReason || '', 210, 410, 320, {
       font: fontRegular,
       size: 10,
       color: softWhite,
-      lineHeight: 14,
-      maxCharsPerLine: 48
+      lineHeight: 14
     });
 
-    y -= 110;
+    // personality mix card
+    drawCard(page1, 40, 150, 515, 185, card, gold);
 
-    page.drawRectangle({
-      x: 40,
-      y: y - 140,
-      width: width - 80,
-      height: 130,
-      color: card
-    });
-
-    page.drawText(mixLabel, {
+    page1.drawText(mixLabel, {
       x: 55,
-      y: y - 24,
+      y: 305,
       size: 13,
       font: fontBold,
       color: gold
     });
 
-    let rowY = y - 50;
-
+    let rowY = 275;
     percentages.forEach((item) => {
       const label = String(item?.label || '');
       const value = Number(item?.value || 0);
 
-      page.drawText(label, {
+      page1.drawText(label, {
         x: 55,
         y: rowY,
         size: 10,
@@ -233,80 +243,78 @@ export default async function handler(req, res) {
         color: white
       });
 
-      page.drawRectangle({
-        x: 190,
-        y: rowY - 2,
-        width: 230,
-        height: 10,
+      page1.drawRectangle({
+        x: 210,
+        y: rowY - 3,
+        width: 220,
+        height: 12,
         color: barBg
       });
 
-      page.drawRectangle({
-        x: 190,
-        y: rowY - 2,
-        width: Math.max(0, Math.min(230, 230 * (value / 100))),
-        height: 10,
-        color: barFill
+      page1.drawRectangle({
+        x: 210,
+        y: rowY - 3,
+        width: Math.max(0, Math.min(220, 220 * (value / 100))),
+        height: 12,
+        color: accent
       });
 
-      page.drawText(`${value}%`, {
-        x: 440,
+      page1.drawText(`${value}%`, {
+        x: 450,
         y: rowY,
         size: 10,
         font: fontBold,
         color: gold
       });
 
-      rowY -= 22;
+      rowY -= 30;
     });
 
-    page = pdfDoc.addPage([595.28, 841.89]);
-
-    page.drawRectangle({
-      x: 0,
-      y: 0,
-      width,
-      height,
-      color: greenDark
+    page1.drawText('Formal Assessment Report', {
+      x: 40,
+      y: 30,
+      size: 10,
+      font: fontRegular,
+      color: muted
     });
 
-    let y2 = height - 50;
+    // ===== PAGE 2 =====
+    page2.drawRectangle({ x: 0, y: 0, width, height, color: bg });
+
+    page2.drawText('PERSONALITY INSIGHTS', {
+      x: 40,
+      y: 785,
+      size: 12,
+      font: fontBold,
+      color: gold
+    });
 
     const sections = [
-      { label: strengthLabel, text: strengthText },
-      { label: shadowLabel, text: shadowText },
-      { label: stepLabel, text: stepText }
+      { label: strengthLabel, text: strengthText, y: 620 },
+      { label: shadowLabel, text: shadowText, y: 455 },
+      { label: stepLabel, text: stepText, y: 290 }
     ];
 
     sections.forEach((section) => {
-      page.drawRectangle({
-        x: 40,
-        y: y2 - 110,
-        width: width - 80,
-        height: 95,
-        color: card
-      });
+      drawCard(page2, 40, section.y, 515, 120, card, accent);
 
-      page.drawText(section.label || '', {
-        x: 55,
-        y: y2 - 28,
-        size: 14,
+      page2.drawText(section.label || '', {
+        x: 60,
+        y: section.y + 88,
+        size: 15,
         font: fontBold,
         color: gold
       });
 
-      drawParagraph(page, section.text || '', 55, y2 - 52, {
+      drawWrappedText(page2, section.text || '', 60, section.y + 58, 475, {
         font: fontRegular,
-        size: 11,
+        size: 12,
         color: softWhite,
-        lineHeight: 16,
-        maxCharsPerLine: 78
+        lineHeight: 18
       });
-
-      y2 -= 125;
     });
 
-    page.drawText('Millionaire Mind × Success Resources', {
+    page2.drawText('Millionaire Mind x Success Resources', {
       x: 40,
       y: 30,
       size: 10,
