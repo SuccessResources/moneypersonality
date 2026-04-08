@@ -75,13 +75,12 @@ export default async function handler(req, res) {
     } = body;
 
     const pdfDoc = await PDFDocument.create();
-    let page = pdfDoc.addPage([595.28, 841.89]); // A4
+    let page = pdfDoc.addPage([595.28, 841.89]);
     const { width, height } = page.getSize();
 
     const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
     const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
-    // Background
     page.drawRectangle({
       x: 0,
       y: 0,
@@ -90,7 +89,6 @@ export default async function handler(req, res) {
       color: rgb(0.04, 0.18, 0.12)
     });
 
-    // Title block
     page.drawText('Money Personality Report', {
       x: 40,
       y: height - 50,
@@ -110,7 +108,7 @@ export default async function handler(req, res) {
     }
 
     if (language) {
-      page.drawText(`Language: ${language.toUpperCase()}`, {
+      page.drawText(`Language: ${String(language).toUpperCase()}`, {
         x: width - 140,
         y: height - 72,
         size: 10,
@@ -138,7 +136,6 @@ export default async function handler(req, res) {
 
     y -= 18;
 
-    // Personality Mix box
     page.drawRectangle({
       x: 40,
       y: y - 135,
@@ -257,6 +254,9 @@ export default async function handler(req, res) {
     res.status(200).send(Buffer.from(pdfBytes));
   } catch (error) {
     console.error('PDF generation failed:', error);
-    res.status(500).json({ error: 'Failed to generate PDF' });
+    res.status(500).json({
+      error: 'Failed to generate PDF',
+      message: error.message
+    });
   }
 }
