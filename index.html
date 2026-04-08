@@ -1,0 +1,2094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Find Out Your Money Personality | Millionaire Mind × Success Resources</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #0a2f1f;
+  --surface:  #1a5238;
+  --card:     #1f6244;
+  --gold:     #FFD700;
+  --gold-light: #FFF8DC;
+  --accent-red: #E63946;
+  --neon:     #22C55E;
+  --white:    #FFFFFF;
+  --muted:    #A8C5B8;
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: linear-gradient(135deg, var(--bg) 0%, #0f3d28 100%);
+  color: var(--white);
+  font-family: 'Poppins', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+#stars-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.6; }
+#confetti-canvas { position: fixed; inset: 0; z-index: 500; pointer-events: none; }
+.page {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 16px 80px;
+}
+.screen {
+  display: none;
+  width: 100%;
+  max-width: 700px;
+}
+.screen.active {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.top-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 28px;
+  background: rgba(10, 47, 31, 0.98);
+  backdrop-filter: blur(30px);
+  border-bottom: 1px solid rgba(34,197,94,.08);
+  animation: slideDown .7s ease both;
+  box-shadow: 0 8px 32px rgba(0,0,0,.3);
+}
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.sr-logo {
+  height: 40px;
+  width: auto;
+  filter: brightness(1.15);
+}
+.top-bar-center {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+.top-bar-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: .06em;
+  background: linear-gradient(90deg, var(--gold), #FFA500);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+}
+.language-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.lang-btn {
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: 1.5px solid rgba(255,215,0,.15);
+  background: rgba(255,215,0,.05);
+  color: var(--white);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .3s cubic-bezier(.4,0,.2,1);
+}
+.lang-btn:hover {
+  background: rgba(255,215,0,.12);
+  border-color: rgba(255,215,0,.3);
+  transform: translateY(-2px);
+}
+.lang-btn.active {
+  background: var(--gold);
+  color: var(--bg);
+  border-color: var(--gold);
+  box-shadow: 0 4px 16px rgba(255,215,0,.25);
+}
+@keyframes slideDown {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(0); }
+}
+#quiz { padding-top: 100px; align-items: stretch; }
+.quiz-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, rgba(34,197,94,.08), rgba(255,215,0,.03));
+  border: 1px solid rgba(34,197,94,.15);
+  border-radius: 24px;
+  padding: 16px 22px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(0,0,0,.15);
+}
+.hud-xp {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, rgba(255,215,0,.2), rgba(34,197,94,.1));
+  border: 1px solid rgba(255,215,0,.25);
+  border-radius: 100px;
+  padding: 8px 16px;
+  font-weight: 800;
+  font-size: 14px;
+  color: var(--gold);
+  white-space: nowrap;
+  box-shadow: 0 0 20px rgba(255,215,0,.15);
+}
+.xp-popup {
+  position: fixed;
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  color: var(--gold);
+  font-weight: 900;
+  pointer-events: none;
+  animation: popupFloat 1.2s ease-out both;
+  text-shadow: 0 2px 8px rgba(0,0,0,.3);
+  z-index: 1000;
+}
+@keyframes popupFloat {
+  0% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-60px) scale(1.3); }
+}
+.btn-prev {
+  padding: 11px 22px;
+  background: rgba(34,197,94,.1);
+  border: 1.5px solid rgba(34,197,94,.25);
+  color: var(--white);
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all .3s cubic-bezier(.4,0,.2,1);
+  display: none;
+}
+.btn-prev.show { display: block; animation: slideUp .3s ease; }
+.btn-prev:hover {
+  background: rgba(34,197,94,.18);
+  border-color: rgba(34,197,94,.4);
+  transform: translateY(-2px);
+}
+.progress-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.hud-counter {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.progress-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(255,255,255,.06);
+  border-radius: 100px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,.3);
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--neon), #34D399, var(--gold));
+  transition: width .6s cubic-bezier(.34,.1,.68,1);
+  box-shadow: 0 0 20px rgba(34,197,94,.5);
+}
+.hud-stars {
+  display: flex;
+  gap: 3px;
+  font-size: 16px;
+}
+.q-card {
+  background: linear-gradient(135deg, rgba(26,82,56,.4), rgba(31,98,68,.2));
+  border: 1.5px solid rgba(34,197,94,.15);
+  border-radius: 32px;
+  padding: 48px 40px;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 20px;
+  animation: slideUp .5s ease both;
+  box-shadow: 0 20px 60px rgba(0,0,0,.25);
+  backdrop-filter: blur(10px);
+}
+.q-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--neon), var(--gold), var(--accent-red));
+}
+.q-card::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(34,197,94,.08), transparent 70%);
+  border-radius: 50%;
+  filter: blur(40px);
+}
+.q-text {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(24px,5vw,36px);
+  font-weight: 800;
+  letter-spacing: .03em;
+  line-height: 1.3;
+  margin-bottom: 36px;
+  color: var(--gold);
+  animation: fadeDown .5s ease both .15s;
+  opacity: 0;
+  animation-fill-mode: both;
+  position: relative;
+  z-index: 1;
+}
+.opts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  position: relative;
+  z-index: 1;
+}
+@media (max-width: 520px) {
+  .opts { grid-template-columns: 1fr; }
+}
+.opt {
+  background: rgba(26,82,56,.3);
+  border: 1.5px solid rgba(34,197,94,.2);
+  border-radius: 20px;
+  padding: 20px 18px;
+  cursor: pointer;
+  text-align: left;
+  transition: all .3s cubic-bezier(.4,0,.2,1);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: slideUp .4s ease both;
+  backdrop-filter: blur(8px);
+}
+.opt:nth-child(2) { animation-delay: .06s; }
+.opt:nth-child(3) { animation-delay: .12s; }
+.opt:nth-child(4) { animation-delay: .18s; }
+.opt::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 20%, rgba(34,197,94,.15), transparent 60%);
+  opacity: 0;
+  transition: opacity .3s;
+}
+.opt:hover {
+  border-color: rgba(34,197,94,.45);
+  transform: translateY(-8px);
+  box-shadow: 0 16px 48px rgba(34,197,94,.2), 0 0 40px rgba(34,197,94,.1);
+  background: rgba(34,197,94,.12);
+}
+.opt:hover::before { opacity: 1; }
+.opt:active { transform: translateY(-2px) scale(.98); }
+.opt.selected {
+  border-color: var(--gold);
+  background: linear-gradient(135deg, rgba(34,197,94,.18), rgba(255,215,0,.08));
+  box-shadow: 0 0 0 2px rgba(255,215,0,.3), 0 12px 40px rgba(34,197,94,.25), inset 0 0 20px rgba(34,197,94,.1);
+  animation: optSelect .3s cubic-bezier(.36,.07,.19,.97) both;
+}
+@keyframes optSelect {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+.opt-emoji {
+  font-size: 26px;
+  line-height: 1;
+  transition: transform .3s cubic-bezier(.34,.1,.68,1);
+  display: inline-block;
+}
+.opt:hover .opt-emoji { transform: scale(1.25) rotate(8deg); }
+.opt-text {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1.5;
+}
+.btn-next {
+  width: 100%;
+  background: linear-gradient(135deg, var(--accent-red), #FF5A5F, #E63946);
+  background-size: 200% auto;
+  color: #FFF;
+  border: none;
+  border-radius: 20px;
+  padding: 20px;
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  cursor: pointer;
+  transition: all .3s cubic-bezier(.4,0,.2,1);
+  display: none;
+  box-shadow: 0 8px 32px rgba(230,57,70,.25);
+  position: relative;
+  overflow: hidden;
+  margin-top: 24px;
+  text-transform: uppercase;
+}
+.btn-next::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,.1);
+  opacity: 0;
+  transition: opacity .3s;
+}
+.btn-next.show {
+  display: block;
+  animation: slideUp .3s ease;
+}
+.btn-next:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 48px rgba(230,57,70,.35);
+  background-position: right center;
+}
+.btn-next:hover::before { opacity: 1; }
+.btn-next:active { transform: scale(.97); }
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+#form-screen { padding-top: 100px; }
+.form-wrap {
+  background: linear-gradient(135deg, rgba(26,82,56,.5), rgba(31,98,68,.3));
+  border: 1.5px solid rgba(34,197,94,.2);
+  border-radius: 32px;
+  padding: 56px 44px;
+  text-align: center;
+  width: 100%;
+  max-width: 540px;
+  position: relative;
+  overflow: hidden;
+  animation: slideUp .5s ease both;
+  box-shadow: 0 40px 100px rgba(0,0,0,.3), 0 0 40px rgba(34,197,94,.12);
+  backdrop-filter: blur(10px);
+}
+.form-wrap::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(34,197,94,.05), transparent 70%);
+  filter: blur(50px);
+}
+.form-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 44px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, var(--gold), #FFA500);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,.2));
+  position: relative;
+  z-index: 1;
+}
+.form-sub {
+  font-size: 15px;
+  color: rgba(255,255,255,.8);
+  line-height: 1.8;
+  margin-bottom: 32px;
+  position: relative;
+  z-index: 1;
+}
+.field {
+  margin-bottom: 20px;
+  text-align: left;
+  animation: slideUp .5s ease both;
+  position: relative;
+  z-index: 1;
+}
+.field label {
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.field input,
+.field select {
+  width: 100%;
+  background: rgba(255,255,255,.05);
+  border: 1.5px solid rgba(34,197,94,.2);
+  border-radius: 14px;
+  padding: 16px 18px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--white);
+  outline: none;
+  transition: all .3s cubic-bezier(.4,0,.2,1);
+  backdrop-filter: blur(8px);
+}
+.field input::placeholder { color: rgba(255,255,255,.4); font-weight: 400; }
+.field select {
+  color: var(--white);
+  cursor: pointer;
+}
+.field select option {
+  background: var(--bg);
+  color: var(--white);
+}
+.field input:focus,
+.field select:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(255,215,0,.1), 0 0 24px rgba(34,197,94,.2);
+  transform: translateY(-2px);
+  background: rgba(255,255,255,.08);
+}
+.phone-field {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 12px;
+  align-items: flex-end;
+}
+.btn-reveal {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  background: linear-gradient(135deg, var(--neon), #34D399, #22C55E);
+  background-size: 200% auto;
+  color: #FFF;
+  border: none;
+  border-radius: 18px;
+  padding: 22px;
+  margin-top: 12px;
+  font-family: 'Playfair Display', serif;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  cursor: pointer;
+  transition: all .3s cubic-bezier(.4,0,.2,1);
+  box-shadow: 0 8px 32px rgba(34,197,94,.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  animation: slideUp .5s ease both .4s;
+  opacity: 0;
+  animation-fill-mode: both;
+  text-transform: uppercase;
+}
+.btn-reveal::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,.1);
+  opacity: 0;
+  transition: opacity .3s;
+}
+.btn-reveal:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 48px rgba(34,197,94,.4), 0 0 30px rgba(34,197,94,.2);
+  background-position: right center;
+}
+.btn-reveal:hover::before { opacity: 1; }
+.btn-reveal:active { transform: scale(.97); }
+.privacy-line {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 18px;
+  animation: slideUp .5s ease both .45s;
+  opacity: 0;
+  animation-fill-mode: both;
+  position: relative;
+  z-index: 1;
+}
+#result {
+  padding-top: 88px;
+  align-items: stretch;
+}
+.result-hero {
+  text-align: center;
+  padding: 0 0 40px;
+  border-bottom: 1px solid rgba(34,197,94,.15);
+  margin-bottom: 40px;
+}
+.result-character {
+  width: 100%;
+  max-width: 300px;
+  height: 300px;
+  margin: 28px auto;
+  border-radius: 28px;
+  overflow: hidden;
+  animation: heroPop .8s ease both;
+  filter: drop-shadow(0 24px 48px rgba(0,0,0,.35));
+  background: linear-gradient(135deg, rgba(34,197,94,.15), rgba(255,215,0,.05));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(34,197,94,.2);
+}
+.result-character img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.result-name {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(48px,11vw,80px);
+  font-weight: 900;
+  letter-spacing: .03em;
+  line-height: 1.1;
+  margin-bottom: 16px;
+  animation: fadeDown .5s ease both .2s;
+  opacity: 0;
+  animation-fill-mode: both;
+}
+.result-description {
+  font-size: 16px;
+  line-height: 1.8;
+  color: rgba(255,255,255,.85);
+  max-width: 600px;
+  margin: 0 auto 28px;
+  animation: fadeDown .5s ease both .3s;
+  opacity: 0;
+  animation-fill-mode: both;
+}
+.personality-breakdown {
+  max-width: 640px;
+  margin: 0 auto 28px;
+  padding: 22px 24px;
+  background: linear-gradient(135deg, rgba(34,197,94,.10), rgba(255,215,0,.04));
+  border: 1px solid rgba(34,197,94,.18);
+  border-radius: 22px;
+  animation: fadeDown .5s ease both .38s;
+  opacity: 0;
+  animation-fill-mode: both;
+  box-shadow: 0 10px 30px rgba(0,0,0,.12);
+}
+.personality-breakdown-title {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+.personality-breakdown-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.personality-breakdown-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) 1fr auto;
+  gap: 12px;
+  align-items: center;
+}
+.personality-breakdown-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--white);
+}
+.personality-breakdown-bar {
+  height: 10px;
+  background: rgba(255,255,255,.08);
+  border-radius: 999px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,.25);
+}
+.personality-breakdown-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width .6s cubic-bezier(.34,.1,.68,1);
+}
+.personality-breakdown-value {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--gold);
+  min-width: 48px;
+  text-align: right;
+}
+.best-match-card {
+  background: linear-gradient(135deg, rgba(34,197,94,.12), rgba(255,215,0,.06));
+  border: 1.5px solid rgba(34,197,94,.25);
+  border-radius: 24px;
+  padding: 32px;
+  margin-bottom: 32px;
+  text-align: center;
+  animation: slideUp .5s ease both .45s;
+  opacity: 0;
+  animation-fill-mode: both;
+  box-shadow: 0 16px 48px rgba(0,0,0,.15);
+  position: relative;
+  overflow: hidden;
+}
+.best-match-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 80% 20%, rgba(255,255,255,.05), transparent 70%);
+  pointer-events: none;
+}
+.best-match-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 18px;
+  position: relative;
+  z-index: 1;
+}
+.best-match-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 18px;
+  position: relative;
+  z-index: 1;
+}
+.best-match-icon {
+  font-size: 80px;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,.2));
+}
+.best-match-personality {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: .04em;
+}
+.best-match-reason {
+  font-size: 14px;
+  line-height: 1.8;
+  color: rgba(255,255,255,.9);
+  position: relative;
+  z-index: 1;
+}
+.insights {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+.ins-card {
+  background: linear-gradient(135deg, rgba(34,197,94,.12), rgba(26,82,56,.08));
+  border: 1px solid rgba(34,197,94,.2);
+  border-radius: 22px;
+  padding: 28px 32px;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  animation: slideUp .4s ease both;
+  transition: all .3s cubic-bezier(.4,0,.2,1);
+  box-shadow: 0 8px 24px rgba(0,0,0,.12);
+  backdrop-filter: blur(8px);
+}
+.ins-card:nth-child(1) { animation-delay: .5s; }
+.ins-card:nth-child(2) { animation-delay: .6s; }
+.ins-card:nth-child(3) { animation-delay: .7s; }
+.ins-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 40px rgba(0,0,0,.15);
+  border-color: rgba(34,197,94,.35);
+  background: linear-gradient(135deg, rgba(34,197,94,.16), rgba(26,82,56,.12));
+}
+.ins-icon {
+  font-size: 36px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.ins-label {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.ins-text {
+  font-size: 14px;
+  line-height: 1.8;
+  color: rgba(255,255,255,.9);
+}
+.personality-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+  margin-bottom: 48px;
+  animation: slideUp .5s ease both .75s;
+  opacity: 0;
+  animation-fill-mode: both;
+}
+.personality-showcase {
+  background: linear-gradient(135deg, rgba(34,197,94,.12), rgba(26,82,56,.08));
+  border: 1.5px solid rgba(34,197,94,.2);
+  border-radius: 22px;
+  padding: 24px;
+  text-align: center;
+  transition: all .3s cubic-bezier(.4,0,.2,1);
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+}
+.personality-showcase:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 40px rgba(0,0,0,.15);
+  border-color: rgba(34,197,94,.35);
+  background: linear-gradient(135deg, rgba(34,197,94,.16), rgba(26,82,56,.12));
+}
+.personality-showcase-icon {
+  font-size: 52px;
+  margin-bottom: 12px;
+  display: block;
+}
+.personality-showcase-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  margin-bottom: 8px;
+}
+.personality-showcase-code {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+/* FREE TICKET CTA */
+.cta-section {
+  background: linear-gradient(135deg, rgba(34,197,94,.12), rgba(255,215,0,.06));
+  border: 1.5px solid rgba(34,197,94,.25);
+  border-radius: 28px;
+  padding: 48px 40px;
+  margin-bottom: 28px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  animation: slideUp .5s ease both .8s;
+  opacity: 0;
+  animation-fill-mode: both;
+  box-shadow: 0 24px 60px rgba(34,197,94,.12);
+  backdrop-filter: blur(10px);
+}
+.cta-section::before {
+  content: '';
+  position: absolute;
+  top: -40%;
+  right: -15%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(34,197,94,.1), transparent 70%);
+  filter: blur(60px);
+}
+.cta-section h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(32px,6vw,48px);
+  font-weight: 800;
+  letter-spacing: .04em;
+  line-height: 1.2;
+  margin-bottom: 18px;
+  color: var(--gold);
+  position: relative;
+  z-index: 1;
+}
+.cta-sub {
+  font-size: 15px;
+  line-height: 1.8;
+  color: rgba(255,255,255,.8);
+  max-width: 600px;
+  margin: 0 auto 32px;
+  position: relative;
+  z-index: 1;
+}
+.btn-join {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, var(--neon), #34D399, #22C55E);
+  background-size: 200% auto;
+  color: #FFF;
+  border: none;
+  border-radius: 100px;
+  padding: 24px 68px;
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  cursor: pointer;
+  transition: all .3s cubic-bezier(.4,0,.2,1);
+  box-shadow: 0 10px 40px rgba(34,197,94,.3);
+  text-decoration: none;
+  animation: slideUp .5s ease both .85s;
+  opacity: 0;
+  animation-fill-mode: both;
+  text-transform: uppercase;
+  z-index: 1;
+}
+.btn-join::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,.1);
+  opacity: 0;
+  transition: opacity .3s;
+}
+.btn-join:hover {
+  transform: scale(1.08) translateY(-3px);
+  box-shadow: 0 18px 56px rgba(34,197,94,.4), 0 0 30px rgba(34,197,94,.2);
+  background-position: right center;
+}
+.btn-join:hover::before { opacity: 1; }
+.btn-join:active { transform: scale(.95); }
+/* HYBRID UPSELL CTA */
+.hybrid-cta-section {
+  background: linear-gradient(135deg, rgba(255,215,0,.1), rgba(230,57,70,.08));
+  border: 2px solid rgba(255,215,0,.3);
+  border-radius: 28px;
+  padding: 52px 40px;
+  margin-bottom: 48px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  animation: slideUp .5s ease both .9s;
+  opacity: 0;
+  animation-fill-mode: both;
+  box-shadow: 0 24px 60px rgba(255,215,0,.08), 0 0 40px rgba(255,215,0,.05);
+  backdrop-filter: blur(10px);
+}
+.hybrid-cta-section::before {
+  content: '';
+  position: absolute;
+  top: -40%;
+  left: -15%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(255,215,0,.08), transparent 70%);
+  filter: blur(60px);
+}
+.hybrid-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--gold), #FFA500);
+  color: var(--bg);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  padding: 8px 24px;
+  border-radius: 100px;
+  margin-bottom: 22px;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 4px 16px rgba(255,215,0,.3);
+}
+.hybrid-cta-section h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(28px,5.5vw,42px);
+  font-weight: 800;
+  letter-spacing: .04em;
+  line-height: 1.2;
+  margin-bottom: 18px;
+  color: var(--white);
+  position: relative;
+  z-index: 1;
+}
+.hybrid-cta-section h2 span {
+  background: linear-gradient(135deg, var(--gold), #FFA500);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hybrid-sub {
+  font-size: 15px;
+  line-height: 1.8;
+  color: rgba(255,255,255,.85);
+  max-width: 580px;
+  margin: 0 auto 32px;
+  position: relative;
+  z-index: 1;
+}
+.hybrid-features {
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+  flex-wrap: wrap;
+  margin-bottom: 32px;
+  position: relative;
+  z-index: 1;
+}
+.hybrid-feature {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gold-light);
+}
+.btn-hybrid {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, var(--accent-red), #FF5A5F, #E63946);
+  background-size: 200% auto;
+  color: #FFF;
+  border: none;
+  border-radius: 100px;
+  padding: 24px 68px;
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  cursor: pointer;
+  transition: all .3s cubic-bezier(.4,0,.2,1);
+  box-shadow: 0 10px 40px rgba(230,57,70,.3);
+  text-decoration: none;
+  text-transform: uppercase;
+  z-index: 1;
+}
+.btn-hybrid::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,.1);
+  opacity: 0;
+  transition: opacity .3s;
+}
+.btn-hybrid:hover {
+  transform: scale(1.08) translateY(-3px);
+  box-shadow: 0 18px 56px rgba(230,57,70,.4), 0 0 30px rgba(230,57,70,.2);
+  background-position: right center;
+}
+.btn-hybrid:hover::before { opacity: 1; }
+.btn-hybrid:active { transform: scale(.95); }
+.actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+  animation: slideUp .5s ease both .95s;
+  opacity: 0;
+  animation-fill-mode: both;
+  position: relative;
+  z-index: 1;
+}
+.btn-share {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 26px;
+  border-radius: 100px;
+  border: 1.5px solid rgba(34,197,94,.2);
+  background: rgba(34,197,94,.08);
+  color: var(--white);
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .3s cubic-bezier(.4,0,.2,1);
+  backdrop-filter: blur(8px);
+}
+.btn-share:hover {
+  background: rgba(34,197,94,.15);
+  border-color: rgba(34,197,94,.4);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(34,197,94,.15);
+}
+/* INTRO VALUE PROPS */
+.intro-value-props {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 520px;
+  margin: 0 auto 36px;
+  text-align: left;
+}
+.intro-value-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: linear-gradient(135deg, rgba(34,197,94,.08), rgba(255,215,0,.03));
+  border: 1px solid rgba(34,197,94,.15);
+  border-radius: 18px;
+  padding: 18px 22px;
+  backdrop-filter: blur(8px);
+  animation: slideUp .5s ease both;
+}
+.intro-value-item:nth-child(1) { animation-delay: .15s; }
+.intro-value-item:nth-child(2) { animation-delay: .25s; }
+.intro-value-item:nth-child(3) { animation-delay: .35s; }
+.intro-value-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.intro-value-text {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.7;
+  color: rgba(255,255,255,.85);
+}
+.intro-value-text strong {
+  color: var(--gold);
+  font-weight: 700;
+}
+footer {
+  width: 100%;
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted);
+  padding: 32px 20px;
+  border-top: 1px solid rgba(34,197,94,.08);
+  position: relative;
+  z-index: 2;
+}
+footer a {
+  color: var(--muted);
+  text-decoration: none;
+  margin: 0 10px;
+  transition: color .3s;
+}
+footer a:hover { color: var(--gold); }
+@keyframes heroPop {
+  0% { transform: scale(0) rotate(-25deg); opacity: 0; }
+  60% { transform: scale(1.25) rotate(6deg); }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+@media (max-width: 520px) {
+  .top-bar { flex-direction: column; gap: 10px; padding: 12px; }
+  .top-bar-center { flex-direction: column; gap: 8px; }
+  .language-selector { gap: 4px; }
+  .lang-btn { padding: 5px 10px; font-size: 11px; }
+  .q-card { padding: 32px 22px; }
+  .form-wrap { padding: 40px 24px; }
+  .cta-section { padding: 32px 20px; }
+  .hybrid-cta-section { padding: 36px 20px; }
+  .phone-field { grid-template-columns: 110px 1fr; }
+  .hud { flex-wrap: wrap; }
+  .personality-grid { grid-template-columns: 1fr; }
+  .best-match-container { flex-direction: column; gap: 12px; }
+  .hybrid-features { flex-direction: column; align-items: center; gap: 12px; }
+}
+</style>
+</head>
+<body>
+<canvas id="stars-canvas"></canvas>
+<canvas id="confetti-canvas"></canvas>
+<header class="top-bar">
+  <div class="logo-container">
+    <img src="https://sr-event.com/sr-logo" alt="Success Resources" class="sr-logo">
+  </div>
+  <div class="top-bar-center">
+    <span class="top-bar-logo">💰 Money Personality 💰</span>
+  </div>
+  <div class="language-selector">
+    <button class="lang-btn active" onclick="setLanguage(event, 'en')">EN</button>
+    <button class="lang-btn" onclick="setLanguage(event, 'zh')">中文</button>
+    <button class="lang-btn" onclick="setLanguage(event, 'de')">DE</button>
+    <button class="lang-btn" onclick="setLanguage(event, 'es')">ES</button>
+  </div>
+</header>
+<div class="page">
+  <!-- ===================== INTRO SCREEN ===================== -->
+  <div id="intro" class="screen active" style="padding-top:100px;text-align:center;min-height:100vh;justify-content:center;">
+    <img
+      src="https://cch-files.edge.live.ds25.io/cch/v/a4e3489d-6bf3-48c8-affb-c268ba45a538/files/69d4d31b32391_money-personality-edited.png"
+      alt="Money Personality"
+      style="
+        width:100%;
+        max-width:420px;
+        height:auto;
+        margin:0 auto 16px;
+        display:block;
+        filter:drop-shadow(0 16px 40px rgba(0,0,0,.4));
+      "
+    >
+    <h1 class="intro-title" style="font-family:'Playfair Display',serif;font-size:clamp(36px,9vw,60px);margin-bottom:16px;font-weight:900;background:linear-gradient(135deg,var(--gold),#FFA500);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;" id="intro-headline">
+      Discover Your Money Personality
+    </h1>
+    <p style="font-size:13px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--neon);margin-bottom:24px;" id="intro-tag">
+      FREE PERSONALIZED PDF REPORT
+    </p>
+    <p style="font-size:17px;color:rgba(255,255,255,.85);margin-bottom:32px;line-height:1.8;max-width:600px;margin-left:auto;margin-right:auto;" id="intro-sub">
+      The way you think about money shapes every financial decision you make — and how you relate to the people around you. This short assessment reveals your unique Money Personality and delivers a personalized PDF report to help you understand your strengths, improve your habits, and communicate better about money with those who matter most.
+    </p>
+    <div class="intro-value-props" id="intro-value-props">
+      <div class="intro-value-item">
+        <span class="intro-value-icon">🧠</span>
+        <span class="intro-value-text" id="intro-vp1"><strong>Understand your money patterns</strong> — why you save, spend, avoid, or detach — and how those patterns shape your financial future.</span>
+      </div>
+      <div class="intro-value-item">
+        <span class="intro-value-icon">💬</span>
+        <span class="intro-value-text" id="intro-vp2"><strong>Improve money conversations</strong> — discover how your personality interacts with partners, family, and colleagues when it comes to finances.</span>
+      </div>
+      <div class="intro-value-item">
+        <span class="intro-value-icon">📄</span>
+        <span class="intro-value-text" id="intro-vp3"><strong>Get your personalized PDF</strong> — receive a detailed report with your personality profile, compatibility match, strengths, blind spots, and your #1 next step.</span>
+      </div>
+    </div>
+    <button class="btn-start" style="background:linear-gradient(135deg,var(--accent-red),#FF5A5F,#E63946);color:#FFF;border:none;padding:24px 64px;border-radius:100px;font-family:'Playfair Display',serif;font-size:24px;font-weight:800;letter-spacing:.08em;cursor:pointer;transition:all .3s;box-shadow:0 10px 40px rgba(230,57,70,.3);text-transform:uppercase;" onclick="startQuiz()" id="btn-start">
+      ⚡ START MY ASSESSMENT
+    </button>
+    <p style="font-size:13px;color:var(--muted);margin-top:28px;" id="intro-note">
+      Takes 2-3 minutes • Your personalized PDF is delivered instantly • 100% private
+    </p>
+  </div>
+
+  <!-- ===================== QUIZ SCREEN ===================== -->
+  <div id="quiz" class="screen" style="padding-top:88px">
+    <div class="hud">
+      <div class="hud-xp"><span id="xp-icon">⚡</span><span id="xp-display">0</span> XP</div>
+      <div class="progress-info" style="flex:1;">
+        <div class="hud-counter" id="q-counter">1 / 10</div>
+        <div class="progress-track">
+          <div class="progress-fill" id="prog-fill" style="width:0%"></div>
+        </div>
+      </div>
+      <div class="hud-stars" id="hud-stars">⭐⭐⭐</div>
+    </div>
+    <div class="quiz-nav" style="margin-bottom:20px;">
+      <button class="btn-prev" id="btn-prev" onclick="prevQuestion()">← BACK</button>
+      <div style="flex:1;"></div>
+    </div>
+    <div class="q-card">
+      <div class="q-text" id="q-text">Loading question...</div>
+      <div class="opts" id="opts-grid"></div>
+    </div>
+    <button class="btn-next" id="btn-next" onclick="nextQuestion()">CONTINUE →</button>
+  </div>
+
+  <!-- ===================== FORM SCREEN ===================== -->
+  <div id="form-screen" class="screen">
+    <div class="form-wrap">
+      <div class="form-title" id="form-title">🎉 You're Almost There!</div>
+      <p class="form-sub" id="form-sub">
+        Enter your details to unlock your personalized Money Personality result and receive your free PDF report — plus claim your free ticket to Millionaire Mind Online.
+      </p>
+      <div class="field">
+        <label id="label-name">Your First Name</label>
+        <input type="text" id="f-name" placeholder="e.g. Ahmad" required>
+      </div>
+      <div class="field">
+        <label id="label-email">Email Address</label>
+        <input type="email" id="f-email" placeholder="e.g. ahmad@email.com" required>
+      </div>
+      <div class="field">
+        <label id="label-phone">WhatsApp / Phone Number</label>
+        <div class="phone-field">
+          <select id="country-code" onchange="updatePhoneCode()"></select>
+          <input type="tel" id="f-phone" placeholder="123 456 7890" required>
+        </div>
+      </div>
+      <div class="field">
+        <label id="label-age">Age</label>
+        <select id="f-age" required>
+          <option value="">Select your age</option>
+          <option value="below18">Below 18</option>
+          <option value="18-24">18–24</option>
+          <option value="25-34">25–34</option>
+          <option value="35-44">35–44</option>
+          <option value="45-54">45–54</option>
+          <option value="55+">55 and above</option>
+        </select>
+      </div>
+      <div class="field">
+        <label id="label-gender">Gender</label>
+        <select id="f-gender" required>
+          <option value="">Select your gender</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="prefer_not">Prefer not to say</option>
+        </select>
+      </div>
+      <button class="btn-reveal" onclick="revealResult()" id="btn-reveal">🔓 REVEAL MY PERSONALITY</button>
+      <p class="privacy-line" id="privacy-note">🔒 Your privacy is protected. Your personalized PDF report is delivered instantly.</p>
+    </div>
+  </div>
+
+  <!-- ===================== RESULT SCREEN ===================== -->
+  <div id="result" class="screen" style="padding-top:88px;align-items:stretch">
+    <div class="result-hero">
+      <div class="result-character">
+        <img id="character-img" src="" alt="Character" style="width:100%;height:100%;object-fit:cover;">
+      </div>
+      <div style="font-size:11px;font-weight:800;letter-spacing:.25em;text-transform:uppercase;margin-bottom:12px;opacity:.6;" id="result-eyebrow">
+        YOUR MONEY PERSONALITY
+      </div>
+      <div class="result-name" id="r-name">The Saver</div>
+      <div class="result-description" id="r-description">Loading description...</div>
+      <div class="personality-breakdown" id="personality-breakdown">
+        <div class="personality-breakdown-title" id="mix-label">Your Personality Mix</div>
+        <div class="personality-breakdown-list" id="personality-breakdown-list"></div>
+      </div>
+    </div>
+    <div class="best-match-card">
+      <div class="best-match-label" id="match-label">Best Compatible Personality</div>
+      <div class="best-match-container">
+        <div class="best-match-icon" id="match-icon">🔒</div>
+        <div class="best-match-personality" id="match-name">The Spender</div>
+      </div>
+      <div class="best-match-reason" id="match-reason">You balance each other out perfectly.</div>
+    </div>
+    <div class="insights" id="insights"></div>
+    
+    <!-- HYBRID UPSELL CTA -->
+    <div class="hybrid-cta-section">
+      <div class="hybrid-badge" id="hybrid-badge">GO DEEPER</div>
+      <h2 id="hybrid-title">Master Your <span>Money Personality</span> With Proven Strategies</h2>
+      <p class="hybrid-sub" id="hybrid-sub">
+        Your Money Personality report is just the beginning. At Millionaire Mind Hybrid, you'll discover the proven wealth-building strategies designed specifically for your personality type — so you can manage, grow, and protect your money the way that works best for you.
+      </p>
+      <div class="hybrid-features" id="hybrid-features">
+        <div class="hybrid-feature"><span>✓</span> Personality-specific money strategies</div>
+        <div class="hybrid-feature"><span>✓</span> Live + online hybrid experience</div>
+        <div class="hybrid-feature"><span>✓</span> Deep-dive wealth blueprint sessions</div>
+      </div>
+      <a href="https://www.millionairemind.online/promotion/special" target="_blank" class="btn-hybrid" onclick="playSound('click',800)" id="btn-hybrid">
+        🔥 LEARN MORE ABOUT HYBRID
+      </a>
+    </div>
+
+    <div class="actions">
+      <button class="btn-share" onclick="shareResult()" id="btn-share">📤 Share Result</button>
+      <button class="btn-share" onclick="copyResultLink()" id="btn-copy">📋 Copy Link</button>
+      <button class="btn-share" onclick="downloadResultPDF()" id="btn-download-pdf">📄 Download PDF</button>
+    </div>
+    <button style="display:block;width:100%;text-align:center;font-family:'Poppins',sans-serif;font-size:13px;font-weight:800;color:var(--muted);cursor:pointer;background:none;border:none;text-decoration:underline;transition:color .3s;padding-bottom:8px;" onclick="restartQuiz()" id="btn-retry">
+      ↺ Play Again
+    </button>
+  </div>
+</div>
+<footer>
+  <div>
+    <a href="https://www.millionairemind.online">Millionaire Mind Online</a>
+    <span>·</span>
+    <a href="#">Privacy Policy</a>
+    <span>·</span>
+    <a href="#">Terms & Conditions</a>
+  </div>
+  <div style="margin-top:12px">Copyright © 2026 Success Resources · All Rights Reserved</div>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+let currentLanguage = 'en';
+let xp = 0;
+const characterImages = {
+  saver: 'https://cch-files.edge.live.ds25.io/cch/v/a4e3489d-6bf3-48c8-affb-c268ba45a538/files/69d3c6fe60dcf_saver.png',
+  spender: 'https://cch-files.edge.live.ds25.io/cch/v/a4e3489d-6bf3-48c8-affb-c268ba45a538/files/69d3c6fe611cd_spender.png',
+  monk: 'https://cch-files.edge.live.ds25.io/cch/v/a4e3489d-6bf3-48c8-affb-c268ba45a538/files/69d3c6fe6114c_monk.png',
+  avoider: 'https://cch-files.edge.live.ds25.io/cch/v/a4e3489d-6bf3-48c8-affb-c268ba45a538/files/69d3c6fe610a0_avoider.png'
+};
+const characterIcons = { saver: '🔒', spender: '🛍️', monk: '🧘', avoider: '😐' };
+const characterColors = { saver: '#22C55E', spender: '#E63946', monk: '#16A34A', avoider: '#FFD700' };
+const bestMatches = {
+  saver: { personality: 'spender', reason: { en: 'You balance each other well. Your discipline keeps things stable, and their spontaneity helps you enjoy life more.', zh: '你们彼此平衡得很好。你的纪律带来稳定，而他们的随性让你更享受生活。', de: 'Ihr gleicht euch gut aus. Deine Disziplin bringt Stabilität, und ihre Spontanität hilft dir, das Leben mehr zu genießen.', es: 'Se equilibran muy bien. Tu disciplina aporta estabilidad y su espontaneidad te ayuda a disfrutar más la vida.' } },
+  spender: { personality: 'saver', reason: { en: 'Your opposite becomes your strength. They help with structure, while you bring joy and energy.', zh: '你的相反面会成为你的优势。他们带来结构，而你带来快乐和活力。', de: 'Dein Gegenteil wird zu deiner Stärke. Sie bringen Struktur, während du Freude und Energie mitbringst.', es: 'Tu opuesto se convierte en tu fortaleza. Ellos aportan estructura y tú traes alegría y energía.' } },
+  monk: { personality: 'avoider', reason: { en: 'You both prefer low drama. Together you can create a calm, low-pressure space around money.', zh: '你们都不喜欢太多压力。一起时，你们可以营造一个平静、低压力的金钱环境。', de: 'Ihr mögt beide wenig Drama. Zusammen könnt ihr einen ruhigen, druckfreien Umgang mit Geld schaffen.', es: 'Ambos prefieren poca presión. Juntos pueden crear un espacio tranquilo y sin mucho estrés alrededor del dinero.' } },
+  avoider: { personality: 'spender', reason: { en: 'They bring action and energy. You bring thoughtfulness. Together, you help each other move forward.', zh: '他们带来行动和活力，而你带来思考。你们能互相帮助，一起前进。', de: 'Sie bringen Energie und Handlung mit. Du bringst Nachdenklichkeit mit. Zusammen helft ihr euch gegenseitig voranzukommen.', es: 'Ellos traen acción y energía. Tú aportas reflexión. Juntos se ayudan a avanzar.' } }
+};
+const translations = {
+  en: {
+    headline: 'Discover Your Money Personality',
+    introTag: 'FREE PERSONALIZED PDF REPORT',
+    subheadline: 'The way you think about money shapes every financial decision you make — and how you relate to the people around you. This short assessment reveals your unique Money Personality and delivers a personalized PDF report to help you understand your strengths, improve your habits, and communicate better about money with those who matter most.',
+    introVP1: '<strong>Understand your money patterns</strong> — why you save, spend, avoid, or detach — and how those patterns shape your financial future.',
+    introVP2: '<strong>Improve money conversations</strong> — discover how your personality interacts with partners, family, and colleagues when it comes to finances.',
+    introVP3: '<strong>Get your personalized PDF</strong> — receive a detailed report with your personality profile, compatibility match, strengths, blind spots, and your #1 next step.',
+    btnStart: '⚡ START MY ASSESSMENT',
+    noteTime: 'Takes 2-3 minutes • Your personalized PDF is delivered instantly • 100% private',
+    formTitle: '🎉 You\'re Almost There!',
+    formSub: 'Enter your details to unlock your personalized Money Personality result and receive your free PDF report — plus claim your free ticket to Millionaire Mind Online.',
+    labelName: 'Your First Name',
+    labelEmail: 'Email Address',
+    labelPhone: 'WhatsApp / Phone Number',
+    labelAge: 'Age',
+    labelGender: 'Gender',
+    agePlaceholder: 'Select your age',
+    genderPlaceholder: 'Select your gender',
+    ageOptions: ['Below 18', '18–24', '25–34', '35–44', '45–54', '55 and above'],
+    genderOptions: ['Male', 'Female', 'Prefer not to say'],
+    btnReveal: '🔓 REVEAL MY PERSONALITY',
+    privacyNote: '🔒 Your privacy is protected. Your personalized PDF report is delivered instantly.',
+    ctaTitle: 'Ready to Reprogram Your Money Blueprint?',
+    ctaSub: 'Join thousands of people transforming their relationship with money at Millionaire Mind Online. Your personality is unique—your transformation should be too.',
+    btnJoin: '🚀 CLAIM YOUR FREE TICKET',
+    hybridBadge: 'GO DEEPER',
+    hybridTitle: 'Master Your <span>Money Personality</span> With Proven Strategies',
+    hybridSub: 'Your Money Personality report is just the beginning. At Millionaire Mind Hybrid, you\'ll discover the proven wealth-building strategies designed specifically for your personality type — so you can manage, grow, and protect your money the way that works best for you.',
+    hybridFeatures: ['✓ Personality-specific money strategies', '✓ Live + online hybrid experience', '✓ Deep-dive wealth blueprint sessions'],
+    btnHybrid: '🔥 LEARN MORE ABOUT HYBRID',
+    btnShare: '📤 Share Result',
+    btnCopy: '📋 Copy Link',
+    btnDownloadPdf: '📄 Download PDF',
+    btnRetry: '↺ Play Again',
+    matchLabel: 'Best Compatible Personality',
+    resultEyebrow: 'YOUR MONEY PERSONALITY',
+    mixLabel: 'Your Personality Mix',
+    strengthLabel: 'Your Strengths',
+    shadowLabel: 'Watch Out For',
+    stepLabel: 'Your Next Step',
+    nextBtn: 'CONTINUE →',
+    backBtn: '← BACK',
+    alerts: { name: 'Please enter your name', email: 'Please enter a valid email', phone: 'Please enter your phone number', age: 'Please select your age', gender: 'Please select your gender', copied: 'Link copied! Share your result with friends 🎉' },
+    personalities: {
+      saver: { name: 'The Saver', code: 'Saver', desc: 'You\'re incredibly disciplined with money. Stability makes you feel safe, and you like knowing you\'re prepared.', strength: 'You plan ahead, avoid careless spending, and build security step by step.', shadow: 'Your caution can become a cage. Sometimes you protect money so much that you forget to enjoy life.', step: 'Give yourself a guilt-free spending budget. Let money support your life, not just your safety.' },
+      spender: { name: 'The Spender', code: 'Spender', desc: 'You enjoy the present and know how to make life feel exciting. Money feels like a tool for experience.', strength: 'You bring joy, generosity, and energy. You know how to live, not just survive.', shadow: 'Without structure, money can disappear fast. Future-you may not love present-you\'s choices.', step: 'Set up an automatic savings transfer before you spend. Keep the fun, but protect the future.' },
+      monk: { name: 'The Monk', code: 'Monk', desc: 'You live simply and don\'t let money control your identity. You care more about peace than status.', strength: 'You are grounded, calm, and less driven by greed or pressure than most people.', shadow: 'Being detached from money can stop you from building more freedom and impact.', step: 'See wealth as a tool, not a threat. Money can support your values when you use it well.' },
+      avoider: { name: 'The Avoider', code: 'Avoider', desc: 'Money feels stressful, so you often put it off. The good news: noticing that is already a breakthrough.', strength: 'You are more aware than you think. Once you start, you can change quickly.', shadow: 'Avoiding money problems makes them grow. Delay adds pressure.', step: 'Do one small thing this week. Check one account, pay one bill, or set one goal.' }
+    }
+  },
+  zh: {
+    headline: '发现你的金钱性格',
+    introTag: '免费个性化 PDF 报告',
+    subheadline: '你对金钱的思维方式，影响着你做出的每一个财务决定 — 也影响着你与身边人的关系。这份简短的评估将揭示你独特的金钱性格，并为你生成一份个性化 PDF 报告，帮助你了解自己的优势、改善习惯，并在金钱话题上与重要的人更好地沟通。',
+    introVP1: '<strong>了解你的金钱模式</strong> — 你为什么存钱、花钱、逃避或超然 — 以及这些模式如何塑造你的财务未来。',
+    introVP2: '<strong>改善金钱对话</strong> — 发现你的金钱性格如何与伴侣、家人和同事在财务方面互动。',
+    introVP3: '<strong>获取个性化 PDF</strong> — 收到一份详细报告，包括你的性格分析、相容性匹配、优势、盲点以及你的第一步行动。',
+    btnStart: '⚡ 开始我的评估',
+    noteTime: '2-3分钟完成 • 个性化 PDF 即时发送 • 100%隐私保护',
+    formTitle: '🎉 你快完成了！',
+    formSub: '输入你的资料，解锁你的专属金钱性格结果，获取免费 PDF 报告，并领取 Millionaire Mind Online 免费门票。',
+    labelName: '你的名字',
+    labelEmail: '邮箱地址',
+    labelPhone: 'WhatsApp / 电话号码',
+    labelAge: '年龄',
+    labelGender: '性别',
+    agePlaceholder: '请选择你的年龄',
+    genderPlaceholder: '请选择你的性别',
+    ageOptions: ['18岁以下', '18–24', '25–34', '35–44', '45–54', '55岁以上'],
+    genderOptions: ['男性', '女性', '不愿透露'],
+    btnReveal: '🔓 揭示我的性格',
+    privacyNote: '🔒 你的隐私受到保护。个性化 PDF 报告即时发送。',
+    ctaTitle: '准备好重塑你的金钱蓝图了吗？',
+    ctaSub: '加入成千上万的人，在 Millionaire Mind Online 改变他们与金钱的关系。你的性格很独特，你的改变也应该如此。',
+    btnJoin: '🚀 领取你的免费门票',
+    hybridBadge: '深入学习',
+    hybridTitle: '用经过验证的策略掌握你的<span>金钱性格</span>',
+    hybridSub: '你的金钱性格报告只是开始。在 Millionaire Mind Hybrid，你将发现专为你的性格类型设计的财富策略 — 让你以最适合自己的方式管理、增长和保护你的金钱。',
+    hybridFeatures: ['✓ 针对性格的理财策略', '✓ 线上+线下混合体验', '✓ 深度财富蓝图课程'],
+    btnHybrid: '🔥 了解更多关于 HYBRID',
+    btnShare: '📤 分享我的结果',
+    btnCopy: '📋 复制链接',
+    btnDownloadPdf: '📄 下载 PDF',
+    btnRetry: '↺ 再试一次',
+    matchLabel: '最适合的配对性格',
+    resultEyebrow: '你的金钱性格',
+    mixLabel: '你的性格比例',
+    strengthLabel: '你的优势',
+    shadowLabel: '需要注意',
+    stepLabel: '你的下一步',
+    nextBtn: '继续 →',
+    backBtn: '← 返回',
+    alerts: { name: '请输入你的名字', email: '请输入有效的邮箱地址', phone: '请输入你的电话号码', age: '请选择你的年龄', gender: '请选择你的性别', copied: '链接已复制！快分享给朋友吧 🎉' },
+    personalities: {
+      saver: { name: '储蓄型人格', code: '储蓄型', desc: '你对金钱很有纪律。稳定会让你有安全感，你喜欢知道自己已经做好准备。', strength: '你会提前计划，避免乱花钱，并一步一步建立安全感。', shadow: '你的谨慎有时会变成束缚。你太专注保护金钱，反而忘了享受生活。', step: '给自己一个"没有罪恶感"的享受预算。让金钱不只是保护你，也支持你生活。' },
+      spender: { name: '消费型人格', code: '消费型', desc: '你喜欢活在当下，也知道怎样让生活更有乐趣。对你来说，钱是用来体验生活的工具。', strength: '你带来快乐、慷慨和活力。你知道怎么生活，而不只是生存。', shadow: '如果没有结构，钱很快就会花光。未来的你可能不会喜欢现在的决定。', step: '先设定自动储蓄，再去享受。保留快乐，也照顾未来。' },
+      monk: { name: '隐士型人格', code: '隐士型', desc: '你生活简单，不让金钱决定你的身份。对你来说，平静比地位更重要。', strength: '你很踏实、平静，也不像大多数人那样容易被贪念或压力推动。', shadow: '如果你和金钱太保持距离，可能会错过更多自由和影响力。', step: '把财富看成工具，而不是威胁。好好使用金钱，它也能支持你的价值观。' },
+      avoider: { name: '逃避型人格', code: '逃避型', desc: '金钱会让你有压力，所以你常常拖着不处理。好消息是：能意识到这一点已经是突破。', strength: '你比自己想的更有觉察。一旦开始行动，你可以改变得很快。', shadow: '逃避金钱问题只会让问题变大。拖延会让压力越来越重。', step: '这周只做一件小事。查一个账户、付一张账单，或设一个目标。' }
+    }
+  },
+  de: {
+    headline: 'Entdecke deine Geldpersönlichkeit',
+    introTag: 'KOSTENLOSER PERSONALISIERTER PDF-BERICHT',
+    subheadline: 'Die Art, wie du über Geld denkst, beeinflusst jede finanzielle Entscheidung — und deine Beziehungen zu den Menschen um dich herum. Diese kurze Auswertung zeigt dir deine einzigartige Geldpersönlichkeit und liefert einen personalisierten PDF-Bericht, der dir hilft, deine Stärken zu verstehen, deine Gewohnheiten zu verbessern und besser über Geld mit den Menschen zu sprechen, die dir wichtig sind.',
+    introVP1: '<strong>Verstehe deine Geldmuster</strong> — warum du sparst, ausgibst, vermeidest oder dich distanzierst — und wie diese Muster deine finanzielle Zukunft formen.',
+    introVP2: '<strong>Verbessere Gespräche über Geld</strong> — entdecke, wie deine Persönlichkeit mit Partnern, Familie und Kollegen bei Finanzthemen interagiert.',
+    introVP3: '<strong>Erhalte deinen personalisierten PDF</strong> — ein detaillierter Bericht mit deinem Persönlichkeitsprofil, Kompatibilität, Stärken, blinden Flecken und deinem nächsten Schritt.',
+    btnStart: '⚡ STARTE MEINE AUSWERTUNG',
+    noteTime: 'Dauert 2–3 Minuten • Personalisierter PDF sofort geliefert • 100 % privat',
+    formTitle: '🎉 Du bist fast fertig!',
+    formSub: 'Gib deine Daten ein, um dein persönliches Ergebnis freizuschalten, deinen kostenlosen PDF-Bericht zu erhalten und dein Gratis-Ticket für Millionaire Mind Online zu sichern.',
+    labelName: 'Dein Vorname',
+    labelEmail: 'E-Mail-Adresse',
+    labelPhone: 'WhatsApp / Telefonnummer',
+    labelAge: 'Alter',
+    labelGender: 'Geschlecht',
+    agePlaceholder: 'Wähle dein Alter',
+    genderPlaceholder: 'Wähle dein Geschlecht',
+    ageOptions: ['Unter 18', '18–24', '25–34', '35–44', '45–54', '55 und älter'],
+    genderOptions: ['Männlich', 'Weiblich', 'Möchte ich nicht angeben'],
+    btnReveal: '🔓 MEINE PERSÖNLICHKEIT ZEIGEN',
+    privacyNote: '🔒 Deine Privatsphäre ist geschützt. Dein personalisierter PDF-Bericht wird sofort geliefert.',
+    ctaTitle: 'Bereit, deinen Geld-Blueprint neu zu programmieren?',
+    ctaSub: 'Schließe dich Tausenden an, die ihre Beziehung zu Geld bei Millionaire Mind Online verändern. Deine Persönlichkeit ist einzigartig – deine Veränderung sollte es auch sein.',
+    btnJoin: '🚀 SICHERE DIR DEIN GRATIS-TICKET',
+    hybridBadge: 'TIEFER EINTAUCHEN',
+    hybridTitle: 'Meistere deine <span>Geldpersönlichkeit</span> mit bewährten Strategien',
+    hybridSub: 'Dein Geldpersönlichkeits-Bericht ist erst der Anfang. Bei Millionaire Mind Hybrid entdeckst du bewährte Strategien zum Vermögensaufbau, die speziell für deinen Persönlichkeitstyp entwickelt wurden — damit du dein Geld auf die Weise verwaltest, vermehrst und schützt, die am besten zu dir passt.',
+    hybridFeatures: ['✓ Persönlichkeitsspezifische Geldstrategien', '✓ Live + Online Hybrid-Erlebnis', '✓ Intensive Vermögens-Blueprint-Sessions'],
+    btnHybrid: '🔥 MEHR ÜBER HYBRID ERFAHREN',
+    btnShare: '📤 Ergebnis teilen',
+    btnCopy: '📋 Link kopieren',
+    btnDownloadPdf: '📄 PDF herunterladen',
+    btnRetry: '↺ Noch einmal spielen',
+    matchLabel: 'Beste passende Persönlichkeit',
+    resultEyebrow: 'DEINE GELDPERSÖNLICHKEIT',
+    mixLabel: 'Dein Persönlichkeitsmix',
+    strengthLabel: 'Deine Stärken',
+    shadowLabel: 'Achte darauf',
+    stepLabel: 'Dein nächster Schritt',
+    nextBtn: 'Weiter →',
+    backBtn: '← ZURÜCK',
+    alerts: { name: 'Bitte gib deinen Namen ein', email: 'Bitte gib eine gültige E-Mail-Adresse ein', phone: 'Bitte gib deine Telefonnummer ein', age: 'Bitte wähle dein Alter', gender: 'Bitte wähle dein Geschlecht', copied: 'Link kopiert! Teile dein Ergebnis mit Freunden 🎉' },
+    personalities: {
+      saver: { name: 'Der Sparer', code: 'Sparer', desc: 'Du gehst sehr diszipliniert mit Geld um. Stabilität gibt dir Sicherheit, und du magst es, vorbereitet zu sein.', strength: 'Du planst voraus, vermeidest unnötige Ausgaben und baust Schritt für Schritt Sicherheit auf.', shadow: 'Deine Vorsicht kann zu einem Käfig werden. Manchmal schützt du Geld so sehr, dass du das Leben vergisst.', step: 'Erlaube dir ein schuldfreies Spaß-Budget. Geld soll nicht nur schützen, sondern auch dein Leben unterstützen.' },
+      spender: { name: 'Der Spender', code: 'Spender', desc: 'Du lebst gern im Moment und weißt, wie man das Leben spannend macht. Geld fühlt sich wie ein Werkzeug für Erlebnisse an.', strength: 'Du bringst Freude, Großzügigkeit und Energie mit. Du weißt, wie man lebt und nicht nur funktioniert.', shadow: 'Ohne Struktur verschwindet Geld schnell. Dein Zukunfts-Ich wird deinem jetzigen Ich vielleicht nicht danken.', step: 'Richte zuerst automatisches Sparen ein und genieße dann bewusst. Behalte den Spaß, aber schütze deine Zukunft.' },
+      monk: { name: 'Der Mönch', code: 'Mönch', desc: 'Du lebst einfach und lässt Geld nicht über deine Identität bestimmen. Frieden ist dir wichtiger als Status.', strength: 'Du bist geerdet, ruhig und weniger von Gier oder äußerem Druck getrieben als die meisten.', shadow: 'Zu viel Distanz zu Geld kann dich von mehr Freiheit und Wirkung abhalten.', step: 'Sieh Wohlstand als Werkzeug, nicht als Bedrohung. Richtig eingesetzt kann Geld deine Werte unterstützen.' },
+      avoider: { name: 'Der Vermeider', code: 'Vermeider', desc: 'Geld fühlt sich stressig an, deshalb schiebst du es oft weg. Die gute Nachricht: Das zu erkennen ist schon ein Durchbruch.', strength: 'Du bist bewusster, als du denkst. Wenn du anfängst, kannst du dich schnell verändern.', shadow: 'Geldprobleme zu vermeiden macht sie größer. Aufschieben erhöht den Druck.', step: 'Mach diese Woche nur eine kleine Sache. Prüfe ein Konto, bezahle eine Rechnung oder setze ein Ziel.' }
+    }
+  },
+  es: {
+    headline: 'Descubre tu personalidad con el dinero',
+    introTag: 'INFORME PDF PERSONALIZADO GRATIS',
+    subheadline: 'La forma en que piensas sobre el dinero determina cada decisión financiera que tomas — y cómo te relacionas con las personas a tu alrededor. Esta breve evaluación revela tu Personalidad del Dinero única y te entrega un informe PDF personalizado para ayudarte a entender tus fortalezas, mejorar tus hábitos y comunicarte mejor sobre el dinero con quienes más te importan.',
+    introVP1: '<strong>Entiende tus patrones con el dinero</strong> — por qué ahorras, gastas, evitas o te desconectas — y cómo esos patrones moldean tu futuro financiero.',
+    introVP2: '<strong>Mejora las conversaciones sobre dinero</strong> — descubre cómo tu personalidad interactúa con tu pareja, familia y colegas en temas financieros.',
+    introVP3: '<strong>Recibe tu PDF personalizado</strong> — un informe detallado con tu perfil de personalidad, compatibilidad, fortalezas, puntos ciegos y tu próximo paso clave.',
+    btnStart: '⚡ COMIENZA MI EVALUACIÓN',
+    noteTime: 'Toma 2–3 minutos • Tu PDF personalizado se entrega al instante • 100 % privado',
+    formTitle: '🎉 ¡Ya casi terminas!',
+    formSub: 'Ingresa tus datos para desbloquear tu resultado personalizado, recibir tu informe PDF gratuito y reclamar tu entrada gratis a Millionaire Mind Online.',
+    labelName: 'Tu nombre',
+    labelEmail: 'Correo electrónico',
+    labelPhone: 'WhatsApp / Número de teléfono',
+    labelAge: 'Edad',
+    labelGender: 'Género',
+    agePlaceholder: 'Selecciona tu edad',
+    genderPlaceholder: 'Selecciona tu género',
+    ageOptions: ['Menos de 18', '18–24', '25–34', '35–44', '45–54', '55 o más'],
+    genderOptions: ['Masculino', 'Femenino', 'Prefiero no decirlo'],
+    btnReveal: '🔓 REVELAR MI PERSONALIDAD',
+    privacyNote: '🔒 Tu privacidad está protegida. Tu informe PDF personalizado se entrega al instante.',
+    ctaTitle: '¿Listo para reprogramar tu plano financiero?',
+    ctaSub: 'Únete a miles de personas que están transformando su relación con el dinero en Millionaire Mind Online. Tu personalidad es única y tu transformación también debería serlo.',
+    btnJoin: '🚀 RECLAMAR MI ENTRADA GRATIS',
+    hybridBadge: 'PROFUNDIZA',
+    hybridTitle: 'Domina tu <span>personalidad del dinero</span> con estrategias comprobadas',
+    hybridSub: 'Tu informe de personalidad del dinero es solo el comienzo. En Millionaire Mind Hybrid, descubrirás estrategias comprobadas de creación de riqueza diseñadas específicamente para tu tipo de personalidad — para que puedas administrar, crecer y proteger tu dinero de la manera que mejor te funcione.',
+    hybridFeatures: ['✓ Estrategias según tu personalidad', '✓ Experiencia híbrida: en vivo + online', '✓ Sesiones profundas de plano de riqueza'],
+    btnHybrid: '🔥 SABER MÁS SOBRE HYBRID',
+    btnShare: '📤 Compartir mi resultado',
+    btnCopy: '📋 Copiar enlace',
+    btnDownloadPdf: '📄 Descargar PDF',
+    btnRetry: '↺ Jugar otra vez',
+    matchLabel: 'Personalidad más compatible',
+    resultEyebrow: 'TU PERSONALIDAD DEL DINERO',
+    mixLabel: 'Tu mezcla de personalidad',
+    strengthLabel: 'Tus fortalezas',
+    shadowLabel: 'Cuidado con',
+    stepLabel: 'Tu siguiente paso',
+    nextBtn: 'Continuar →',
+    backBtn: '← VOLVER',
+    alerts: { name: 'Por favor ingresa tu nombre', email: 'Por favor ingresa un correo válido', phone: 'Por favor ingresa tu número de teléfono', age: 'Por favor selecciona tu edad', gender: 'Por favor selecciona tu género', copied: '¡Enlace copiado! Compártelo con tus amigos 🎉' },
+    personalities: {
+      saver: { name: 'El Ahorrador', code: 'Ahorrador', desc: 'Eres muy disciplinado con el dinero. La estabilidad te da seguridad y te gusta saber que estás preparado.', strength: 'Planificas con tiempo, evitas gastos descuidados y construyes seguridad paso a paso.', shadow: 'Tu cautela puede volverse una jaula. A veces proteges tanto el dinero que olvidas disfrutar la vida.', step: 'Date un presupuesto para disfrutar sin culpa. El dinero no solo debe protegerte, también debe apoyarte.' },
+      spender: { name: 'El Gastador', code: 'Gastador', desc: 'Te gusta vivir el presente y sabes cómo hacer la vida más divertida. El dinero se siente como una herramienta para disfrutar.', strength: 'Traes alegría, generosidad y energía. Sabes vivir, no solo sobrevivir.', shadow: 'Sin estructura, el dinero puede desaparecer rápido. Tu yo del futuro quizá no agradezca las decisiones de hoy.', step: 'Configura primero un ahorro automático y luego disfruta. Mantén la diversión, pero protege tu futuro.' },
+      monk: { name: 'El Monje', code: 'Monje', desc: 'Vives de forma simple y no dejas que el dinero defina quién eres. La paz te importa más que el estatus.', strength: 'Eres tranquilo, centrado y menos guiado por la codicia o la presión que la mayoría.', shadow: 'Alejarte demasiado del dinero puede limitar tu libertad y tu impacto.', step: 'Mira la riqueza como una herramienta, no como una amenaza. Bien usada, puede apoyar tus valores.' },
+      avoider: { name: 'El Evasor', code: 'Evasor', desc: 'El dinero te genera estrés, así que muchas veces lo postergas. La buena noticia: darte cuenta ya es un gran paso.', strength: 'Tienes más conciencia de la que crees. Cuando empiezas, puedes cambiar rápido.', shadow: 'Evitar los problemas de dinero hace que crezcan. Retrasar añade presión.', step: 'Haz una sola cosa pequeña esta semana. Revisa una cuenta, paga una factura o fija una meta.' }
+    }
+  }
+};
+const localizedQuestions = {
+  en: [
+    { text: "You just got a new job. Your salary is $3,000 a month. What is your first thought?", answers: [{ emoji: "🏦", text: "First, I need to see my budget and how much I can save.", type: "saver" }, { emoji: "🎉", text: "Nice. I should buy myself something to celebrate.", type: "spender" }, { emoji: "🙂", text: "As long as I can live comfortably, I'm happy.", type: "monk" }, { emoji: "😅", text: "I know I should make a plan… but maybe later.", type: "avoider" }] },
+    { text: "Your first paycheck comes in. What do you do next?", answers: [{ emoji: "🙈", text: "I tell myself I'll sort it out later and avoid looking too much.", type: "avoider" }, { emoji: "🌿", text: "I leave it there. Money is useful, but I don't get too excited about it.", type: "monk" }, { emoji: "🛍️", text: "I treat myself because payday should feel good.", type: "spender" }, { emoji: "🔐", text: "I move some money to savings right away.", type: "saver" }] },
+    { text: "Your coworkers invite you to a fancy dinner after work. What do you do?", answers: [{ emoji: "🍝", text: "I go and enjoy it. It's good to have fun sometimes.", type: "spender" }, { emoji: "📱", text: "I check the price first before I say yes.", type: "saver" }, { emoji: "🧘", text: "I skip it. A quiet night sounds better.", type: "monk" }, { emoji: "🫥", text: "I say I'll think about it… then never reply properly.", type: "avoider" }] },
+    { text: "You want to buy a few things for your room. What happens?", answers: [{ emoji: "🛒", text: "I add things to cart, then close it, then open it again, then do nothing.", type: "avoider" }, { emoji: "🌱", text: "I decide I already have what I need.", type: "monk" }, { emoji: "✨", text: "I buy the things that make life feel nicer.", type: "spender" }, { emoji: "📊", text: "I compare prices and choose carefully.", type: "saver" }] },
+    { text: "Bills week is here. Rent, phone, and other payments all show up together. What is your reaction?", answers: [{ emoji: "🍃", text: "It's okay. My life is simple, so it's easier to manage.", type: "monk" }, { emoji: "😵", text: "I look at it, feel stressed, and want to lie down.", type: "avoider" }, { emoji: "✅", text: "Not fun, but I was ready for this.", type: "saver" }, { emoji: "💸", text: "I pay them, but it still hurts a little.", type: "spender" }] },
+    { text: "Your laptop breaks, and fixing it costs $800. What do you do?", answers: [{ emoji: "🧯", text: "That hurts, but this is why emergency savings exist.", type: "saver" }, { emoji: "😬", text: "I just stare at the price and feel my soul leave my body.", type: "avoider" }, { emoji: "🪷", text: "I stay calm and look for the easiest solution.", type: "monk" }, { emoji: "🛠️", text: "Annoying, but I'll figure it out and move on.", type: "spender" }] },
+    { text: "A few months later, you get a $1,000 bonus. What do you do with it?", answers: [{ emoji: "🎉", text: "This money already has fun plans.", type: "spender" }, { emoji: "🙂", text: "Nice. I'll use what I need and not think too much about it.", type: "monk" }, { emoji: "🧠", text: "Some of this should go to savings or something smart.", type: "saver" }, { emoji: "😐", text: "I want to make a smart choice, but somehow I make no choice at all.", type: "avoider" }] },
+    { text: "A friend says, 'You should start investing.' What sounds most like you?", answers: [{ emoji: "🙉", text: "I hope they don't ask me more because I have no idea.", type: "avoider" }, { emoji: "📈", text: "Yes, but I want to do it carefully and understand it first.", type: "saver" }, { emoji: "🍹", text: "Maybe later. Right now I want to enjoy life more.", type: "spender" }, { emoji: "🌙", text: "I get it, but growing money is not something I care about that much.", type: "monk" }] },
+    { text: "Think about 10 years from now. Which future sounds best to you?", answers: [{ emoji: "☮️", text: "A peaceful life, simple and comfortable.", type: "monk" }, { emoji: "🌍", text: "Freedom, travel, fun, and enough money to enjoy life.", type: "spender" }, { emoji: "🌫️", text: "Honestly… I don't really like thinking that far ahead.", type: "avoider" }, { emoji: "🏠", text: "A stable life, good savings, and no money stress.", type: "saver" }] },
+    { text: "Final question. Which quote sounds the most like you?", answers: [{ emoji: "📚", text: "Being prepared makes me feel safe.", type: "saver" }, { emoji: "🫠", text: "I was going to fix my finances… then time just disappeared.", type: "avoider" }, { emoji: "🧘", text: "Money is useful, but it's not everything.", type: "monk" }, { emoji: "🛍️", text: "I work hard, so I should enjoy what I earn.", type: "spender" }] }
+  ],
+  zh: [
+    { text: "你刚得到一份新工作。你的月薪是 3,000 美元。你的第一个想法是什么？", answers: [{ emoji: "🏦", text: "我先要看看预算，算出能存多少钱。", type: "saver" }, { emoji: "🎉", text: "不错，我应该买点东西奖励自己。", type: "spender" }, { emoji: "🙂", text: "只要我能过得舒服，我就很满足了。", type: "monk" }, { emoji: "😅", text: "我知道我应该做个计划……但晚一点吧。", type: "avoider" }] },
+    { text: "你的第一笔工资到账了。你接下来会做什么？", answers: [{ emoji: "🙈", text: "我告诉自己之后再处理，然后尽量不去看。", type: "avoider" }, { emoji: "🌿", text: "我就让它放在那里。钱有用，但我不会太兴奋。", type: "monk" }, { emoji: "🛍️", text: "我会犒赏自己，因为发薪日应该开心一点。", type: "spender" }, { emoji: "🔐", text: "我会马上把一部分转进储蓄。", type: "saver" }] },
+    { text: "同事邀请你下班后去一家很贵的餐厅。你会怎么做？", answers: [{ emoji: "🍝", text: "我会去，也会享受一下。偶尔开心一下挺好。", type: "spender" }, { emoji: "📱", text: "我会先看看价格，再决定要不要去。", type: "saver" }, { emoji: "🧘", text: "我会拒绝。安静的晚上更适合我。", type: "monk" }, { emoji: "🫥", text: "我会说我再想想，然后就没下文了。", type: "avoider" }] },
+    { text: "你想给房间买点东西。结果会怎样？", answers: [{ emoji: "🛒", text: "我把东西加进购物车，关掉页面，又打开，然后什么也没做。", type: "avoider" }, { emoji: "🌱", text: "我觉得自己已经拥有需要的东西了。", type: "monk" }, { emoji: "✨", text: "我会买那些能让生活更舒服的东西。", type: "spender" }, { emoji: "📊", text: "我会比较价格，再小心选择。", type: "saver" }] },
+    { text: "账单周到了。房租、电话费和其他费用一起出现。你的反应是什么？", answers: [{ emoji: "🍃", text: "还好，我的生活比较简单，所以比较容易处理。", type: "monk" }, { emoji: "😵", text: "我一看到就有压力，只想先躺一下。", type: "avoider" }, { emoji: "✅", text: "虽然不开心，但我早就准备好了。", type: "saver" }, { emoji: "💸", text: "我会付，但心里还是会有点痛。", type: "spender" }] },
+    { text: "你的笔记本电脑坏了，维修要 800 美元。你会怎么做？", answers: [{ emoji: "🧯", text: "很痛，但这就是紧急储蓄存在的原因。", type: "saver" }, { emoji: "😬", text: "我只会盯着价格看，感觉灵魂都飞走了。", type: "avoider" }, { emoji: "🪷", text: "我会保持冷静，找最简单的解决方法。", type: "monk" }, { emoji: "🛠️", text: "很烦，但我会想办法解决，然后继续往前。", type: "spender" }] },
+    { text: "几个月后，你拿到 1,000 美元奖金。你会怎么用？", answers: [{ emoji: "🎉", text: "这笔钱已经有自己的快乐计划了。", type: "spender" }, { emoji: "🙂", text: "不错，我会用在需要的地方，不会想太多。", type: "monk" }, { emoji: "🧠", text: "其中一部分应该存起来，或者做点聪明的安排。", type: "saver" }, { emoji: "😐", text: "我想做个聪明决定，但最后却什么都没决定。", type: "avoider" }] },
+    { text: "朋友说：'你应该开始投资。' 哪个最像你？", answers: [{ emoji: "🙉", text: "我只希望他不要继续问，因为我根本不懂。", type: "avoider" }, { emoji: "📈", text: "可以，但我要先弄懂，而且要谨慎。", type: "saver" }, { emoji: "🍹", text: "也许以后吧。现在我更想享受生活。", type: "spender" }, { emoji: "🌙", text: "我懂这个道理，但让钱增值这件事对我没那么重要。", type: "monk" }] },
+    { text: "想象 10 年后的自己。哪种未来最吸引你？", answers: [{ emoji: "☮️", text: "平静、简单、舒服的生活。", type: "monk" }, { emoji: "🌍", text: "自由、旅行、乐趣，还有足够的钱享受生活。", type: "spender" }, { emoji: "🌫️", text: "老实说……我不太喜欢想那么远。", type: "avoider" }, { emoji: "🏠", text: "稳定的生活、不错的储蓄，没有金钱压力。", type: "saver" }] },
+    { text: "最后一个问题。哪句话最像你？", answers: [{ emoji: "📚", text: "有准备会让我安心。", type: "saver" }, { emoji: "🫠", text: "我本来想整理财务……然后时间就这样过去了。", type: "avoider" }, { emoji: "🧘", text: "钱很有用，但它不是一切。", type: "monk" }, { emoji: "🛍️", text: "我努力工作，所以应该享受自己赚的钱。", type: "spender" }] }
+  ],
+  de: [
+    { text: "Du hast gerade einen neuen Job bekommen. Dein Gehalt beträgt 3.000 $ im Monat. Was denkst du zuerst?", answers: [{ emoji: "🏦", text: "Zuerst muss ich mein Budget ansehen und schauen, wie viel ich sparen kann.", type: "saver" }, { emoji: "🎉", text: "Super. Ich sollte mir etwas zur Feier kaufen.", type: "spender" }, { emoji: "🙂", text: "Solange ich bequem leben kann, bin ich zufrieden.", type: "monk" }, { emoji: "😅", text: "Ich weiß, ich sollte einen Plan machen … aber vielleicht später.", type: "avoider" }] },
+    { text: "Dein erstes Gehalt ist da. Was machst du als Nächstes?", answers: [{ emoji: "🙈", text: "Ich sage mir, dass ich es später regle, und schaue lieber nicht zu genau hin.", type: "avoider" }, { emoji: "🌿", text: "Ich lasse es einfach dort. Geld ist nützlich, aber ich werde nicht besonders aufgeregt.", type: "monk" }, { emoji: "🛍️", text: "Ich gönne mir etwas, weil Zahltag sich gut anfühlen sollte.", type: "spender" }, { emoji: "🔐", text: "Ich überweise sofort etwas auf mein Sparkonto.", type: "saver" }] },
+    { text: "Deine Kollegen laden dich nach der Arbeit in ein schickes Restaurant ein. Was machst du?", answers: [{ emoji: "🍝", text: "Ich gehe hin und genieße es. Man sollte auch mal Spaß haben.", type: "spender" }, { emoji: "📱", text: "Ich prüfe zuerst den Preis, bevor ich ja sage.", type: "saver" }, { emoji: "🧘", text: "Ich sage ab. Ein ruhiger Abend klingt besser.", type: "monk" }, { emoji: "🫥", text: "Ich sage, ich überlege es mir … und melde mich dann nie richtig zurück.", type: "avoider" }] },
+    { text: "Du willst ein paar Dinge für dein Zimmer kaufen. Was passiert?", answers: [{ emoji: "🛒", text: "Ich lege Dinge in den Warenkorb, schließe ihn, öffne ihn wieder und mache dann nichts.", type: "avoider" }, { emoji: "🌱", text: "Ich entscheide, dass ich eigentlich schon habe, was ich brauche.", type: "monk" }, { emoji: "✨", text: "Ich kaufe die Dinge, die das Leben schöner machen.", type: "spender" }, { emoji: "📊", text: "Ich vergleiche Preise und wähle sorgfältig aus.", type: "saver" }] },
+    { text: "Rechnungswoche ist da. Miete, Telefon und andere Zahlungen kommen alle zusammen. Wie reagierst du?", answers: [{ emoji: "🍃", text: "Schon okay. Mein Leben ist einfach, also ist es leichter zu regeln.", type: "monk" }, { emoji: "😵", text: "Ich sehe es und fühle sofort Stress. Ich will mich erst mal hinlegen.", type: "avoider" }, { emoji: "✅", text: "Nicht schön, aber ich war vorbereitet.", type: "saver" }, { emoji: "💸", text: "Ich bezahle alles, aber es tut trotzdem ein bisschen weh.", type: "spender" }] },
+    { text: "Dein Laptop geht kaputt und die Reparatur kostet 800 $. Was machst du?", answers: [{ emoji: "🧯", text: "Tut weh, aber genau dafür gibt es Notfallersparnisse.", type: "saver" }, { emoji: "😬", text: "Ich starre nur auf den Preis und spüre, wie meine Seele kurz den Körper verlässt.", type: "avoider" }, { emoji: "🪷", text: "Ich bleibe ruhig und suche die einfachste Lösung.", type: "monk" }, { emoji: "🛠️", text: "Nervig, aber ich kümmere mich darum und mache weiter.", type: "spender" }] },
+    { text: "Ein paar Monate später bekommst du einen Bonus von 1.000 $. Was machst du damit?", answers: [{ emoji: "🎉", text: "Dieses Geld hat schon Freizeitpläne.", type: "spender" }, { emoji: "🙂", text: "Schön. Ich nutze, was ich brauche, und denke nicht zu viel darüber nach.", type: "monk" }, { emoji: "🧠", text: "Ein Teil davon sollte gespart oder klug eingesetzt werden.", type: "saver" }, { emoji: "😐", text: "Ich will eine kluge Entscheidung treffen, aber am Ende treffe ich gar keine.", type: "avoider" }] },
+    { text: "Ein Freund sagt: „Du solltest anfangen zu investieren.“ Was passt am besten zu dir?", answers: [{ emoji: "🙉", text: "Ich hoffe nur, dass keine weiteren Fragen kommen, weil ich keine Ahnung habe.", type: "avoider" }, { emoji: "📈", text: "Ja, aber ich möchte es vorsichtig machen und zuerst verstehen.", type: "saver" }, { emoji: "🍹", text: "Vielleicht später. Im Moment will ich das Leben mehr genießen.", type: "spender" }, { emoji: "🌙", text: "Ich verstehe es, aber Geld wachsen zu lassen ist mir nicht so wichtig.", type: "monk" }] },
+    { text: "Denk an 10 Jahre in der Zukunft. Welche Zukunft klingt am besten für dich?", answers: [{ emoji: "☮️", text: "Ein friedliches, einfaches und angenehmes Leben.", type: "monk" }, { emoji: "🌍", text: "Freiheit, Reisen, Spaß und genug Geld, um das Leben zu genießen.", type: "spender" }, { emoji: "🌫️", text: "Ehrlich gesagt … ich denke nicht gern so weit voraus.", type: "avoider" }, { emoji: "🏠", text: "Ein stabiles Leben, gute Ersparnisse und kein Geldstress.", type: "saver" }] },
+    { text: "Letzte Frage. Welcher Satz klingt am meisten nach dir?", answers: [{ emoji: "📚", text: "Vorbereitet zu sein gibt mir Sicherheit.", type: "saver" }, { emoji: "🫠", text: "Ich wollte meine Finanzen ordnen … und dann ist die Zeit einfach verschwunden.", type: "avoider" }, { emoji: "🧘", text: "Geld ist nützlich, aber nicht alles.", type: "monk" }, { emoji: "🛍️", text: "Ich arbeite hart, also sollte ich auch genießen, was ich verdiene.", type: "spender" }] }
+  ],
+  es: [
+    { text: "Acabas de conseguir un nuevo trabajo. Tu salario es de $3,000 al mes. ¿Cuál es tu primer pensamiento?", answers: [{ emoji: "🏦", text: "Primero necesito ver mi presupuesto y cuánto puedo ahorrar.", type: "saver" }, { emoji: "🎉", text: "Qué bien. Debería comprarme algo para celebrarlo.", type: "spender" }, { emoji: "🙂", text: "Mientras pueda vivir cómodamente, estoy feliz.", type: "monk" }, { emoji: "😅", text: "Sé que debería hacer un plan… pero tal vez después.", type: "avoider" }] },
+    { text: "Llega tu primer sueldo. ¿Qué haces después?", answers: [{ emoji: "🙈", text: "Me digo que lo arreglaré después y evito mirar demasiado.", type: "avoider" }, { emoji: "🌿", text: "Lo dejo ahí. El dinero es útil, pero no me emociona demasiado.", type: "monk" }, { emoji: "🛍️", text: "Me doy un gusto porque el día de pago debe sentirse bien.", type: "spender" }, { emoji: "🔐", text: "Paso algo de dinero a mis ahorros de inmediato.", type: "saver" }] },
+    { text: "Tus compañeros te invitan a una cena elegante después del trabajo. ¿Qué haces?", answers: [{ emoji: "🍝", text: "Voy y lo disfruto. A veces está bien divertirse.", type: "spender" }, { emoji: "📱", text: "Primero reviso el precio antes de decir que sí.", type: "saver" }, { emoji: "🧘", text: "No voy. Una noche tranquila suena mejor.", type: "monk" }, { emoji: "🫥", text: "Digo que lo pensaré… y luego nunca respondo bien.", type: "avoider" }] },
+    { text: "Quieres comprar algunas cosas para tu cuarto. ¿Qué pasa?", answers: [{ emoji: "🛒", text: "Pongo cosas en el carrito, lo cierro, lo vuelvo a abrir y al final no hago nada.", type: "avoider" }, { emoji: "🌱", text: "Decido que ya tengo lo que necesito.", type: "monk" }, { emoji: "✨", text: "Compro las cosas que hacen la vida más agradable.", type: "spender" }, { emoji: "📊", text: "Comparo precios y elijo con cuidado.", type: "saver" }] },
+    { text: "Llega la semana de pagar cuentas. Renta, teléfono y otros pagos aparecen todos juntos. ¿Cuál es tu reacción?", answers: [{ emoji: "🍃", text: "Está bien. Mi vida es simple, así que es más fácil manejarlo.", type: "monk" }, { emoji: "😵", text: "Lo veo, me estreso y solo quiero acostarme un rato.", type: "avoider" }, { emoji: "✅", text: "No es divertido, pero estaba preparado.", type: "saver" }, { emoji: "💸", text: "Pago todo, pero igual duele un poco.", type: "spender" }] },
+    { text: "Tu portátil se rompe y arreglarla cuesta $800. ¿Qué haces?", answers: [{ emoji: "🧯", text: "Duele, pero para eso existen los ahorros de emergencia.", type: "saver" }, { emoji: "😬", text: "Solo miro el precio y siento que mi alma abandona el cuerpo.", type: "avoider" }, { emoji: "🪷", text: "Mantengo la calma y busco la solución más sencilla.", type: "monk" }, { emoji: "🛠️", text: "Es molesto, pero lo resolveré y seguiré adelante.", type: "spender" }] },
+    { text: "Unos meses después, recibes un bono de $1,000. ¿Qué haces con él?", answers: [{ emoji: "🎉", text: "Este dinero ya tiene planes divertidos.", type: "spender" }, { emoji: "🙂", text: "Bien. Usaré lo que necesite y no pensaré demasiado en ello.", type: "monk" }, { emoji: "🧠", text: "Una parte de esto debería ir a ahorros o a algo inteligente.", type: "saver" }, { emoji: "😐", text: "Quiero tomar una decisión inteligente, pero de alguna forma no tomo ninguna.", type: "avoider" }] },
+    { text: "Un amigo dice: 'Deberías empezar a invertir.' ¿Qué suena más como tú?", answers: [{ emoji: "🙉", text: "Solo espero que no me pregunte más porque no tengo idea.", type: "avoider" }, { emoji: "📈", text: "Sí, pero quiero hacerlo con cuidado y entenderlo primero.", type: "saver" }, { emoji: "🍹", text: "Tal vez después. Ahora quiero disfrutar más la vida.", type: "spender" }, { emoji: "🌙", text: "Lo entiendo, pero hacer crecer el dinero no me importa tanto.", type: "monk" }] },
+    { text: "Piensa en 10 años en el futuro. ¿Qué futuro te suena mejor?", answers: [{ emoji: "☮️", text: "Una vida tranquila, simple y cómoda.", type: "monk" }, { emoji: "🌍", text: "Libertad, viajes, diversión y suficiente dinero para disfrutar la vida.", type: "spender" }, { emoji: "🌫️", text: "La verdad… no me gusta pensar tan lejos.", type: "avoider" }, { emoji: "🏠", text: "Una vida estable, buenos ahorros y nada de estrés por dinero.", type: "saver" }] },
+    { text: "Última pregunta. ¿Qué frase suena más a ti?", answers: [{ emoji: "📚", text: "Estar preparado me hace sentir seguro.", type: "saver" }, { emoji: "🫠", text: "Iba a ordenar mis finanzas… y luego el tiempo desapareció.", type: "avoider" }, { emoji: "🧘", text: "El dinero es útil, pero no lo es todo.", type: "monk" }, { emoji: "🛍️", text: "Trabajo duro, así que debo disfrutar lo que gano.", type: "spender" }] }
+  ]
+};
+const countries = [
+  { name: '🇦🇫 Afghanistan', code: '+93' }, { name: '🇦🇱 Albania', code: '+355' }, { name: '🇩🇿 Algeria', code: '+213' }, { name: '🇦🇩 Andorra', code: '+376' }, { name: '🇦🇴 Angola', code: '+244' }, { name: '🇦🇷 Argentina', code: '+54' }, { name: '🇦🇺 Australia', code: '+61' }, { name: '🇦🇹 Austria', code: '+43' }, { name: '🇧🇭 Bahrain', code: '+973' }, { name: '🇧🇩 Bangladesh', code: '+880' }, { name: '🇧🇪 Belgium', code: '+32' }, { name: '🇧🇷 Brazil', code: '+55' }, { name: '🇧🇬 Bulgaria', code: '+359' }, { name: '🇰🇭 Cambodia', code: '+855' }, { name: '🇨🇦 Canada', code: '+1' }, { name: '🇨🇱 Chile', code: '+56' }, { name: '🇨🇳 China', code: '+86' }, { name: '🇨🇴 Colombia', code: '+57' }, { name: '🇭🇷 Croatia', code: '+385' }, { name: '🇨🇾 Cyprus', code: '+357' }, { name: '🇨🇿 Czech Republic', code: '+420' }, { name: '🇩🇰 Denmark', code: '+45' }, { name: '🇪🇬 Egypt', code: '+20' }, { name: '🇪🇪 Estonia', code: '+372' }, { name: '🇫🇮 Finland', code: '+358' }, { name: '🇫🇷 France', code: '+33' }, { name: '🇩🇪 Germany', code: '+49' }, { name: '🇬🇷 Greece', code: '+30' }, { name: '🇭🇰 Hong Kong', code: '+852' }, { name: '🇭🇺 Hungary', code: '+36' }, { name: '🇮🇸 Iceland', code: '+354' }, { name: '🇮🇳 India', code: '+91' }, { name: '🇮🇩 Indonesia', code: '+62' }, { name: '🇮🇪 Ireland', code: '+353' }, { name: '🇮🇱 Israel', code: '+972' }, { name: '🇮🇹 Italy', code: '+39' }, { name: '🇯🇵 Japan', code: '+81' }, { name: '🇯🇴 Jordan', code: '+962' }, { name: '🇰🇿 Kazakhstan', code: '+7' }, { name: '🇰🇪 Kenya', code: '+254' }, { name: '🇰🇼 Kuwait', code: '+965' }, { name: '🇱🇻 Latvia', code: '+371' }, { name: '🇱🇧 Lebanon', code: '+961' }, { name: '🇱🇹 Lithuania', code: '+370' }, { name: '🇱🇺 Luxembourg', code: '+352' }, { name: '🇲🇾 Malaysia', code: '+60' }, { name: '🇲🇹 Malta', code: '+356' }, { name: '🇲🇽 Mexico', code: '+52' }, { name: '🇲🇦 Morocco', code: '+212' }, { name: '🇳🇱 Netherlands', code: '+31' }, { name: '🇳🇿 New Zealand', code: '+64' }, { name: '🇳🇬 Nigeria', code: '+234' }, { name: '🇳🇴 Norway', code: '+47' }, { name: '🇴🇲 Oman', code: '+968' }, { name: '🇵🇰 Pakistan', code: '+92' }, { name: '🇵🇭 Philippines', code: '+63' }, { name: '🇵🇱 Poland', code: '+48' }, { name: '🇵🇹 Portugal', code: '+351' }, { name: '🇶🇦 Qatar', code: '+974' }, { name: '🇷🇴 Romania', code: '+40' }, { name: '🇷🇺 Russia', code: '+7' }, { name: '🇸🇦 Saudi Arabia', code: '+966' }, { name: '🇷🇸 Serbia', code: '+381' }, { name: '🇸🇬 Singapore', code: '+65' }, { name: '🇸🇰 Slovakia', code: '+421' }, { name: '🇸🇮 Slovenia', code: '+386' }, { name: '🇿🇦 South Africa', code: '+27' }, { name: '🇰🇷 South Korea', code: '+82' }, { name: '🇪🇸 Spain', code: '+34' }, { name: '🇱🇰 Sri Lanka', code: '+94' }, { name: '🇸🇪 Sweden', code: '+46' }, { name: '🇨🇭 Switzerland', code: '+41' }, { name: '🇹🇼 Taiwan', code: '+886' }, { name: '🇹🇭 Thailand', code: '+66' }, { name: '🇹🇷 Turkey', code: '+90' }, { name: '🇦🇪 United Arab Emirates', code: '+971' }, { name: '🇬🇧 United Kingdom', code: '+44' }, { name: '🇺🇸 United States', code: '+1' }, { name: '🇻🇳 Vietnam', code: '+84' }
+];
+function getQuestions() { return localizedQuestions[currentLanguage] || localizedQuestions.en; }
+function getText(key) { return translations[currentLanguage]?.[key] || translations.en[key] || ''; }
+function getPersonalityText(type, field) {
+  const langPack = translations[currentLanguage]?.personalities?.[type];
+  const enPack = translations.en.personalities[type];
+  return (langPack && langPack[field]) || enPack[field] || '';
+}
+function setLanguage(event, lang) {
+  currentLanguage = lang;
+  document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+  if (event && event.target) event.target.classList.add('active');
+  updateUI();
+  if (document.getElementById('quiz').classList.contains('active')) renderQuestion();
+  if (document.getElementById('result').classList.contains('active')) {
+    const dominant = getDominantPersonality();
+    displayResult(dominant);
+  }
+  playSound('click', 700);
+}
+function updateUI() {
+  document.getElementById('intro-headline').textContent = getText('headline');
+  document.getElementById('intro-tag').textContent = getText('introTag');
+  document.getElementById('intro-sub').textContent = getText('subheadline');
+  document.getElementById('intro-vp1').innerHTML = getText('introVP1');
+  document.getElementById('intro-vp2').innerHTML = getText('introVP2');
+  document.getElementById('intro-vp3').innerHTML = getText('introVP3');
+  document.getElementById('btn-start').textContent = getText('btnStart');
+  document.getElementById('intro-note').textContent = getText('noteTime');
+  document.getElementById('form-title').textContent = getText('formTitle');
+  document.getElementById('form-sub').textContent = getText('formSub');
+  document.getElementById('label-name').textContent = getText('labelName');
+  document.getElementById('label-email').textContent = getText('labelEmail');
+  document.getElementById('label-phone').textContent = getText('labelPhone');
+  document.getElementById('label-age').textContent = getText('labelAge');
+  document.getElementById('label-gender').textContent = getText('labelGender');
+  updateLocalizedSelect('f-age', getText('agePlaceholder'), getText('ageOptions'));
+  updateLocalizedSelect('f-gender', getText('genderPlaceholder'), getText('genderOptions'));
+  document.getElementById('btn-reveal').textContent = getText('btnReveal');
+  document.getElementById('privacy-note').textContent = getText('privacyNote');
+  document.getElementById('cta-title').textContent = getText('ctaTitle');
+  document.getElementById('cta-sub').textContent = getText('ctaSub');
+  document.getElementById('btn-join').textContent = getText('btnJoin');
+  document.getElementById('hybrid-badge').textContent = getText('hybridBadge');
+  document.getElementById('hybrid-title').innerHTML = getText('hybridTitle');
+  document.getElementById('hybrid-sub').textContent = getText('hybridSub');
+  const hybridFeatures = getText('hybridFeatures');
+  if (hybridFeatures && Array.isArray(hybridFeatures)) {
+    document.getElementById('hybrid-features').innerHTML = hybridFeatures.map(f => `<div class="hybrid-feature"><span>${f}</span></div>`).join('');
+  }
+  document.getElementById('btn-hybrid').textContent = getText('btnHybrid');
+  document.getElementById('btn-share').textContent = getText('btnShare');
+  document.getElementById('btn-copy').textContent = getText('btnCopy');
+  document.getElementById('btn-download-pdf').textContent = getText('btnDownloadPdf');
+  document.getElementById('btn-retry').textContent = getText('btnRetry');
+  document.getElementById('match-label').textContent = getText('matchLabel');
+  document.getElementById('result-eyebrow').textContent = getText('resultEyebrow');
+  document.getElementById('mix-label').textContent = getText('mixLabel');
+  document.getElementById('btn-next').textContent = getText('nextBtn');
+  document.getElementById('btn-prev').textContent = getText('backBtn');
+}
+function updateLocalizedSelect(id, placeholder, options) {
+  const select = document.getElementById(id);
+  const currentValue = select.value;
+  select.innerHTML = '';
+  const placeholderOption = document.createElement('option');
+  placeholderOption.value = '';
+  placeholderOption.textContent = placeholder;
+  select.appendChild(placeholderOption);
+  (options || []).forEach((text, index) => {
+    const option = document.createElement('option');
+    if (id === 'f-age') {
+      const values = ['below18', '18-24', '25-34', '35-44', '45-54', '55+'];
+      option.value = values[index];
+    } else if (id === 'f-gender') {
+      const values = ['male', 'female', 'prefer_not'];
+      option.value = values[index];
+    }
+    option.textContent = text;
+    select.appendChild(option);
+  });
+  select.value = currentValue || '';
+}
+function populateCountries() {
+  const select = document.getElementById('country-code');
+  select.innerHTML = '';
+  countries.forEach(country => {
+    const option = document.createElement('option');
+    option.value = country.code;
+    option.textContent = country.name;
+    select.appendChild(option);
+  });
+  select.value = '+60';
+}
+let audioCtx = null;
+let audioEnabled = true;
+let masterVolume = 0.5;
+function ensureAudioContext() {
+  if (!audioCtx) {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (AC) audioCtx = new AC();
+  }
+}
+function playSound(type = 'click', freq = 600, duration = 0.1) {
+  if (!audioEnabled) return;
+  ensureAudioContext();
+  if (!audioCtx) return;
+  const now = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  if (type === 'click') {
+    osc.frequency.setValueAtTime(freq, now);
+    osc.frequency.exponentialRampToValueAtTime(200, now + duration);
+    gain.gain.setValueAtTime(0.3 * masterVolume, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + duration);
+    osc.start(now);
+    osc.stop(now + duration);
+  } else if (type === 'success') {
+    osc.frequency.setValueAtTime(400, now);
+    osc.frequency.exponentialRampToValueAtTime(800, now + 0.05);
+    osc.frequency.exponentialRampToValueAtTime(600, now + 0.15);
+    gain.gain.setValueAtTime(0.4 * masterVolume, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+    osc.start(now);
+    osc.stop(now + 0.25);
+  } else if (type === 'answer') {
+    osc.frequency.setValueAtTime(400, now);
+    osc.frequency.exponentialRampToValueAtTime(800, now + 0.2);
+    gain.gain.setValueAtTime(0.35 * masterVolume, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+    osc.start(now);
+    osc.stop(now + 0.2);
+  }
+}
+(function () {
+  const c = document.getElementById('stars-canvas');
+  const ctx = c.getContext('2d');
+  let stars = [];
+  function init() {
+    c.width = window.innerWidth;
+    c.height = window.innerHeight;
+    stars = Array.from({ length: 100 }, () => ({
+      x: Math.random() * c.width,
+      y: Math.random() * c.height,
+      r: Math.random() * 1.2 + 0.3,
+      phase: Math.random() * Math.PI * 2,
+      speed: Math.random() * 0.004 + 0.001
+    }));
+  }
+  function draw() {
+    ctx.clearRect(0, 0, c.width, c.height);
+    stars.forEach(s => {
+      s.phase += s.speed;
+      const a = (Math.sin(s.phase) * 0.5 + 0.5) * 0.5;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${a})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  init();
+  draw();
+  window.addEventListener('resize', init);
+})();
+const confCanvas = document.getElementById('confetti-canvas');
+const confCtx = confCanvas.getContext('2d');
+let pieces = [];
+function fireConfetti() {
+  confCanvas.width = window.innerWidth;
+  confCanvas.height = window.innerHeight;
+  const cols = ['#FFD700', '#22C55E', '#E63946', '#34D399', '#FFA500'];
+  for (let i = 0; i < 160; i++) {
+    pieces.push({
+      x: Math.random() * confCanvas.width,
+      y: -10,
+      vx: (Math.random() - 0.5) * 7,
+      vy: Math.random() * 5 + 2,
+      rot: Math.random() * 360,
+      rs: (Math.random() - 0.5) * 12,
+      w: Math.random() * 9 + 4,
+      h: Math.random() * 5 + 3,
+      color: cols[Math.floor(Math.random() * cols.length)],
+      life: 1
+    });
+  }
+  runConf();
+}
+function runConf() {
+  confCtx.clearRect(0, 0, confCanvas.width, confCanvas.height);
+  pieces = pieces.filter(p => p.life > 0);
+  pieces.forEach(p => {
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += 0.12;
+    p.rot += p.rs;
+    p.life -= 0.007;
+    confCtx.save();
+    confCtx.globalAlpha = p.life;
+    confCtx.translate(p.x, p.y);
+    confCtx.rotate(p.rot * Math.PI / 180);
+    confCtx.fillStyle = p.color;
+    confCtx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+    confCtx.restore();
+  });
+  if (pieces.length) requestAnimationFrame(runConf);
+}
+let currentQuestion = 0;
+let answers = {};
+let userEmail = '';
+let userName = '';
+let userPhone = '';
+let userAge = '';
+let userGender = '';
+function showScreen(screenId) {
+  document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+  const target = document.getElementById(screenId);
+  if (target) target.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function startQuiz() {
+  playSound('click', 800);
+  currentQuestion = 0;
+  answers = {};
+  xp = 0;
+  showScreen('quiz');
+  renderQuestion();
+}
+function renderQuestion() {
+  const questions = getQuestions();
+  const q = questions[currentQuestion];
+  const percent = ((currentQuestion + 1) / questions.length) * 100;
+  document.getElementById('q-counter').textContent = `${currentQuestion + 1} / ${questions.length}`;
+  document.getElementById('prog-fill').style.width = `${percent}%`;
+  document.getElementById('xp-display').textContent = xp;
+  document.getElementById('q-text').textContent = q.text;
+  const grid = document.getElementById('opts-grid');
+  grid.innerHTML = '';
+  q.answers.forEach((ans, idx) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'opt';
+    btn.innerHTML = `<span class="opt-emoji">${ans.emoji}</span><span class="opt-text">${ans.text}</span>`;
+    if (answers[currentQuestion] === ans.type) btn.classList.add('selected');
+    btn.addEventListener('click', () => selectAnswer(ans.type, idx));
+    btn.style.opacity = '0';
+    btn.style.transform = 'translateY(16px)';
+    btn.style.transition = `opacity .35s ${idx * 0.07}s ease, transform .35s ${idx * 0.07}s ease`;
+    grid.appendChild(btn);
+    setTimeout(() => {
+      btn.style.opacity = '1';
+      btn.style.transform = 'translateY(0)';
+    }, 10);
+  });
+  document.getElementById('btn-next').classList.toggle('show', !!answers[currentQuestion]);
+  document.getElementById('btn-prev').classList.toggle('show', currentQuestion > 0);
+}
+function selectAnswer(type, idx) {
+  playSound('answer', 500);
+  answers[currentQuestion] = type;
+  if (!answers.hasOwnProperty('_first_' + currentQuestion)) {
+    xp += 10;
+    showXPPopup();
+  }
+  answers['_first_' + currentQuestion] = true;
+  document.getElementById('xp-display').textContent = xp;
+  const btns = document.querySelectorAll('.opt');
+  btns.forEach(b => b.classList.remove('selected'));
+  if (btns[idx]) btns[idx].classList.add('selected');
+  setTimeout(() => {
+    document.getElementById('btn-next').classList.add('show');
+  }, 300);
+}
+function showXPPopup() {
+  const popup = document.createElement('div');
+  popup.className = 'xp-popup';
+  popup.textContent = '+10 XP';
+  popup.style.left = Math.random() * 80 + 10 + '%';
+  popup.style.top = Math.random() * 40 + 20 + '%';
+  document.body.appendChild(popup);
+  setTimeout(() => popup.remove(), 1200);
+}
+function nextQuestion() {
+  if (!answers[currentQuestion]) {
+    playSound('click', 400);
+    return;
+  }
+  playSound('click', 800);
+  currentQuestion++;
+  if (currentQuestion < getQuestions().length) {
+    renderQuestion();
+  } else {
+    showScreen('form-screen');
+    fireConfetti();
+    playSound('success', 800);
+  }
+}
+function prevQuestion() {
+  if (currentQuestion > 0) {
+    playSound('click', 700);
+    currentQuestion--;
+    renderQuestion();
+  }
+}
+function updatePhoneCode() {}
+function getDominantPersonality() {
+  const counts = { saver: 0, spender: 0, monk: 0, avoider: 0 };
+  Object.entries(answers).forEach(([k, v]) => {
+    if (typeof v === 'string' && counts[v] !== undefined) counts[v]++;
+  });
+  return Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
+}
+function revealResult() {
+  const name = document.getElementById('f-name').value.trim();
+  const email = document.getElementById('f-email').value.trim();
+  const countryCode = document.getElementById('country-code').value;
+  const phone = document.getElementById('f-phone').value.trim();
+  const age = document.getElementById('f-age').value;
+  const gender = document.getElementById('f-gender').value;
+  if (!name) {
+    alert(getText('alerts').name);
+    return;
+  }
+  if (!email || !email.includes('@')) {
+    alert(getText('alerts').email);
+    return;
+  }
+  if (!phone) {
+    alert(getText('alerts').phone);
+    return;
+  }
+  if (!age) {
+    alert(getText('alerts').age);
+    return;
+  }
+  if (!gender) {
+    alert(getText('alerts').gender);
+    return;
+  }
+  userName = name;
+  userEmail = email;
+  userPhone = countryCode + ' ' + phone;
+  userAge = age;
+  userGender = gender;
+  sendToWebhook();
+  const dominant = getDominantPersonality();
+  displayResult(dominant);
+  showScreen('result');
+  fireConfetti();
+  playSound('success', 800);
+}
+function getPersonalityPercentages() {
+  const counts = { saver: 0, spender: 0, monk: 0, avoider: 0 };
+  Object.entries(answers).forEach(([k, v]) => {
+    if (typeof v === 'string' && counts[v] !== undefined) counts[v]++;
+  });
+  const total = Object.values(counts).reduce((sum, value) => sum + value, 0) || 1;
+  return Object.fromEntries(
+    Object.entries(counts).map(([key, value]) => [key, Math.round((value / total) * 100)])
+  );
+}
+function renderPersonalityBreakdown() {
+  const percentages = getPersonalityPercentages();
+  const order = ['saver', 'spender', 'monk', 'avoider'];
+  const html = order.map((key) => `
+    <div class="personality-breakdown-row">
+      <div class="personality-breakdown-name">${getPersonalityText(key, 'name')}</div>
+      <div class="personality-breakdown-bar">
+        <div class="personality-breakdown-fill" style="width:${percentages[key]}%; background:${characterColors[key]};"></div>
+      </div>
+      <div class="personality-breakdown-value">${percentages[key]}%</div>
+    </div>
+  `).join('');
+  document.getElementById('personality-breakdown-list').innerHTML = html;
+}
+function displayResult(type) {
+  document.getElementById('character-img').src = characterImages[type];
+  document.getElementById('r-name').textContent = getPersonalityText(type, 'name');
+  document.getElementById('r-name').style.color = characterColors[type];
+  document.getElementById('r-description').textContent = getPersonalityText(type, 'desc');
+  renderPersonalityBreakdown();
+  const match = bestMatches[type];
+  const matchType = match.personality;
+  document.getElementById('match-name').textContent = getPersonalityText(matchType, 'name');
+  document.getElementById('match-icon').textContent = characterIcons[matchType];
+  document.getElementById('match-icon').style.color = characterColors[matchType];
+  document.getElementById('match-reason').textContent = match.reason[currentLanguage] || match.reason.en;
+  document.getElementById('insights').innerHTML = `
+    <div class="ins-card"><div class="ins-icon">✨</div><div><div class="ins-label">${getText('strengthLabel')}</div><div class="ins-text">${getPersonalityText(type, 'strength')}</div></div></div>
+    <div class="ins-card"><div class="ins-icon">⚠️</div><div><div class="ins-label">${getText('shadowLabel')}</div><div class="ins-text">${getPersonalityText(type, 'shadow')}</div></div></div>
+    <div class="ins-card"><div class="ins-icon">🚀</div><div><div class="ins-label">${getText('stepLabel')}</div><div class="ins-text">${getPersonalityText(type, 'step')}</div></div></div>
+  `;
+}
+function sendToWebhook() {
+  const counts = { saver: 0, spender: 0, monk: 0, avoider: 0 };
+  Object.entries(answers).forEach(([k, v]) => {
+    if (typeof v === 'string' && counts[v] !== undefined) counts[v]++;
+  });
+  const dominant = Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
+  const data = {
+    name: userName,
+    email: userEmail,
+    phone: userPhone,
+    age: userAge,
+    gender: userGender,
+    language: currentLanguage,
+    personality_type: dominant,
+    personality_name: getPersonalityText(dominant, 'name'),
+    best_match: getPersonalityText(bestMatches[dominant].personality, 'name'),
+    saver_score: counts.saver,
+    spender_score: counts.spender,
+    monk_score: counts.monk,
+    avoider_score: counts.avoider,
+    strength: getPersonalityText(dominant, 'strength'),
+    shadow: getPersonalityText(dominant, 'shadow'),
+    next_step: getPersonalityText(dominant, 'step'),
+    xp_earned: xp,
+    timestamp: new Date().toISOString(),
+    landing_page_url: window.location.href
+  };
+  // Send to new webhook for Google Sheets & ActiveCampaign
+  fetch('https://hooks.zapier.com/hooks/catch/3673966/bq5tk72/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  }).catch(err => console.log('Webhook error:', err));
+}
+function shareResult() {
+  playSound('click', 700);
+  const dominant = getDominantPersonality();
+  const p = getPersonalityText(dominant, 'name');
+  const text = `I'm ${p} on the Money Personality Quest! 💰\n\nTake the free assessment and discover your money personality:\n${window.location.href}`;
+  if (navigator.share) {
+    navigator.share({
+      title: 'My Money Personality',
+      text: text,
+      url: window.location.href
+    }).catch(err => console.log('Share failed:', err));
+  } else {
+    copyResultLink();
+  }
+}
+function copyResultLink() {
+  playSound('click', 700);
+  const url = window.location.href;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(() => {
+      alert(getText('alerts').copied);
+    }).catch(() => {
+      fallbackCopy(url);
+    });
+  } else {
+    fallbackCopy(url);
+  }
+}
+function fallbackCopy(text) {
+  const temp = document.createElement('textarea');
+  temp.value = text;
+  document.body.appendChild(temp);
+  temp.select();
+  try {
+    document.execCommand('copy');
+    alert(getText('alerts').copied);
+  } catch (e) {
+    alert('Unable to copy automatically. Please copy this link manually: ' + text);
+  }
+  document.body.removeChild(temp);
+}
+function downloadResultPDF() {
+  const dominant = getDominantPersonality();
+  const personalityName = getPersonalityText(dominant, 'name') || 'Money Personality';
+  const resultHTML = `<div style="background:linear-gradient(135deg,#0a2f1f,#0f3d28);color:#FFFFFF;font-family:Arial,sans-serif;padding:40px;min-height:100vh;"><div style="text-align:center;margin-bottom:30px;"><img src="${document.getElementById('character-img').src}" style="width:220px;height:220px;object-fit:cover;border-radius:20px;display:block;margin:0 auto 20px;"><div style="font-size:12px;letter-spacing:3px;text-transform:uppercase;color:#A8C5B8;margin-bottom:10px;">${document.getElementById('result-eyebrow').textContent}</div><h1 style="font-size:42px;margin:0 0 14px;color:${characterColors[dominant]};font-family:Arial,sans-serif;">${document.getElementById('r-name').textContent}</h1><p style="font-size:16px;line-height:1.7;color:#FFFFFF;max-width:700px;margin:0 auto;">${document.getElementById('r-description').textContent}</p></div><div style="border:1px solid rgba(34,197,94,.3);border-radius:16px;padding:20px;margin-bottom:20px;background:rgba(34,197,94,.08);text-align:center;"><div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#A8C5B8;margin-bottom:10px;">${document.getElementById('match-label').textContent}</div><div style="font-size:28px;font-weight:bold;margin-bottom:10px;color:${characterColors[bestMatches[dominant].personality]};">${document.getElementById('match-icon').textContent} ${document.getElementById('match-name').textContent}</div><div style="font-size:14px;line-height:1.7;color:#FFFFFF;">${document.getElementById('match-reason').textContent}</div></div><div style="display:flex;flex-direction:column;gap:14px;margin-bottom:24px;">${Array.from(document.querySelectorAll('#insights .ins-card')).map(card => { const icon = card.querySelector('.ins-icon')?.textContent || ''; const label = card.querySelector('.ins-label')?.textContent || ''; const text = card.querySelector('.ins-text')?.textContent || ''; return `<div style="background:rgba(30,98,68,.5);border:1px solid rgba(34,197,94,.25);border-radius:16px;padding:20px;display:flex;gap:14px;align-items:flex-start;"><div style="font-size:28px;line-height:1;">${icon}</div><div><div style="font-size:10px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;color:#A8C5B8;margin-bottom:8px;">${label}</div><div style="font-size:14px;line-height:1.7;color:#FFFFFF;">${text}</div></div></div>`; }).join('')}</div><div style="border-top:1px solid rgba(34,197,94,.1);margin-top:20px;padding-top:20px;text-align:center;font-size:12px;color:#A8C5B8;">Millionaire Mind × Success Resources</div></div>`;
+  const wrapper = document.createElement('div');
+  wrapper.style.position = 'fixed';
+  wrapper.style.left = '-99999px';
+  wrapper.style.top = '0';
+  wrapper.style.width = '800px';
+  wrapper.innerHTML = resultHTML;
+  document.body.appendChild(wrapper);
+  const safeName = personalityName.replace(/[^\p{L}\p{N}\s_-]/gu, '').replace(/\s+/g, '_');
+  const opt = {
+    margin: 0.5,
+    filename: `${safeName || 'Money_Personality'}_Result.pdf`,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#0a2f1f' },
+    jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+  };
+  html2pdf().set(opt).from(wrapper).save().then(() => {
+    document.body.removeChild(wrapper);
+  }).catch(() => {
+    document.body.removeChild(wrapper);
+  });
+}
+function restartQuiz() {
+  playSound('click', 700);
+  currentQuestion = 0;
+  answers = {};
+  xp = 0;
+  userName = '';
+  userEmail = '';
+  userPhone = '';
+  userAge = '';
+  userGender = '';
+  document.getElementById('f-name').value = '';
+  document.getElementById('f-email').value = '';
+  document.getElementById('f-phone').value = '';
+  document.getElementById('f-age').value = '';
+  document.getElementById('f-gender').value = '';
+  showScreen('intro');
+}
+populateCountries();
+updateUI();
+</script>
+</body>
+</html>
