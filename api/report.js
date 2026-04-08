@@ -1,6 +1,6 @@
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 
-function wrapText(text, maxCharsPerLine = 85) {
+function wrapText(text, maxCharsPerLine = 80) {
   if (!text) return [''];
   const words = String(text).split(/\s+/);
   const lines = [];
@@ -26,7 +26,7 @@ function drawParagraph(page, text, x, y, options = {}) {
     size = 12,
     color = rgb(1, 1, 1),
     lineHeight = 18,
-    maxCharsPerLine = 85
+    maxCharsPerLine = 80
   } = options;
 
   const lines = wrapText(text, maxCharsPerLine);
@@ -47,32 +47,48 @@ function safeFilename(name) {
     .replace(/\s+/g, '_');
 }
 
-export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    res.status(405).json({ error: 'Method not allowed' });
-    return;
+async function embedImageFromUrl(pdfDoc, url) {
+  if (!url) return null;
+
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`Failed to fetch image: ${url}`);
+
+  const bytes = await response.arrayBuffer();
+  const contentType = response.headers.get('content-type') || '';
+
+  if (contentType.includes('png')) {
+    return await pdfDoc.embedPng(bytes);
   }
 
+  return await pdfDoc.embedJpg(bytes);
+}
+
+export default async function handler(req, res) {
   try {
-    const body =
-      typeof req.body === 'string'
-        ? JSON.parse(req.body)
-        : req.body;
+    if (req.method !== 'POST') {
+      return res.status(405).json({ error: 'Method not allowed' });
+    }
+
+    const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
 
     const {
-      personalityName,
-      description,
-      strengthLabel,
-      strengthText,
-      shadowLabel,
-      shadowText,
-      stepLabel,
-      stepText,
-      mixLabel,
-      percentages,
-      userName,
-      language
-    } = body;
+      userName = '',
+      language = 'en',
+      personalityName = 'Money Personality',
+      description = '',
+      strengthLabel = 'Your Strengths',
+      strengthText = '',
+      shadowLabel = 'Watch Out For',
+      shadowText = '',
+      stepLabel = 'Your Next Step',
+      stepText = '',
+      mixLabel = 'Your Personality Mix',
+      characterImage = '',
+      personalityColor = '#FFD700',
+      bestMatchName = '',
+      bestMatchReason = '',
+      percentages = []
+    } = body || {};
 
     const pdfDoc = await PDFDocument.create();
     let page = pdfDoc.addPage([595.28, 841.89]);
@@ -81,122 +97,180 @@ export default async function handler(req, res) {
     const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
     const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
+    const gold = rgb(1, 0.84, 0);
+    const white = rgb(1, 1, 1);
+    const softWhite = rgb(0.92, 0.96, 0.94);
+    const greenDark = rgb(0.04, 0.18, 0.12);
+    const card = rgb(0.09, 0.28, 0.19);
+    const barBg = rgb(0.18, 0.22, 0.20);
+    const barFill = rgb(0.13, 0.77, 0.37);
+
     page.drawRectangle({
       x: 0,
       y: 0,
       width,
       height,
-      color: rgb(0.04, 0.18, 0.12)
+      color: greenDark
     });
 
-    page.drawText('Money Personality Report', {
+    page.drawText('Millionaire Mind × Success Resources', {
       x: 40,
-      y: height - 50,
-      size: 16,
+      y: height - 40,
+      size: 11,
       font: fontBold,
-      color: rgb(1, 0.84, 0)
+      color: gold
     });
 
-    if (userName) {
-      page.drawText(`Name: ${userName}`, {
+    page.drawText(
+      userName ? `${userName}, here is your personalized result` : 'Here is your personalized result',
+      {
         x: 40,
-        y: height - 72,
-        size: 10,
-        font: fontRegular,
-        color: rgb(0.88, 0.95, 0.9)
-      });
+        y: height - 68,
+        size: 18,
+        font: fontBold,
+        color: white
+      }
+    );
+
+    let imageTopY = height - 110;
+
+    try {
+      const embeddedImage = await embedImageFromUrl(pdfDoc, characterImage);
+      if (embeddedImage) {
+        const imgWidth = 150;
+        const imgHeight = 150;
+        page.drawImage(embeddedImage, {
+          x: (width - imgWidth) / 2,
+          y: imageTopY - imgHeight,
+          width: imgWidth,
+          height: imgHeight
+        });
+      }
+    } catch (err) {
+      console.error('Character image embed failed:', err);
     }
 
-    if (language) {
-      page.drawText(`Language: ${String(language).toUpperCase()}`, {
-        x: width - 140,
-        y: height - 72,
-        size: 10,
-        font: fontRegular,
-        color: rgb(0.88, 0.95, 0.9)
-      });
-    }
-
-    page.drawText(personalityName || 'Your Result', {
+    page.drawText(personalityName, {
       x: 40,
-      y: height - 120,
+      y: 510,
       size: 28,
       font: fontBold,
-      color: rgb(1, 1, 1)
+      color: gold
     });
 
-    let y = height - 155;
-    y = drawParagraph(page, description || '', 40, y, {
+    let y = 480;
+    y = drawParagraph(page, description, 40, y, {
       font: fontRegular,
       size: 12,
-      color: rgb(0.92, 0.96, 0.94),
+      color: softWhite,
       lineHeight: 18,
       maxCharsPerLine: 78
     });
 
-    y -= 18;
+    y -= 15;
 
     page.drawRectangle({
       x: 40,
-      y: y - 135,
+      y: y - 85,
       width: width - 80,
-      height: 125,
-      color: rgb(0.09, 0.28, 0.19),
-      borderColor: rgb(0.2, 0.7, 0.4),
-      borderWidth: 1
+      height: 75,
+      color: card
     });
 
-    page.drawText(mixLabel || 'Your Personality Mix', {
+    page.drawText('Best Compatible Personality', {
       x: 55,
-      y: y - 25,
+      y: y - 24,
+      size: 12,
+      font: fontBold,
+      color: gold
+    });
+
+    page.drawText(bestMatchName || '-', {
+      x: 55,
+      y: y - 46,
+      size: 16,
+      font: fontBold,
+      color: white
+    });
+
+    drawParagraph(page, bestMatchReason || '', 200, y - 28, {
+      font: fontRegular,
+      size: 10,
+      color: softWhite,
+      lineHeight: 14,
+      maxCharsPerLine: 48
+    });
+
+    y -= 110;
+
+    page.drawRectangle({
+      x: 40,
+      y: y - 140,
+      width: width - 80,
+      height: 130,
+      color: card
+    });
+
+    page.drawText(mixLabel, {
+      x: 55,
+      y: y - 24,
       size: 13,
       font: fontBold,
-      color: rgb(1, 0.84, 0)
+      color: gold
     });
 
-    const entries = Array.isArray(percentages) ? percentages : [];
-    let rowY = y - 48;
+    let rowY = y - 50;
 
-    entries.forEach((item) => {
-      const label = item.label || '';
-      const value = Number(item.value || 0);
+    percentages.forEach((item) => {
+      const label = String(item?.label || '');
+      const value = Number(item?.value || 0);
 
       page.drawText(label, {
         x: 55,
         y: rowY,
         size: 10,
         font: fontRegular,
-        color: rgb(1, 1, 1)
+        color: white
       });
 
       page.drawRectangle({
-        x: 180,
-        y: rowY - 1,
-        width: 280,
+        x: 190,
+        y: rowY - 2,
+        width: 230,
         height: 10,
-        color: rgb(0.18, 0.22, 0.2)
+        color: barBg
       });
 
       page.drawRectangle({
-        x: 180,
-        y: rowY - 1,
-        width: Math.max(0, Math.min(280, 280 * (value / 100))),
+        x: 190,
+        y: rowY - 2,
+        width: Math.max(0, Math.min(230, 230 * (value / 100))),
         height: 10,
-        color: rgb(0.13, 0.77, 0.37)
+        color: barFill
       });
 
       page.drawText(`${value}%`, {
-        x: 475,
+        x: 440,
         y: rowY,
         size: 10,
         font: fontBold,
-        color: rgb(1, 0.84, 0)
+        color: gold
       });
 
-      rowY -= 24;
+      rowY -= 22;
     });
 
-    y -= 165;
+    page = pdfDoc.addPage([595.28, 841.89]);
+
+    page.drawRectangle({
+      x: 0,
+      y: 0,
+      width,
+      height,
+      color: greenDark
+    });
+
+    let y2 = height - 50;
 
     const sections = [
       { label: strengthLabel, text: strengthText },
@@ -204,57 +278,51 @@ export default async function handler(req, res) {
       { label: stepLabel, text: stepText }
     ];
 
-    for (const section of sections) {
-      if (y < 140) {
-        page = pdfDoc.addPage([595.28, 841.89]);
-        page.drawRectangle({
-          x: 0,
-          y: 0,
-          width,
-          height,
-          color: rgb(0.04, 0.18, 0.12)
-        });
-        y = height - 60;
-      }
-
+    sections.forEach((section) => {
       page.drawRectangle({
         x: 40,
-        y: y - 95,
+        y: y2 - 110,
         width: width - 80,
-        height: 85,
-        color: rgb(0.09, 0.28, 0.19),
-        borderColor: rgb(0.2, 0.7, 0.4),
-        borderWidth: 1
+        height: 95,
+        color: card
       });
 
       page.drawText(section.label || '', {
         x: 55,
-        y: y - 22,
-        size: 13,
+        y: y2 - 28,
+        size: 14,
         font: fontBold,
-        color: rgb(1, 0.84, 0)
+        color: gold
       });
 
-      drawParagraph(page, section.text || '', 55, y - 44, {
+      drawParagraph(page, section.text || '', 55, y2 - 52, {
         font: fontRegular,
         size: 11,
-        color: rgb(0.95, 0.97, 0.96),
+        color: softWhite,
         lineHeight: 16,
         maxCharsPerLine: 78
       });
 
-      y -= 110;
-    }
+      y2 -= 125;
+    });
+
+    page.drawText('Millionaire Mind × Success Resources', {
+      x: 40,
+      y: 30,
+      size: 10,
+      font: fontBold,
+      color: gold
+    });
 
     const pdfBytes = await pdfDoc.save();
-    const fileName = safeFilename(personalityName || 'Money_Personality_Report');
+    const fileName = safeFilename(`${userName ? userName + '_' : ''}${personalityName}`);
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="${fileName}.pdf"`);
-    res.status(200).send(Buffer.from(pdfBytes));
+    return res.status(200).send(Buffer.from(pdfBytes));
   } catch (error) {
     console.error('PDF generation failed:', error);
-    res.status(500).json({
+    return res.status(500).json({
       error: 'Failed to generate PDF',
       message: error.message
     });
