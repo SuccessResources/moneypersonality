@@ -1673,7 +1673,7 @@ function updateLocalizedSelect(id, placeholder, options) {
   });
   select.value = currentValue || '';
 }
-function populateCountries() {
+function populateCountries(preferredCode = '+60') {
   const select = document.getElementById('country-code');
   select.innerHTML = '';
   countries.forEach(country => {
@@ -1682,7 +1682,8 @@ function populateCountries() {
     option.textContent = country.name;
     select.appendChild(option);
   });
-  select.value = '+60';
+  const exists = Array.from(select.options).some(opt => opt.value === preferredCode);
+  select.value = exists ? preferredCode : '+60';
 }
 let audioCtx = null;
 let audioEnabled = true;
@@ -1806,6 +1807,9 @@ let userName = '';
 let userPhone = '';
 let userAge = '';
 let userGender = '';
+let userIp = '';
+let userCountryName = '';
+let userCountryCodeDetected = '';
 function showScreen(screenId) {
   document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
   const target = document.getElementById(screenId);
@@ -1897,6 +1901,45 @@ function prevQuestion() {
   }
 }
 function updatePhoneCode() {}
+
+async function autoDetectCountry() {
+  const providers = [
+    'https://ipapi.co/json/',
+    'https://ipwho.is/'
+  ];
+
+  for (const url of providers) {
+    try {
+      const res = await fetch(url, { cache: 'no-store' });
+      const data = await res.json();
+
+      const callingCode =
+        data.country_calling_code ||
+        (data.calling_code ? `+${String(data.calling_code).replace(/^\+/, '')}` : '');
+
+      const countryName =
+        data.country_name ||
+        data.country ||
+        '';
+
+      const ip =
+        data.ip ||
+        '';
+
+      if (callingCode) {
+        userIp = ip || userIp;
+        userCountryName = countryName || userCountryName;
+        userCountryCodeDetected = callingCode;
+        populateCountries(callingCode);
+        return;
+      }
+    } catch (err) {
+      console.warn('Country detection failed for provider:', url, err);
+    }
+  }
+
+  populateCountries('+60');
+}
 function getDominantPersonality() {
   const counts = { saver: 0, spender: 0, monk: 0, avoider: 0 };
   Object.entries(answers).forEach(([k, v]) => {
@@ -1990,7 +2033,10 @@ function sendToWebhook() {
   Object.entries(answers).forEach(([k, v]) => {
     if (typeof v === 'string' && counts[v] !== undefined) counts[v]++;
   });
+
   const dominant = Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
+  const percentages = getPersonalityPercentages();
+
   const data = {
     name: userName,
     email: userEmail,
@@ -1998,27 +2044,49 @@ function sendToWebhook() {
     age: userAge,
     gender: userGender,
     language: currentLanguage,
+    ip_address: userIp,
+    detected_country: userCountryName,
+    detected_country_calling_code: userCountryCodeDetected,
     personality_type: dominant,
     personality_name: getPersonalityText(dominant, 'name'),
     best_match: getPersonalityText(bestMatches[dominant].personality, 'name'),
-    saver_score: counts.saver,
-    spender_score: counts.spender,
-    monk_score: counts.monk,
-    avoider_score: counts.avoider,
+    saver_score: String(counts.saver),
+    spender_score: String(counts.spender),
+    monk_score: String(counts.monk),
+    avoider_score: String(counts.avoider),
+    saver_percentage: String(percentages.saver || 0),
+    spender_percentage: String(percentages.spender || 0),
+    monk_percentage: String(percentages.monk || 0),
+    avoider_percentage: String(percentages.avoider || 0),
     strength: getPersonalityText(dominant, 'strength'),
     shadow: getPersonalityText(dominant, 'shadow'),
     next_step: getPersonalityText(dominant, 'step'),
-    xp_earned: xp,
+    xp_earned: String(xp),
     timestamp: new Date().toISOString(),
     landing_page_url: window.location.href
   };
-  // Send to new webhook for Google Sheets & ActiveCampaign
-  fetch('https://hooks.zapier.com/hooks/catch/3673966/bq5tk72/', {
+
+  const formData = new URLSearchParams();
+  Object.entries(data).forEach(([key, value]) => {
+    formData.append(key, value ?? '');
+  });
+
+  fetch('https://hooks.zapier.com/hooks/catch/3673966/u72dgq3/', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  }).catch(err => console.log('Webhook error:', err));
+    body: formData,
+    keepalive: true
+  })
+    .then(async (response) => {
+      const responseText = await response.text();
+      console.log('Zapier webhook status:', response.status);
+      console.log('Zapier webhook response:', responseText);
+      if (!response.ok) {
+        console.warn('Zapier webhook did not return OK status.');
+      }
+    })
+    .catch(err => console.log('Webhook error:', err));
 }
+
 function shareResult() {
   playSound('click', 700);
   const dominant = getDominantPersonality();
@@ -2065,22 +2133,22 @@ function getReportPayload() {
   const percentages = getPersonalityPercentages();
 
   return {
-    userName: userName,
-    language: currentLanguage,
-    personalityName: getPersonalityText(dominant, 'name'),
-    description: getPersonalityText(dominant, 'desc'),
-    strengthLabel: getText('strengthLabel'),
-    strengthText: getPersonalityText(dominant, 'strength'),
-    shadowLabel: getText('shadowLabel'),
-    shadowText: getPersonalityText(dominant, 'shadow'),
-    stepLabel: getText('stepLabel'),
-    stepText: getPersonalityText(dominant, 'step'),
-    mixLabel: getText('mixLabel'),
+    userName: userName || '',
+    language: currentLanguage || 'en',
+    personalityName: getPersonalityText(dominant, 'name') || '',
+    description: getPersonalityText(dominant, 'desc') || '',
+    strengthLabel: getText('strengthLabel') || 'Your Strengths',
+    strengthText: getPersonalityText(dominant, 'strength') || '',
+    shadowLabel: getText('shadowLabel') || 'Watch Out For',
+    shadowText: getPersonalityText(dominant, 'shadow') || '',
+    stepLabel: getText('stepLabel') || 'Your Next Step',
+    stepText: getPersonalityText(dominant, 'step') || '',
+    mixLabel: getText('mixLabel') || 'Your Personality Mix',
     percentages: [
-      { label: getPersonalityText('saver', 'name'), value: percentages.saver || 0 },
-      { label: getPersonalityText('spender', 'name'), value: percentages.spender || 0 },
-      { label: getPersonalityText('monk', 'name'), value: percentages.monk || 0 },
-      { label: getPersonalityText('avoider', 'name'), value: percentages.avoider || 0 }
+      { label: getPersonalityText('saver', 'name') || 'Saver', value: Number(percentages.saver || 0) },
+      { label: getPersonalityText('spender', 'name') || 'Spender', value: Number(percentages.spender || 0) },
+      { label: getPersonalityText('monk', 'name') || 'Monk', value: Number(percentages.monk || 0) },
+      { label: getPersonalityText('avoider', 'name') || 'Avoider', value: Number(percentages.avoider || 0) }
     ]
   };
 }
@@ -2094,6 +2162,7 @@ async function downloadResultPDF() {
     btn.disabled = true;
 
     const payload = getReportPayload();
+    console.log('PDF payload:', payload);
 
     const response = await fetch('/api/report', {
       method: 'POST',
@@ -2102,7 +2171,10 @@ async function downloadResultPDF() {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to generate PDF');
+      const errorText = await response.text();
+      console.error('API error:', response.status, errorText);
+      alert(`PDF generation failed.\nStatus: ${response.status}\n\n${errorText}`);
+      return;
     }
 
     const blob = await response.blob();
@@ -2118,7 +2190,7 @@ async function downloadResultPDF() {
     window.URL.revokeObjectURL(url);
   } catch (error) {
     console.error('Download failed:', error);
-    alert('Sorry, the PDF could not be generated right now.');
+    alert(`Sorry, the PDF could not be generated right now.\n\n${error.message}`);
   } finally {
     btn.textContent = originalText;
     btn.disabled = false;
@@ -2141,8 +2213,8 @@ function restartQuiz() {
   document.getElementById('f-gender').value = '';
   showScreen('intro');
 }
-populateCountries();
 updateUI();
+autoDetectCountry();
 </script>
 </body>
 </html>
