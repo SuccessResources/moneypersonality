@@ -907,11 +907,11 @@ const t = pdfText[normalizedLanguage] || pdfText.en;
     drawCentered(page2, t.quote1, quoteY, width, {
       font: fontOblique, size: 12, color: softGray
     });
-    drawCentered(page2, t.quote1, quoteY, width, {
+    drawCentered(page2, t.quote2, quoteY - 18, width, {
       font: fontOblique, size: 12, color: softGray
     });
-    drawCentered(page2, '- T. Harv Eker', quoteY - 42, width, {
-      font: fontBold, size: 10, color: gold
+    drawCentered(page2, '- T. Harv Eker', quoteY - 48, width, {
+      font: fontBold, size: 12, color: gold
     });
 
     drawDivider(page2, 40, 45, width - 80, goldDim, 0.5);
