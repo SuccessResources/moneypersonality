@@ -1099,7 +1099,7 @@ const translations = {
     btnReveal: '🔓 ZEIGE MEINE PERSÖNLICHKEIT',
     privacyNote: '🔒 Deine Privatsphäre ist geschützt. Dein persönlicher PDF-Bericht wird sofort geliefert.',
     btnShare: '📤 Ergebnis teilen',
-    btnCopy: '📋 Link kopieren',
+    btnCopy: '📣 Jetzt Test teilen',
     btnDownloadPdf: '📄 PDF herunterladen',
     btnRetry: '↺ Noch einmal spielen',
     matchLabel: 'Beste passende Persönlichkeit',
@@ -1156,7 +1156,7 @@ const translations = {
     btnReveal: '🔓 REVELAR MI PERSONALIDAD',
     privacyNote: '🔒 Tu privacidad está protegida. Tu informe PDF personalizado se entrega al instante.',
     btnShare: '📤 Compartir resultado',
-    btnCopy: '📋 Copiar enlace',
+    btnCopy: '📣 Comparte este test',
     btnDownloadPdf: '📄 Descargar PDF',
     btnRetry: '↺ Jugar otra vez',
     matchLabel: 'Personalidad más compatible',
@@ -1655,12 +1655,11 @@ function fallbackCopy(text) {
     document.execCommand('copy');
     alert(getText('alerts').copied);
   } catch (e) {
-    alert('Unable to copy automatically. Please copy this text manually:
-
-' + text);
+    alert(`Unable to copy automatically. Please copy this text manually:\n\n${text}`);
   }
   document.body.removeChild(temp);
 }
+
 function getReportPayload() {
   const dominant = getDominantPersonality();
   const percentages = getPersonalityPercentages();
