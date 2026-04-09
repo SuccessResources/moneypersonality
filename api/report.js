@@ -263,11 +263,43 @@ function drawDiamond(page, cx, cy, size, color) {
   }
 }
 
+/**
+ * Sanitize filename for safe filesystem and HTTP header use
+ */
 function safeFilename(name) {
   return String(name || 'Money_Personality_Report')
     .replace(/[^\p{L}\p{N}\s_-]/gu, '')
     .trim()
-    .replace(/\s+/g, '_');
+    .replace(/\s+/g, '_')
+    .substring(0, 100);
+}
+
+/**
+ * Encode filename for RFC 5987 Content-Disposition header
+ * Supports all Unicode characters in both ASCII and non-ASCII filenames
+ */
+function encodeRFC5987Filename(filename) {
+  const ascii = /^[\x20-\x7E]*$/.test(filename);
+  
+  if (ascii) {
+    // For pure ASCII, just quote it
+    return `"${filename}"`;
+  }
+
+  // For non-ASCII, use RFC 5987 encoding: filename*=UTF-8''encoded-name
+  const encoded = Buffer.from(filename, 'utf8')
+    .toString('binary')
+    .split('')
+    .map(char => {
+      const code = char.charCodeAt(0);
+      return code < 128 && /^[\w\-.]$/.test(char) ? char : `%${code.toString(16).toUpperCase().padStart(2, '0')}`;
+    })
+    .join('');
+
+  return {
+    simple: safeFilename(filename),
+    extended: encoded
+  };
 }
 
 async function embedImageFromUrl(pdfDoc, url) {
@@ -783,23 +815,40 @@ export default async function handler(req, res) {
       color: midnight
     });
 
-    addLinkAnnotation(pdfDoc, page4, ctaX, ctaY, ctaW, ctaH, 'http://www.millionairemind.online/special');
+    addLinkAnnotation(pdfDoc, page4, ctaX, ctaY, ctaW, ctaH, 'http://www.millionairemind.online');
 
     const pdfBytes = await pdfDoc.save();
-    const fileName = safeFilename(`${userName ? userName + '_' : ''}${personalityName}_Report`);
+    
+    // Build filename with proper multilingual support
+    const baseFilename = `${userName ? userName + '_' : ''}${personalityName}_Report`;
+    const safeSimpleFilename = safeFilename(baseFilename);
+    const encodingInfo = encodeRFC5987Filename(baseFilename);
 
     if (format === 'thumbnail') {
       const base64 = Buffer.from(pdfBytes).toString('base64');
       res.setHeader('Content-Type', 'application/json');
       return res.status(200).json({
         pdfBase64: base64,
-        fileName: `${fileName}.pdf`,
+        fileName: `${safeSimpleFilename}.pdf`,
         pageCount: pdfDoc.getPageCount()
       });
     }
 
+    // Set headers with RFC 5987 encoding for multilingual filenames
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="${fileName}.pdf"`);
+    
+    // Use RFC 5987 encoding for the filename (works with all languages)
+    if (typeof encodingInfo === 'object') {
+      // Non-ASCII: use both filename and filename*
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename="${encodingInfo.simple}.pdf"; filename*=UTF-8''${encodingInfo.extended}.pdf`
+      );
+    } else {
+      // Pure ASCII: use simple quoted filename
+      res.setHeader('Content-Disposition', `attachment; filename=${encodingInfo}`);
+    }
+
     return res.status(200).send(Buffer.from(pdfBytes));
   } catch (error) {
     console.error('PDF generation failed:', error);
