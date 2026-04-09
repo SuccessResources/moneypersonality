@@ -1482,56 +1482,62 @@ footer a:hover { color: var(--gold); }
   </div>
   <div class="language-selector">
     <button class="lang-btn active" onclick="setLanguage(event, 'en')">EN</button>
-    <button class="lang-btn" onclick="setLanguage(event, 'zh')">中文</button>
     <button class="lang-btn" onclick="setLanguage(event, 'de')">DE</button>
     <button class="lang-btn" onclick="setLanguage(event, 'es')">ES</button>
   </div>
 </header>
 <div class="page">
   <!-- ===================== INTRO SCREEN ===================== -->
-  <div id="intro" class="screen active" style="padding-top:100px;text-align:center;min-height:100vh;justify-content:center;">
-    <img
-      src="https://cch-files.edge.live.ds25.io/cch/v/a4e3489d-6bf3-48c8-affb-c268ba45a538/files/69d4d31b32391_money-personality-edited.png"
-      alt="Money Personality"
-      style="
-        width:100%;
-        max-width:420px;
-        height:auto;
-        margin:8px auto 12px;
-        display:block;
-        filter:drop-shadow(0 16px 40px rgba(0,0,0,.4));
-      "
-    >
-    <h1 class="intro-title" style="font-family:'Playfair Display',serif;font-size:clamp(36px,9vw,60px);margin-bottom:16px;font-weight:900;background:linear-gradient(135deg,var(--gold),#FFA500);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;" id="intro-headline">
-      Discover Your Money Personality
-    </h1>
-    <p style="font-size:13px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--neon);margin-bottom:24px;" id="intro-tag">
-      FREE PERSONALIZED PDF REPORT
-    </p>
-    <p style="font-size:17px;color:rgba(255,255,255,.85);margin-bottom:32px;line-height:1.8;max-width:600px;margin-left:auto;margin-right:auto;" id="intro-sub">
-      The way you think about money shapes every financial decision you make — and how you relate to the people around you. This short assessment reveals your unique Money Personality and delivers a personalized PDF report to help you understand your strengths, improve your habits, and communicate better about money with those who matter most.
-    </p>
-    <div class="intro-value-props" id="intro-value-props">
-      <div class="intro-value-item">
-        <span class="intro-value-icon">🧠</span>
-        <span class="intro-value-text" id="intro-vp1"><strong>Understand your money patterns</strong> — why you save, spend, avoid, or detach — and how those patterns shape your financial future.</span>
-      </div>
-      <div class="intro-value-item">
-        <span class="intro-value-icon">💬</span>
-        <span class="intro-value-text" id="intro-vp2"><strong>Improve money conversations</strong> — discover how your personality interacts with partners, family, and colleagues when it comes to finances.</span>
-      </div>
-      <div class="intro-value-item">
-        <span class="intro-value-icon">📄</span>
-        <span class="intro-value-text" id="intro-vp3"><strong>Get your personalized PDF</strong> — receive a detailed report with your personality profile, compatibility match, strengths, blind spots, and your #1 next step.</span>
-      </div>
+<section id="intro" class="screen active">
+  <img
+    class="hero-img"
+    src="https://cch-files.edge.live.ds25.io/cch/v/a4e3489d-6bf3-48c8-affb-c268ba45a538/files/69d4d31b32391_money-personality-edited.png"
+    alt="Money Personality"
+  >
+
+  <h1 class="intro-title">Discover Your Money Personality</h1>
+  <p class="intro-tag">Free Personalized PDF Report</p>
+  <p class="intro-sub">
+    Find out what's secretly controlling your financial success in just 2 minutes.
+    The real reason money feels easy for some people and frustrating for others often
+    starts with a hidden pattern you've never been shown how to see.
+  </p>
+
+  <div class="intro-value-props">
+    <div class="intro-value-item">
+      <span class="intro-value-icon">💸</span>
+      <span class="intro-value-text"><strong>Why you earn what you earn</strong> — and why your current pattern keeps repeating.</span>
     </div>
-    <button class="btn-start" style="background:linear-gradient(135deg,var(--accent-red),#FF5A5F,#E63946);color:#FFF;border:none;padding:24px 64px;border-radius:100px;font-family:'Playfair Display',serif;font-size:24px;font-weight:800;letter-spacing:.08em;cursor:pointer;transition:all .3s;box-shadow:0 10px 40px rgba(230,57,70,.3);text-transform:uppercase;" onclick="startQuiz()" id="btn-start">
-      ⚡ START MY ASSESSMENT
-    </button>
-    <p style="font-size:13px;color:var(--muted);margin-top:28px;" id="intro-note">
-      Takes 2-3 minutes • Your personalized PDF is delivered instantly • 100% private
+    <div class="intro-value-item">
+      <span class="intro-value-icon">🕳️</span>
+      <span class="intro-value-text"><strong>Why money slips away</strong> — feels stressful, or never seems to stay with you for long.</span>
+    </div>
+    <div class="intro-value-item">
+      <span class="intro-value-icon">🎯</span>
+      <span class="intro-value-text"><strong>Your biggest financial blind spot</strong> — the one silently shaping your decisions.</span>
+    </div>
+    <div class="intro-value-item">
+      <span class="intro-value-icon">🚀</span>
+      <span class="intro-value-text"><strong>The next step to break the cycle</strong> — and start thinking like wealthier people do.</span>
+    </div>
+    <div class="intro-value-item">
+      <span class="intro-value-icon">📄</span>
+      <span class="intro-value-text"><strong>Get your personalized detailed report</strong> — with your personality profile, compatibility match, strengths, blind spots, and your #1 next step.</span>
+    </div>
+  </div>
+
+  <div class="quiz-tip">
+    <p class="quiz-tip-title">💡 Important Tip for Accurate Results</p>
+    <p class="quiz-tip-text">
+      Don't overthink your answers. Go with what comes to mind <strong>instantly</strong> —
+      your first instinct is always the most accurate.
     </p>
   </div>
+
+  <button id="btn-start" class="btn-start" type="button">⚡ Start My Assessment</button>
+
+  <p class="intro-note">Takes 2–3 minutes • Your personalized PDF is delivered instantly • 100% private</p>
+</section>
 
   <!-- ===================== QUIZ SCREEN ===================== -->
   <div id="quiz" class="screen" style="padding-top:88px">
@@ -1638,9 +1644,9 @@ footer a:hover { color: var(--gold); }
   <div>
     <a href="https://www.millionairemind.online">Millionaire Mind Online</a>
     <span>·</span>
-    <a href="#">Privacy Policy</a>
+    <a href="https://docs.google.com/document/d/1WWRyCrQ9jwLe8NR4A270KG3Ggyrk1D4b7Sxud95sIYo/edit?tab=t.0" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
     <span>·</span>
-    <a href="#">Terms & Conditions</a>
+    <a href="https://www.millionairemindworld.com/terms-and-conditions" target="_blank" rel="noopener noreferrer">Terms & Conditions</a>
   </div>
   <div style="margin-top:12px">Copyright © 2026 Success Resources · All Rights Reserved</div>
 </footer>
@@ -1656,10 +1662,10 @@ const characterImages = {
 const characterIcons = { saver: '🔒', spender: '🛍️', monk: '🧘', avoider: '😐' };
 const characterColors = { saver: '#22C55E', spender: '#E63946', monk: '#16A34A', avoider: '#FFD700' };
 const bestMatches = {
-  saver: { personality: 'spender', reason: { en: 'You balance each other well. Your discipline keeps things stable, and their spontaneity helps you enjoy life more.', zh: '你们彼此平衡得很好。你的纪律带来稳定，而他们的随性让你更享受生活。', de: 'Ihr gleicht euch gut aus. Deine Disziplin bringt Stabilität, und ihre Spontanität hilft dir, das Leben mehr zu genießen.', es: 'Se equilibran muy bien. Tu disciplina aporta estabilidad y su espontaneidad te ayuda a disfrutar más la vida.' } },
-  spender: { personality: 'saver', reason: { en: 'Your opposite becomes your strength. They help with structure, while you bring joy and energy.', zh: '你的相反面会成为你的优势。他们带来结构，而你带来快乐和活力。', de: 'Dein Gegenteil wird zu deiner Stärke. Sie bringen Struktur, während du Freude und Energie mitbringst.', es: 'Tu opuesto se convierte en tu fortaleza. Ellos aportan estructura y tú traes alegría y energía.' } },
-  monk: { personality: 'avoider', reason: { en: 'You both prefer low drama. Together you can create a calm, low-pressure space around money.', zh: '你们都不喜欢太多压力。一起时，你们可以营造一个平静、低压力的金钱环境。', de: 'Ihr mögt beide wenig Drama. Zusammen könnt ihr einen ruhigen, druckfreien Umgang mit Geld schaffen.', es: 'Ambos prefieren poca presión. Juntos pueden crear un espacio tranquilo y sin mucho estrés alrededor del dinero.' } },
-  avoider: { personality: 'spender', reason: { en: 'They bring action and energy. You bring thoughtfulness. Together, you help each other move forward.', zh: '他们带来行动和活力，而你带来思考。你们能互相帮助，一起前进。', de: 'Sie bringen Energie und Handlung mit. Du bringst Nachdenklichkeit mit. Zusammen helft ihr euch gegenseitig voranzukommen.', es: 'Ellos traen acción y energía. Tú aportas reflexión. Juntos se ayudan a avanzar.' } }
+  saver: { personality: 'spender', reason: { en: 'You balance each other well. Your discipline keeps things stable, and their spontaneity helps you enjoy life more.', de: 'Ihr gleicht euch gut aus. Deine Disziplin bringt Stabilität, und ihre Spontanität hilft dir, das Leben mehr zu genießen.', es: 'Se equilibran muy bien. Tu disciplina aporta estabilidad y su espontaneidad te ayuda a disfrutar más la vida.' } },
+  spender: { personality: 'saver', reason: { en: 'Your opposite becomes your strength. They help with structure, while you bring joy and energy.', de: 'Dein Gegenteil wird zu deiner Stärke. Sie bringen Struktur, während du Freude und Energie mitbringst.', es: 'Tu opuesto se convierte en tu fortaleza. Ellos aportan estructura y tú traes alegría y energía.' } },
+  monk: { personality: 'avoider', reason: { en: 'You both prefer low drama. Together you can create a calm, low-pressure space around money.', de: 'Ihr mögt beide wenig Drama. Zusammen könnt ihr einen ruhigen, druckfreien Umgang mit Geld schaffen.', es: 'Ambos prefieren poca presión. Juntos pueden crear un espacio tranquilo y sin mucho estrés alrededor del dinero.' } },
+  avoider: { personality: 'spender', reason: { en: 'They bring action and energy. You bring thoughtfulness. Together, you help each other move forward.', de: 'Sie bringen Energie und Handlung mit. Du bringst Nachdenklichkeit mit. Zusammen helft ihr euch gegenseitig voranzukommen.', es: 'Ellos traen acción y energía. Tú aportas reflexión. Juntos se ayudan a avanzar.' } }
 };
 const translations = {
   en: {
@@ -1710,56 +1716,6 @@ const translations = {
       spender: { name: 'The Spender', code: 'Spender', desc: 'You enjoy the present and know how to make life feel exciting. Money feels like a tool for experience.', strength: 'You bring joy, generosity, and energy. You know how to live, not just survive.', shadow: 'Without structure, money can disappear fast. Future-you may not love present-you\'s choices.', step: 'Set up an automatic savings transfer before you spend. Keep the fun, but protect the future.' },
       monk: { name: 'The Monk', code: 'Monk', desc: 'You live simply and don\'t let money control your identity. You care more about peace than status.', strength: 'You are grounded, calm, and less driven by greed or pressure than most people.', shadow: 'Being detached from money can stop you from building more freedom and impact.', step: 'See wealth as a tool, not a threat. Money can support your values when you use it well.' },
       avoider: { name: 'The Avoider', code: 'Avoider', desc: 'Money feels stressful, so you often put it off. The good news: noticing that is already a breakthrough.', strength: 'You are more aware than you think. Once you start, you can change quickly.', shadow: 'Avoiding money problems makes them grow. Delay adds pressure.', step: 'Do one small thing this week. Check one account, pay one bill, or set one goal.' }
-    }
-  },
-  zh: {
-    headline: '发现你的金钱性格',
-    introTag: '免费个性化 PDF 报告',
-    subheadline: '你对金钱的思维方式，影响着你做出的每一个财务决定 — 也影响着你与身边人的关系。这份简短的评估将揭示你独特的金钱性格，并为你生成一份个性化 PDF 报告，帮助你了解自己的优势、改善习惯，并在金钱话题上与重要的人更好地沟通。',
-    introVP1: '<strong>了解你的金钱模式</strong> — 你为什么存钱、花钱、逃避或超然 — 以及这些模式如何塑造你的财务未来。',
-    introVP2: '<strong>改善金钱对话</strong> — 发现你的金钱性格如何与伴侣、家人和同事在财务方面互动。',
-    introVP3: '<strong>获取个性化 PDF</strong> — 收到一份详细报告，包括你的性格分析、相容性匹配、优势、盲点以及你的第一步行动。',
-    btnStart: '⚡ 开始我的评估',
-    noteTime: '2-3分钟完成 • 个性化 PDF 即时发送 • 100%隐私保护',
-    formTitle: '🎉 你快完成了！',
-    formSub: '输入你的资料，解锁你的专属金钱性格结果，获取免费 PDF 报告，并领取 Millionaire Mind Online 免费门票。',
-    labelName: '你的名字',
-    labelEmail: '邮箱地址',
-    labelPhone: 'WhatsApp / 电话号码',
-    labelAge: '年龄',
-    labelGender: '性别',
-    agePlaceholder: '请选择你的年龄',
-    genderPlaceholder: '请选择你的性别',
-    ageOptions: ['18岁以下', '18–24', '25–34', '35–44', '45–54', '55岁以上'],
-    genderOptions: ['男性', '女性', '不愿透露'],
-    btnReveal: '🔓 揭示我的性格',
-    privacyNote: '🔒 你的隐私受到保护。个性化 PDF 报告即时发送。',
-    ctaTitle: '准备好重塑你的金钱蓝图了吗？',
-    ctaSub: '加入成千上万的人，在 Millionaire Mind Online 改变他们与金钱的关系。你的性格很独特，你的改变也应该如此。',
-    btnJoin: '🚀 领取你的免费门票',
-    hybridBadge: '深入学习',
-    hybridTitle: '用经过验证的策略掌握你的<span>金钱性格</span>',
-    hybridSub: '你的金钱性格报告只是开始。在 Millionaire Mind Hybrid，你将发现专为你的性格类型设计的财富策略 — 让你以最适合自己的方式管理、增长和保护你的金钱。',
-    hybridFeatures: ['✓ 针对性格的理财策略', '✓ 线上+线下混合体验', '✓ 深度财富蓝图课程'],
-    btnHybrid: '🔥 了解更多关于 HYBRID',
-    btnShare: '📤 分享我的结果',
-    btnCopy: '📋 复制链接',
-    btnDownloadPdf: '📄 下载 PDF',
-    btnRetry: '↺ 再试一次',
-    matchLabel: '最适合的配对性格',
-    resultEyebrow: '你的金钱性格',
-    mixLabel: '你的性格比例',
-    strengthLabel: '你的优势',
-    shadowLabel: '需要注意',
-    stepLabel: '你的下一步',
-    nextBtn: '继续 →',
-    backBtn: '← 返回',
-    alerts: { name: '请输入你的名字', email: '请输入有效的邮箱地址', phone: '请输入你的电话号码', age: '请选择你的年龄', gender: '请选择你的性别', copied: '链接已复制！快分享给朋友吧 🎉' },
-    personalities: {
-      saver: { name: '储蓄型人格', code: '储蓄型', desc: '你对金钱很有纪律。稳定会让你有安全感，你喜欢知道自己已经做好准备。', strength: '你会提前计划，避免乱花钱，并一步一步建立安全感。', shadow: '你的谨慎有时会变成束缚。你太专注保护金钱，反而忘了享受生活。', step: '给自己一个"没有罪恶感"的享受预算。让金钱不只是保护你，也支持你生活。' },
-      spender: { name: '消费型人格', code: '消费型', desc: '你喜欢活在当下，也知道怎样让生活更有乐趣。对你来说，钱是用来体验生活的工具。', strength: '你带来快乐、慷慨和活力。你知道怎么生活，而不只是生存。', shadow: '如果没有结构，钱很快就会花光。未来的你可能不会喜欢现在的决定。', step: '先设定自动储蓄，再去享受。保留快乐，也照顾未来。' },
-      monk: { name: '隐士型人格', code: '隐士型', desc: '你生活简单，不让金钱决定你的身份。对你来说，平静比地位更重要。', strength: '你很踏实、平静，也不像大多数人那样容易被贪念或压力推动。', shadow: '如果你和金钱太保持距离，可能会错过更多自由和影响力。', step: '把财富看成工具，而不是威胁。好好使用金钱，它也能支持你的价值观。' },
-      avoider: { name: '逃避型人格', code: '逃避型', desc: '金钱会让你有压力，所以你常常拖着不处理。好消息是：能意识到这一点已经是突破。', strength: '你比自己想的更有觉察。一旦开始行动，你可以改变得很快。', shadow: '逃避金钱问题只会让问题变大。拖延会让压力越来越重。', step: '这周只做一件小事。查一个账户、付一张账单，或设一个目标。' }
     }
   },
   de: {
@@ -1876,18 +1832,6 @@ const localizedQuestions = {
     { text: "Think about 10 years from now. Which future sounds best to you?", answers: [{ emoji: "☮️", text: "A peaceful life, simple and comfortable.", type: "monk" }, { emoji: "🌍", text: "Freedom, travel, fun, and enough money to enjoy life.", type: "spender" }, { emoji: "🌫️", text: "Honestly… I don't really like thinking that far ahead.", type: "avoider" }, { emoji: "🏠", text: "A stable life, good savings, and no money stress.", type: "saver" }] },
     { text: "Final question. Which quote sounds the most like you?", answers: [{ emoji: "📚", text: "Being prepared makes me feel safe.", type: "saver" }, { emoji: "🫠", text: "I was going to fix my finances… then time just disappeared.", type: "avoider" }, { emoji: "🧘", text: "Money is useful, but it's not everything.", type: "monk" }, { emoji: "🛍️", text: "I work hard, so I should enjoy what I earn.", type: "spender" }] }
   ],
-  zh: [
-    { text: "你刚得到一份新工作。你的月薪是 3,000 美元。你的第一个想法是什么？", answers: [{ emoji: "🏦", text: "我先要看看预算，算出能存多少钱。", type: "saver" }, { emoji: "🎉", text: "不错，我应该买点东西奖励自己。", type: "spender" }, { emoji: "🙂", text: "只要我能过得舒服，我就很满足了。", type: "monk" }, { emoji: "😅", text: "我知道我应该做个计划……但晚一点吧。", type: "avoider" }] },
-    { text: "你的第一笔工资到账了。你接下来会做什么？", answers: [{ emoji: "🙈", text: "我告诉自己之后再处理，然后尽量不去看。", type: "avoider" }, { emoji: "🌿", text: "我就让它放在那里。钱有用，但我不会太兴奋。", type: "monk" }, { emoji: "🛍️", text: "我会犒赏自己，因为发薪日应该开心一点。", type: "spender" }, { emoji: "🔐", text: "我会马上把一部分转进储蓄。", type: "saver" }] },
-    { text: "同事邀请你下班后去一家很贵的餐厅。你会怎么做？", answers: [{ emoji: "🍝", text: "我会去，也会享受一下。偶尔开心一下挺好。", type: "spender" }, { emoji: "📱", text: "我会先看看价格，再决定要不要去。", type: "saver" }, { emoji: "🧘", text: "我会拒绝。安静的晚上更适合我。", type: "monk" }, { emoji: "🫥", text: "我会说我再想想，然后就没下文了。", type: "avoider" }] },
-    { text: "你想给房间买点东西。结果会怎样？", answers: [{ emoji: "🛒", text: "我把东西加进购物车，关掉页面，又打开，然后什么也没做。", type: "avoider" }, { emoji: "🌱", text: "我觉得自己已经拥有需要的东西了。", type: "monk" }, { emoji: "✨", text: "我会买那些能让生活更舒服的东西。", type: "spender" }, { emoji: "📊", text: "我会比较价格，再小心选择。", type: "saver" }] },
-    { text: "账单周到了。房租、电话费和其他费用一起出现。你的反应是什么？", answers: [{ emoji: "🍃", text: "还好，我的生活比较简单，所以比较容易处理。", type: "monk" }, { emoji: "😵", text: "我一看到就有压力，只想先躺一下。", type: "avoider" }, { emoji: "✅", text: "虽然不开心，但我早就准备好了。", type: "saver" }, { emoji: "💸", text: "我会付，但心里还是会有点痛。", type: "spender" }] },
-    { text: "你的笔记本电脑坏了，维修要 800 美元。你会怎么做？", answers: [{ emoji: "🧯", text: "很痛，但这就是紧急储蓄存在的原因。", type: "saver" }, { emoji: "😬", text: "我只会盯着价格看，感觉灵魂都飞走了。", type: "avoider" }, { emoji: "🪷", text: "我会保持冷静，找最简单的解决方法。", type: "monk" }, { emoji: "🛠️", text: "很烦，但我会想办法解决，然后继续往前。", type: "spender" }] },
-    { text: "几个月后，你拿到 1,000 美元奖金。你会怎么用？", answers: [{ emoji: "🎉", text: "这笔钱已经有自己的快乐计划了。", type: "spender" }, { emoji: "🙂", text: "不错，我会用在需要的地方，不会想太多。", type: "monk" }, { emoji: "🧠", text: "其中一部分应该存起来，或者做点聪明的安排。", type: "saver" }, { emoji: "😐", text: "我想做个聪明决定，但最后却什么都没决定。", type: "avoider" }] },
-    { text: "朋友说：'你应该开始投资。' 哪个最像你？", answers: [{ emoji: "🙉", text: "我只希望他不要继续问，因为我根本不懂。", type: "avoider" }, { emoji: "📈", text: "可以，但我要先弄懂，而且要谨慎。", type: "saver" }, { emoji: "🍹", text: "也许以后吧。现在我更想享受生活。", type: "spender" }, { emoji: "🌙", text: "我懂这个道理，但让钱增值这件事对我没那么重要。", type: "monk" }] },
-    { text: "想象 10 年后的自己。哪种未来最吸引你？", answers: [{ emoji: "☮️", text: "平静、简单、舒服的生活。", type: "monk" }, { emoji: "🌍", text: "自由、旅行、乐趣，还有足够的钱享受生活。", type: "spender" }, { emoji: "🌫️", text: "老实说……我不太喜欢想那么远。", type: "avoider" }, { emoji: "🏠", text: "稳定的生活、不错的储蓄，没有金钱压力。", type: "saver" }] },
-    { text: "最后一个问题。哪句话最像你？", answers: [{ emoji: "📚", text: "有准备会让我安心。", type: "saver" }, { emoji: "🫠", text: "我本来想整理财务……然后时间就这样过去了。", type: "avoider" }, { emoji: "🧘", text: "钱很有用，但它不是一切。", type: "monk" }, { emoji: "🛍️", text: "我努力工作，所以应该享受自己赚的钱。", type: "spender" }] }
-  ],
   de: [
     { text: "Du hast gerade einen neuen Job bekommen. Dein Gehalt beträgt 3.000 $ im Monat. Was denkst du zuerst?", answers: [{ emoji: "🏦", text: "Zuerst muss ich mein Budget ansehen und schauen, wie viel ich sparen kann.", type: "saver" }, { emoji: "🎉", text: "Super. Ich sollte mir etwas zur Feier kaufen.", type: "spender" }, { emoji: "🙂", text: "Solange ich bequem leben kann, bin ich zufrieden.", type: "monk" }, { emoji: "😅", text: "Ich weiß, ich sollte einen Plan machen … aber vielleicht später.", type: "avoider" }] },
     { text: "Dein erstes Gehalt ist da. Was machst du als Nächstes?", answers: [{ emoji: "🙈", text: "Ich sage mir, dass ich es später regle, und schaue lieber nicht zu genau hin.", type: "avoider" }, { emoji: "🌿", text: "Ich lasse es einfach dort. Geld ist nützlich, aber ich werde nicht besonders aufgeregt.", type: "monk" }, { emoji: "🛍️", text: "Ich gönne mir etwas, weil Zahltag sich gut anfühlen sollte.", type: "spender" }, { emoji: "🔐", text: "Ich überweise sofort etwas auf mein Sparkonto.", type: "saver" }] },
@@ -1924,9 +1868,13 @@ function getPersonalityText(type, field) {
   return (langPack && langPack[field]) || enPack[field] || '';
 }
 function setLanguage(event, lang) {
+  const allowedLanguages = ['en', 'de', 'es'];
+  if (!allowedLanguages.includes(lang)) lang = 'en';
+
   currentLanguage = lang;
   document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-  if (event && event.target) event.target.classList.add('active');
+  const activeBtn = document.querySelector(`.lang-btn[onclick*="'${lang}'"]`);
+  if (activeBtn) activeBtn.classList.add('active');
   updateUI();
   if (document.getElementById('quiz').classList.contains('active')) renderQuestion();
   if (document.getElementById('result').classList.contains('active')) {
