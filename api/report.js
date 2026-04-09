@@ -1,191 +1,41 @@
 import { PDFDocument, StandardFonts, rgb, PDFName, PDFString, PDFArray } from 'pdf-lib';
-import fontkit from '@pdf-lib/fontkit';
-import https from 'https';
-import http from 'http';
 
 // ================================================================
-// LANGUAGE / FONT HELPERS
+// CRITICAL FIX: RFC 5987 ENCODING FOR HEADERS
 // ================================================================
 
-function containsCJK(text = '') {
-  return /[\u3400-\u9FFF\uF900-\uFAFF\u4E00-\u9FFF]/.test(String(text));
-}
-
-function containsNonLatin(text = '') {
-  return /[^\u0000-\u00FF]/.test(String(text));
-}
-
-function sanitizeText(text = '') {
-  return String(text || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-}
-
-function getBaseUrl(req) {
-  const proto =
-    req.headers['x-forwarded-proto'] ||
-    req.headers['X-Forwarded-Proto'] ||
-    'https';
-  const host =
-    req.headers['x-forwarded-host'] ||
-    req.headers['host'];
-
-  return `${proto}://${host}`;
-}
-
 /**
- * Fetch with better error handling and logging
+ * Encode filename for safe HTTP header (handles ALL languages)
+ * This is the KEY FIX for Chinese/multilingual filenames
  */
-async function fetchArrayBuffer(url) {
-  console.log(`[Font] Fetching font from: ${url}`);
+function encodeRFC5987Filename(filename) {
+  const ascii = /^[\x20-\x7E]*$/.test(filename);
   
-  return new Promise((resolve, reject) => {
-    const protocol = url.startsWith('https') ? https : http;
-    
-    protocol.get(url, { timeout: 30000 }, (response) => {
-      console.log(`[Font] Response status: ${response.statusCode}`);
-      
-      if (response.statusCode !== 200) {
-        reject(new Error(`HTTP ${response.statusCode}: ${url}`));
-        return;
-      }
-
-      const chunks = [];
-      let totalSize = 0;
-
-      response.on('data', (chunk) => {
-        chunks.push(chunk);
-        totalSize += chunk.length;
-        console.log(`[Font] Downloaded: ${(totalSize / 1024 / 1024).toFixed(2)}MB`);
-      });
-
-      response.on('end', () => {
-        const buffer = Buffer.concat(chunks);
-        console.log(`[Font] Total size: ${(buffer.length / 1024 / 1024).toFixed(2)}MB`);
-        resolve(buffer.buffer);
-      });
-
-      response.on('error', (err) => {
-        console.error(`[Font] Stream error:`, err.message);
-        reject(err);
-      });
-    }).on('error', (err) => {
-      console.error(`[Font] Request error:`, err.message);
-      reject(err);
-    });
-  });
-}
-
-/**
- * Load Unicode font with multiple fallback sources
- */
-async function loadUnicodeFontBytes(req) {
-  const baseUrl = getBaseUrl(req);
-
-  // Priority: Local > Self-hosted > CDN
-  const candidates = [
-    {
-      url: `${baseUrl}/fonts/NotoSansCJK-Regular.ttf`,
-      name: 'Local TTF'
-    },
-    {
-      url: `${baseUrl}/fonts/NotoSansCJK-Regular.otf`,
-      name: 'Local OTF'
-    },
-    {
-      url: 'https://raw.githubusercontent.com/notofonts/noto-cjk/main/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Regular.otf',
-      name: 'GitHub OTF'
-    },
-    {
-      url: 'https://cdn.jsdelivr.net/gh/notofonts/noto-cjk@main/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Regular.otf',
-      name: 'jsDelivr CDN'
-    },
-    {
-      url: 'https://unpkg.com/@notofonts/noto-cjk@latest/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Regular.otf',
-      name: 'unpkg CDN'
-    }
-  ];
-
-  let lastError = null;
-
-  for (const candidate of candidates) {
-    try {
-      console.log(`[Font] Trying ${candidate.name}: ${candidate.url}`);
-      const bytes = await fetchArrayBuffer(candidate.url);
-      console.log(`[Font] ✅ SUCCESS: ${candidate.name}`);
-      return bytes;
-    } catch (err) {
-      console.warn(`[Font] ❌ FAILED ${candidate.name}: ${err.message}`);
-      lastError = err;
-      // Continue to next candidate
-    }
+  if (ascii) {
+    // Pure ASCII: "Report.pdf" → just quote it
+    return `"${filename}"`;
   }
 
-  console.error(`[Font] All font sources failed. Last error: ${lastError?.message}`);
-  throw new Error(
-    `Could not load CJK font from any source. Options:\n` +
-    `1. Add local font: public/fonts/NotoSansCJK-Regular.otf\n` +
-    `2. Check internet connection (CDN access)\n` +
-    `Last error: ${lastError?.message}`
-  );
-}
+  // Non-ASCII (Chinese, Arabic, etc): UTF-8 percent-encode
+  const encoded = Buffer.from(filename, 'utf8')
+    .toString('binary')
+    .split('')
+    .map(char => {
+      const code = char.charCodeAt(0);
+      return code < 128 && /^[\w\-.]$/.test(char) 
+        ? char 
+        : `%${code.toString(16).toUpperCase().padStart(2, '0')}`;
+    })
+    .join('');
 
-/**
- * Get appropriate fonts with intelligent fallback
- */
-async function getFonts(pdfDoc, req, allText) {
-  console.log('[Font] Initializing fonts...');
-  
-  const regularLatin = await pdfDoc.embedFont(StandardFonts.Helvetica);
-  const boldLatin = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-  const obliqueLatin = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
-
-  const hasNonLatin = containsNonLatin(allText);
-  const hasCJK = containsCJK(allText);
-
-  console.log(`[Font] Text analysis: hasNonLatin=${hasNonLatin}, hasCJK=${hasCJK}`);
-
-  if (!hasNonLatin) {
-    console.log('[Font] Using Latin-only fonts (Helvetica)');
-    return {
-      regular: regularLatin,
-      bold: boldLatin,
-      oblique: obliqueLatin,
-      unicode: false,
-      cjk: false
-    };
-  }
-
-  // Load Unicode font
-  console.log('[Font] Loading Unicode font (NotoSansCJK)...');
-  try {
-    pdfDoc.registerFontkit(fontkit);
-    const unicodeBytes = await loadUnicodeFontBytes(req);
-    
-    console.log('[Font] Embedding font (WITHOUT subsetting)...');
-    // TRY WITHOUT SUBSET FIRST - this is more reliable for CJK
-    const unicodeFont = await pdfDoc.embedFont(unicodeBytes, { subset: false });
-    
-    console.log('[Font] ✅ Unicode font loaded successfully');
-    return {
-      regular: unicodeFont,
-      bold: unicodeFont,
-      oblique: unicodeFont,
-      unicode: true,
-      cjk: hasCJK
-    };
-  } catch (err) {
-    console.error('[Font] ❌ Unicode font loading failed:', err.message);
-    console.warn('[Font] Falling back to Latin fonts (Chinese will not render)');
-    
-    // Fallback: return Latin fonts anyway
-    return {
-      regular: regularLatin,
-      bold: boldLatin,
-      oblique: obliqueLatin,
-      unicode: false,
-      cjk: false,
-      error: err.message
-    };
-  }
+  return {
+    simple: String(filename || 'Report')
+      .replace(/[^\p{L}\p{N}\s_-]/gu, '')
+      .trim()
+      .replace(/\s+/g, '_')
+      .substring(0, 100),
+    extended: encoded
+  };
 }
 
 // ================================================================
@@ -215,115 +65,49 @@ function lerpColor(c1, c2, t) {
 // ================================================================
 
 function wrapTextByWidth(text, font, fontSize, maxWidth) {
-  const safeText = sanitizeText(text);
-  if (!safeText) return [''];
-
-  const paragraphs = safeText.split('\n');
+  if (!text) return [''];
+  const words = String(text).split(/\s+/);
   const lines = [];
-
-  for (const paragraph of paragraphs) {
-    if (!paragraph.trim()) {
-      lines.push('');
-      continue;
-    }
-
-    // For CJK text: wrap character-by-character
-    if (containsCJK(paragraph)) {
-      let current = '';
-      for (const char of paragraph) {
-        const test = current + char;
-        try {
-          const width = font.widthOfTextAtSize(test, fontSize);
-          if (width <= maxWidth) {
-            current = test;
-          } else {
-            if (current) lines.push(current);
-            current = char;
-          }
-        } catch (err) {
-          console.warn(`[Text] Width calculation failed for char: ${char}`, err.message);
-          // If width calculation fails, just add char anyway
-          if (current.length > 50) {
-            // Arbitrary limit to prevent infinite lines
-            lines.push(current);
-            current = char;
-          } else {
-            current += char;
-          }
-        }
-      }
+  let current = '';
+  for (const word of words) {
+    const test = current ? `${current} ${word}` : word;
+    if (font.widthOfTextAtSize(test, fontSize) <= maxWidth) {
+      current = test;
+    } else {
       if (current) lines.push(current);
-      continue;
+      current = word;
     }
-
-    // For Latin text: wrap by word
-    const words = paragraph.split(/\s+/);
-    let current = '';
-
-    for (const word of words) {
-      const test = current ? `${current} ${word}` : word;
-      if (font.widthOfTextAtSize(test, fontSize) <= maxWidth) {
-        current = test;
-      } else {
-        if (current) lines.push(current);
-        current = word;
-      }
-    }
-
-    if (current) lines.push(current);
   }
-
-  return lines.length ? lines : [''];
+  if (current) lines.push(current);
+  return lines;
 }
 
 function drawWrappedText(page, text, x, y, width, options = {}) {
   const { font, size = 12, color = rgb(1, 1, 1), lineHeight = 18 } = options;
   const lines = wrapTextByWidth(text, font, size, width);
   let currentY = y;
-
   for (const line of lines) {
-    if (line) {
-      try {
-        page.drawText(line, { x, y: currentY, size, font, color });
-      } catch (err) {
-        console.warn(`[Draw] Failed to draw text: ${line}`, err.message);
-      }
-    }
+    page.drawText(line, { x, y: currentY, size, font, color });
     currentY -= lineHeight;
   }
-
   return currentY;
 }
 
 function drawCentered(page, text, y, pageWidth, options = {}) {
-  const safeText = sanitizeText(text);
   const { font, size = 12, color = rgb(1, 1, 1) } = options;
-  
-  try {
-    const tw = font.widthOfTextAtSize(safeText, size);
-    page.drawText(safeText, { x: (pageWidth - tw) / 2, y, size, font, color });
-  } catch (err) {
-    console.warn(`[Draw] Failed to draw centered text: ${safeText}`, err.message);
-  }
+  const tw = font.widthOfTextAtSize(text, size);
+  page.drawText(text, { x: (pageWidth - tw) / 2, y, size, font, color });
 }
 
 function drawCenteredWrapped(page, text, y, pageWidth, maxWidth, options = {}) {
   const { font, size = 12, color = rgb(1, 1, 1), lineHeight = 18 } = options;
   const lines = wrapTextByWidth(text, font, size, maxWidth);
   let cy = y;
-
   for (const line of lines) {
-    if (line) {
-      try {
-        const tw = font.widthOfTextAtSize(line, size);
-        page.drawText(line, { x: (pageWidth - tw) / 2, y: cy, size, font, color });
-      } catch (err) {
-        console.warn(`[Draw] Failed to draw centered wrapped text: ${line}`, err.message);
-      }
-    }
+    const tw = font.widthOfTextAtSize(line, size);
+    page.drawText(line, { x: (pageWidth - tw) / 2, y: cy, size, font, color });
     cy -= lineHeight;
   }
-
   return cy;
 }
 
@@ -336,10 +120,8 @@ function drawGradientV(page, x, y, w, h, colorTop, colorBottom, steps = 24) {
   for (let i = 0; i < steps; i++) {
     const t = i / (steps - 1);
     page.drawRectangle({
-      x,
-      y: y + h - (i + 1) * stepH,
-      width: w,
-      height: stepH + 0.5,
+      x, y: y + h - (i + 1) * stepH,
+      width: w, height: stepH + 0.5,
       color: lerpColor(colorTop, colorBottom, t)
     });
   }
@@ -350,10 +132,8 @@ function drawGradientH(page, x, y, w, h, colorLeft, colorRight, steps = 30) {
   for (let i = 0; i < steps; i++) {
     const t = i / (steps - 1);
     page.drawRectangle({
-      x: x + i * stepW,
-      y,
-      width: stepW + 0.5,
-      height: h,
+      x: x + i * stepW, y,
+      width: stepW + 0.5, height: h,
       color: lerpColor(colorLeft, colorRight, t)
     });
   }
@@ -365,10 +145,7 @@ function drawDivider(page, x, y, w, color, thickness = 1) {
 
 function drawCard(page, x, y, w, h, fillColor, borderColor = null, borderWidth = 1) {
   page.drawRectangle({
-    x,
-    y,
-    width: w,
-    height: h,
+    x, y, width: w, height: h,
     color: fillColor,
     borderColor: borderColor || fillColor,
     borderWidth: borderColor ? borderWidth : 0
@@ -391,51 +168,13 @@ function drawDiamond(page, cx, cy, size, color) {
   }
 }
 
-/**
- * Sanitize filename for safe filesystem and HTTP header use
- */
-function safeFilename(name) {
-  return String(name || 'Money_Personality_Report')
-    .replace(/[^\p{L}\p{N}\s_-]/gu, '')
-    .trim()
-    .replace(/\s+/g, '_')
-    .substring(0, 100);
-}
-
-/**
- * Encode filename for RFC 5987 Content-Disposition header
- */
-function encodeRFC5987Filename(filename) {
-  const ascii = /^[\x20-\x7E]*$/.test(filename);
-  
-  if (ascii) {
-    return `"${filename}"`;
-  }
-
-  const encoded = Buffer.from(filename, 'utf8')
-    .toString('binary')
-    .split('')
-    .map(char => {
-      const code = char.charCodeAt(0);
-      return code < 128 && /^[\w\-.]$/.test(char) ? char : `%${code.toString(16).toUpperCase().padStart(2, '0')}`;
-    })
-    .join('');
-
-  return {
-    simple: safeFilename(filename),
-    extended: encoded
-  };
-}
-
 async function embedImageFromUrl(pdfDoc, url) {
   if (!url) return null;
-
   try {
     const response = await fetch(url);
     if (!response.ok) return null;
     const bytes = await response.arrayBuffer();
     const contentType = response.headers.get('content-type') || '';
-
     if (contentType.includes('png')) return await pdfDoc.embedPng(bytes);
     return await pdfDoc.embedJpg(bytes);
   } catch (err) {
@@ -482,11 +221,6 @@ function addLinkAnnotation(pdfDoc, page, x, y, w, h, url) {
 
 export default async function handler(req, res) {
   try {
-    console.log('[API] Request received:', {
-      method: req.method,
-      path: req.url
-    });
-
     if (req.method !== 'POST') {
       return res.status(405).json({ error: 'Method not allowed' });
     }
@@ -513,51 +247,16 @@ export default async function handler(req, res) {
       format = 'pdf'
     } = body || {};
 
-    console.log('[API] Input data:', {
-      userName,
-      personalityName,
-      hasDescription: !!description,
-      format
-    });
-
-    // Collect all text for language detection
-    const allText = [
-      userName,
-      personalityName,
-      description,
-      strengthLabel,
-      strengthText,
-      shadowLabel,
-      shadowText,
-      stepLabel,
-      stepText,
-      mixLabel,
-      bestMatchName,
-      bestMatchReason,
-      ...percentages.map(p => `${p?.label || ''} ${p?.value || ''}`)
-    ].join(' ');
-
-    console.log('[API] Creating PDF document...');
     const pdfDoc = await PDFDocument.create();
     const width = 595.28;
     const height = 841.89;
 
-    // Smart font loading with debugging
-    console.log('[API] Loading fonts...');
-    const fonts = await getFonts(pdfDoc, req, allText);
-    const fontRegular = fonts.regular;
-    const fontBold = fonts.bold;
-    const fontOblique = fonts.oblique;
+    // Standard fonts (no external fetch needed)
+    const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+    const fontOblique = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
 
-    console.log('[API] Font loading result:', {
-      unicode: fonts.unicode,
-      cjk: fonts.cjk,
-      error: fonts.error || 'none'
-    });
-
-    // Rest of the PDF generation code (pages 1-4) remains the same...
-    // [PAGES IMPLEMENTATION FOLLOWS BELOW]
-
+    // Brand palette
     const midnight = rgb(0.051, 0.051, 0.051);
     const cardDark = rgb(0.11, 0.11, 0.13);
     const cardMid = rgb(0.14, 0.14, 0.16);
@@ -574,15 +273,12 @@ export default async function handler(req, res) {
     const accentDim = lerpColor(accent, midnight, 0.6);
 
     const displayDate = quizDate || new Date().toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+      year: 'numeric', month: 'long', day: 'numeric'
     });
 
     // ================================================================
     // PAGE 1 - COVER
     // ================================================================
-    console.log('[PDF] Creating page 1 (cover)...');
     const page1 = pdfDoc.addPage([width, height]);
 
     drawGradientV(page1, 0, 0, width, height, rgb(0.07, 0.07, 0.07), midnight, 30);
@@ -605,7 +301,6 @@ export default async function handler(req, res) {
     } catch (err) {
       console.error('SR logo failed:', err.message);
     }
-
     drawCentered(page1, 'MILLIONAIRE MIND', height - 100, width, {
       font: fontBold, size: 12, color: gold
     });
@@ -622,11 +317,10 @@ export default async function handler(req, res) {
       drawCentered(page1, 'Prepared exclusively for', height - 232, width, {
         font: fontOblique, size: 11, color: softGray
       });
-      drawCentered(page1, sanitizeText(userName), height - 256, width, {
+      drawCentered(page1, userName, height - 256, width, {
         font: fontBold, size: 22, color: offWhite
       });
     }
-
     drawCentered(page1, displayDate, height - 284, width, {
       font: fontRegular, size: 10, color: softGray
     });
@@ -653,11 +347,11 @@ export default async function handler(req, res) {
     drawGradientH(page1, badgeX, badgeY, badgeW, badgeH, accentDim, accent, 20);
     drawDivider(page1, badgeX, badgeY + badgeH - 1, badgeW, gold, 1);
     drawDivider(page1, badgeX, badgeY, badgeW, gold, 1);
-    drawCentered(page1, sanitizeText(personalityName).toUpperCase(), badgeY + 15, width, {
+    drawCentered(page1, personalityName.toUpperCase(), badgeY + 15, width, {
       font: fontBold, size: 20, color: white
     });
 
-    drawCenteredWrapped(page1, sanitizeText(description), badgeY - 28, width, 440, {
+    drawCenteredWrapped(page1, description, badgeY - 28, width, 440, {
       font: fontRegular, size: 11, color: offWhite, lineHeight: 17
     });
 
@@ -669,7 +363,6 @@ export default async function handler(req, res) {
     // ================================================================
     // PAGE 2 - PERSONALITY MIX + BEST MATCH
     // ================================================================
-    console.log('[PDF] Creating page 2 (personality blueprint)...');
     const page2 = pdfDoc.addPage([width, height]);
 
     drawGradientV(page2, 0, 0, width, height, rgb(0.06, 0.06, 0.06), midnight, 30);
@@ -687,7 +380,7 @@ export default async function handler(req, res) {
     const mixCardH = 290;
     drawCard(page2, 40, mixCardY, width - 80, mixCardH, cardDark, cardMid);
 
-    page2.drawText(sanitizeText(mixLabel).toUpperCase(), {
+    page2.drawText(mixLabel.toUpperCase(), {
       x: 65, y: mixCardY + mixCardH - 35, size: 12, font: fontBold, color: gold
     });
     drawDivider(page2, 65, mixCardY + mixCardH - 48, 160, goldDim, 0.5);
@@ -698,7 +391,7 @@ export default async function handler(req, res) {
     const maxVal = Math.max(...percentages.map(p => Number(p?.value || 0)), 1);
 
     percentages.forEach((item) => {
-      const label = sanitizeText(item?.label || '');
+      const label = String(item?.label || '');
       const value = Number(item?.value || 0);
       const isTop = value >= maxVal;
 
@@ -741,11 +434,11 @@ export default async function handler(req, res) {
       x: 65, y: matchCardY + matchCardH - 30,
       size: 10, font: fontBold, color: greenLight
     });
-    page2.drawText(sanitizeText(bestMatchName || '-'), {
+    page2.drawText(bestMatchName || '-', {
       x: 65, y: matchCardY + matchCardH - 58,
       size: 20, font: fontBold, color: white
     });
-    drawWrappedText(page2, sanitizeText(bestMatchReason || ''), 65, matchCardY + matchCardH - 80, width - 140, {
+    drawWrappedText(page2, bestMatchReason || '', 65, matchCardY + matchCardH - 80, width - 140, {
       font: fontRegular, size: 10, color: offWhite, lineHeight: 15
     });
 
@@ -765,8 +458,8 @@ export default async function handler(req, res) {
       x: 40, y: 28, size: 8, font: fontRegular, color: softGray
     });
     if (userName) {
-      const nameW = fontRegular.widthOfTextAtSize(sanitizeText(userName), 8);
-      page2.drawText(sanitizeText(userName), {
+      const nameW = fontRegular.widthOfTextAtSize(userName, 8);
+      page2.drawText(userName, {
         x: width - 40 - nameW, y: 28, size: 8, font: fontRegular, color: softGray
       });
     }
@@ -774,7 +467,6 @@ export default async function handler(req, res) {
     // ================================================================
     // PAGE 3 - DEEP PERSONALITY INSIGHTS
     // ================================================================
-    console.log('[PDF] Creating page 3 (insights)...');
     const page3 = pdfDoc.addPage([width, height]);
 
     drawGradientV(page3, 0, 0, width, height, rgb(0.06, 0.06, 0.06), midnight, 30);
@@ -806,14 +498,14 @@ export default async function handler(req, res) {
         x: 40, y: cy, width: 4, height: cardH, color: section.accentColor
       });
 
-      page3.drawText(sanitizeText(section.label).toUpperCase(), {
+      page3.drawText(section.label.toUpperCase(), {
         x: 65, y: cy + cardH - 32,
         size: 14, font: fontBold, color: gold
       });
 
       drawDivider(page3, 65, cy + cardH - 46, 200, goldDim, 0.5);
 
-      drawWrappedText(page3, sanitizeText(section.text || ''), 65, cy + cardH - 68, width - 140, {
+      drawWrappedText(page3, section.text || '', 65, cy + cardH - 68, width - 140, {
         font: fontRegular, size: 11, color: offWhite, lineHeight: 16
       });
 
@@ -828,7 +520,6 @@ export default async function handler(req, res) {
     // ================================================================
     // PAGE 4 - CTA
     // ================================================================
-    console.log('[PDF] Creating page 4 (CTA)...');
     const page4 = pdfDoc.addPage([width, height]);
 
     drawGradientV(page4, 0, 0, width, height, rgb(0.06, 0.12, 0.07), midnight, 40);
@@ -904,20 +595,20 @@ export default async function handler(req, res) {
     });
 
     addLinkAnnotation(pdfDoc, page4, ctaX, ctaY, ctaW, ctaH,
-      'http://www.millionairemind.online');
+      'http://www.millionairemind.online/special');
 
-    const urlStr = 'www.millionairemind.online';
+    const urlStr = 'www.millionairemind.online/special';
     drawCentered(page4, urlStr, ctaY - 28, width, {
       font: fontBold, size: 12, color: gold
     });
 
-    const urlTextW = fontBold.widthOfTextAtSize(urlStr, 12);
+    const urlTextW = fontRegular.widthOfTextAtSize(urlStr, 12);
     const urlTextX = (width - urlTextW) / 2;
     addLinkAnnotation(pdfDoc, page4, urlTextX - 5, ctaY - 34, urlTextW + 10, 18,
       'http://www.millionairemind.online');
 
     if (userName) {
-      drawCentered(page4, `${sanitizeText(userName)}, your blueprint is waiting to be rewritten.`, ctaY - 78, width, {
+      drawCentered(page4, `${userName}, your blueprint is waiting to be rewritten.`, ctaY - 78, width, {
         font: fontOblique, size: 12, color: offWhite
       });
     }
@@ -934,21 +625,15 @@ export default async function handler(req, res) {
     });
 
     // ================================================================
-    // GENERATE OUTPUT
+    // GENERATE OUTPUT - FIX IS HERE!
     // ================================================================
-    console.log('[PDF] Saving PDF...');
     const pdfBytes = await pdfDoc.save();
 
-    const baseFilename = `${userName ? sanitizeText(userName) + '_' : ''}${sanitizeText(personalityName)}_Report`;
-    const safeSimpleFilename = safeFilename(baseFilename);
+    // Build filename
+    const baseFilename = `${userName ? userName + '_' : ''}${personalityName}_Report`;
     const encodingInfo = encodeRFC5987Filename(baseFilename);
 
-    console.log('[API] PDF generated successfully:', {
-      size: `${(pdfBytes.length / 1024).toFixed(2)}KB`,
-      filename: safeSimpleFilename,
-      pages: pdfDoc.getPageCount()
-    });
-
+    // Thumbnail mode
     if (format === 'thumbnail') {
       const base64 = Buffer.from(pdfBytes).toString('base64');
       res.setHeader('Content-Type', 'application/json');
@@ -956,31 +641,32 @@ export default async function handler(req, res) {
         pdfBase64: base64,
         fileName: typeof encodingInfo === 'object' 
           ? `${encodingInfo.simple}.pdf` 
-          : safeSimpleFilename + '.pdf',
+          : encodingInfo.replace(/"/g, '').split(';')[0] + '.pdf',
         pageCount: pdfDoc.getPageCount()
       });
     }
 
+    // ⭐ KEY FIX: Proper RFC 5987 header encoding
     res.setHeader('Content-Type', 'application/pdf');
     
     if (typeof encodingInfo === 'object') {
+      // Non-ASCII filename: use both filename and filename*
       res.setHeader(
         'Content-Disposition',
         `attachment; filename="${encodingInfo.simple}.pdf"; filename*=UTF-8''${encodingInfo.extended}.pdf`
       );
     } else {
+      // ASCII filename: use simple format
       res.setHeader('Content-Disposition', `attachment; filename=${encodingInfo}`);
     }
 
-    console.log('[API] Sending PDF download...');
     return res.status(200).send(Buffer.from(pdfBytes));
 
   } catch (error) {
-    console.error('[API] ❌ PDF generation failed:', error);
+    console.error('PDF generation failed:', error);
     return res.status(500).json({
       error: 'Failed to generate PDF',
-      message: error.message,
-      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      message: error.message
     });
   }
 }
