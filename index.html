@@ -1553,7 +1553,6 @@ footer a:hover { color: var(--gold); }
       <div class="q-text" id="q-text">Loading question...</div>
       <div class="opts" id="opts-grid"></div>
     </div>
-    <button class="btn-next" id="btn-next" onclick="nextQuestion()">CONTINUE →</button>
   </div>
 
   <!-- ===================== FORM SCREEN ===================== -->
@@ -1577,29 +1576,7 @@ footer a:hover { color: var(--gold); }
           <select id="country-code" onchange="updatePhoneCode()"></select>
           <input type="tel" id="f-phone" placeholder="123 456 7890" required>
         </div>
-      </div>
-      <div class="field">
-        <label id="label-age">Age</label>
-        <select id="f-age" required>
-          <option value="">Select your age</option>
-          <option value="below18">Below 18</option>
-          <option value="18-24">18–24</option>
-          <option value="25-34">25–34</option>
-          <option value="35-44">35–44</option>
-          <option value="45-54">45–54</option>
-          <option value="55+">55 and above</option>
-        </select>
-      </div>
-      <div class="field">
-        <label id="label-gender">Gender</label>
-        <select id="f-gender" required>
-          <option value="">Select your gender</option>
-          <option value="male">Male</option>
-          <option value="female">Female</option>
-          <option value="prefer_not">Prefer not to say</option>
-        </select>
-      </div>
-      <button class="btn-reveal" onclick="revealResult()" id="btn-reveal">🔓 REVEAL MY PERSONALITY</button>
+      </div>      <button class="btn-reveal" onclick="revealResult()" id="btn-reveal">🔓 REVEAL MY PERSONALITY</button>
       <p class="privacy-line" id="privacy-note">🔒 Your privacy is protected. Your personalized PDF report is delivered instantly.</p>
     </div>
   </div>
@@ -1983,11 +1960,7 @@ function updateUI() {
   setText('label-name', getText('labelName'));
   setText('label-email', getText('labelEmail'));
   setText('label-phone', getText('labelPhone'));
-  setText('label-age', getText('labelAge'));
-  setText('label-gender', getText('labelGender'));
 
-  updateLocalizedSelect('f-age', getText('agePlaceholder'), getText('ageOptions'));
-  updateLocalizedSelect('f-gender', getText('genderPlaceholder'), getText('genderOptions'));
 
   setText('btn-reveal', getText('btnReveal'));
   setText('privacy-note', getText('privacyNote'));
@@ -2012,7 +1985,6 @@ function updateUI() {
   setText('match-label', getText('matchLabel'));
   setText('result-eyebrow', getText('resultEyebrow'));
   setText('mix-label', getText('mixLabel'));
-  setText('btn-next', getText('nextBtn'));
   setText('btn-prev', getText('backBtn'));
 }
 function updateLocalizedSelect(id, placeholder, options) {
@@ -2214,7 +2186,6 @@ function renderQuestion() {
       btn.style.transform = 'translateY(0)';
     }, 10);
   });
-  document.getElementById('btn-next').classList.toggle('show', !!answers[currentQuestion]);
   document.getElementById('btn-prev').classList.toggle('show', currentQuestion > 0);
 }
 function selectAnswer(type, idx) {
@@ -2230,8 +2201,8 @@ function selectAnswer(type, idx) {
   btns.forEach(b => b.classList.remove('selected'));
   if (btns[idx]) btns[idx].classList.add('selected');
   setTimeout(() => {
-    document.getElementById('btn-next').classList.add('show');
-  }, 300);
+    nextQuestion();
+  }, 320);
 }
 function showXPPopup() {
   const popup = document.createElement('div');
@@ -2316,8 +2287,6 @@ function revealResult() {
   const email = document.getElementById('f-email').value.trim();
   const countryCode = document.getElementById('country-code').value;
   const phone = document.getElementById('f-phone').value.trim();
-  const age = document.getElementById('f-age').value;
-  const gender = document.getElementById('f-gender').value;
   if (!name) {
     alert(getText('alerts').name);
     return;
@@ -2330,19 +2299,9 @@ function revealResult() {
     alert(getText('alerts').phone);
     return;
   }
-  if (!age) {
-    alert(getText('alerts').age);
-    return;
-  }
-  if (!gender) {
-    alert(getText('alerts').gender);
-    return;
-  }
   userName = name;
   userEmail = email;
   userPhone = countryCode + ' ' + phone;
-  userAge = age;
-  userGender = gender;
   sendToWebhook();
   const dominant = getDominantPersonality();
   displayResult(dominant);
@@ -2405,8 +2364,6 @@ function sendToWebhook() {
     name: userName,
     email: userEmail,
     phone: userPhone,
-    age: userAge,
-    gender: userGender,
     language: currentLanguage,
     ip_address: userIp,
     detected_country: userCountryName,
@@ -2585,8 +2542,6 @@ function restartQuiz() {
   document.getElementById('f-name').value = '';
   document.getElementById('f-email').value = '';
   document.getElementById('f-phone').value = '';
-  document.getElementById('f-age').value = '';
-  document.getElementById('f-gender').value = '';
   showScreen('intro');
 }
 updateUI();
