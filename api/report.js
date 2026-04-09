@@ -1,4 +1,4 @@
-import { PDFDocument, StandardFonts, rgb, PDFName, PDFString, PDFArray } from 'pdf-lib';
+  import { PDFDocument, StandardFonts, rgb, PDFName, PDFString, PDFArray } from 'pdf-lib';
 
 // ================================================================
 // CRITICAL FIX: RFC 5987 ENCODING FOR HEADERS
@@ -611,6 +611,103 @@ const resolvedStepText =
   deepInsights[normalizedType]?.step?.en ||
   stepText;
 
+    const pdfText = {
+  en: {
+    page2Title: 'YOUR PERSONALITY BLUEPRINT',
+    bestCompatible: 'BEST COMPATIBLE PERSONALITY',
+    quote1: '"Your relationship with money is a mirror',
+    quote2: 'of your relationship with yourself."',
+    reportFooter: 'Money Personality Assessment Report',
+
+    page3Title: 'DEEP PERSONALITY INSIGHTS',
+
+    page4Top1: 'NOW YOU KNOW YOUR',
+    page4Top2: 'MONEY PERSONALITY.',
+    page4Hero1: "IT'S TIME TO",
+    page4Hero2: 'REWRITE YOUR',
+    page4Hero3: 'MONEY BLUEPRINT.',
+    eventTitle: 'MILLIONAIRE MIND HYBRID',
+    eventSubtitle: 'LIVE ONLINE EVENT',
+    bullet1: 'Discover the 17 wealth principles of millionaires',
+    bullet2: 'Reset your financial thermostat in 3 days',
+    bullet3: 'Join thousands transforming their money blueprint',
+    bullet4: "Learn directly from T. Harv Eker's proven system",
+    cta: 'CLAIM YOUR SEAT NOW',
+    closing1: `${userName}, your blueprint is waiting to be rewritten.`,
+    closing2: 'The knowledge you need. The transformation you deserve.',
+    footerBrand: 'MILLIONAIRE MIND  x  SUCCESS RESOURCES',
+    footerCopyright: '(c) 2026 Success Resources. All rights reserved.',
+    confidential: 'CONFIDENTIAL  |  PERSONAL ASSESSMENT',
+    coverTitle1: 'MONEY PERSONALITY',
+    coverTitle2: 'ASSESSMENT REPORT',
+    preparedFor: 'Prepared exclusively for'
+  },
+
+  de: {
+    page2Title: 'DEIN PERSÖNLICHKEITS-PLAN',
+    bestCompatible: 'BESTE PASSENDE PERSÖNLICHKEIT',
+    quote1: '"Deine Beziehung zu Geld ist ein Spiegel',
+    quote2: 'deiner Beziehung zu dir selbst."',
+    reportFooter: 'Bericht zur Geldpersönlichkeit',
+
+    page3Title: 'TIEFE PERSÖNLICHE EINBLICKE',
+
+    page4Top1: 'JETZT KENNST DU DEINE',
+    page4Top2: 'GELDPERSÖNLICHKEIT.',
+    page4Hero1: 'ES IST ZEIT,',
+    page4Hero2: 'DEINEN',
+    page4Hero3: 'GELD-BAUPLAN NEU ZU SCHREIBEN.',
+    eventTitle: 'MILLIONAIRE MIND HYBRID',
+    eventSubtitle: 'LIVE-ONLINE-EVENT',
+    bullet1: 'Entdecke die 17 Wohlstandsprinzipien der Millionäre',
+    bullet2: 'Setze deinen finanziellen Thermostat in 3 Tagen neu',
+    bullet3: 'Schließe dich Tausenden an, die ihren Geld-Bauplan verändern',
+    bullet4: 'Lerne direkt aus dem bewährten System von T. Harv Eker',
+    cta: 'SICHERE DIR JETZT DEINEN PLATZ',
+    closing1: `${userName}, dein Geld-Bauplan wartet darauf, neu geschrieben zu werden.`,
+    closing2: 'Das Wissen, das du brauchst. Die Veränderung, die du verdienst.',
+    footerBrand: 'MILLIONAIRE MIND  x  SUCCESS RESOURCES',
+    footerCopyright: '(c) 2026 Success Resources. Alle Rechte vorbehalten.',
+    confidential: 'VERTRAULICH  |  PERSÖNLICHE AUSWERTUNG',
+    coverTitle1: 'GELDPERSÖNLICHKEIT',
+    coverTitle2: 'AUSWERTUNGSBERICHT',
+    preparedFor: 'Exklusiv erstellt für'
+  },
+
+  es: {
+    page2Title: 'TU MAPA DE PERSONALIDAD',
+    bestCompatible: 'PERSONALIDAD MÁS COMPATIBLE',
+    quote1: '"Tu relación con el dinero es un reflejo',
+    quote2: 'de tu relación contigo mismo."',
+    reportFooter: 'Informe de personalidad del dinero',
+
+    page3Title: 'INSIGHTS PROFUNDOS DE TU PERSONALIDAD',
+
+    page4Top1: 'AHORA YA CONOCES TU',
+    page4Top2: 'PERSONALIDAD DEL DINERO.',
+    page4Hero1: 'ES MOMENTO DE',
+    page4Hero2: 'REESCRIBIR TU',
+    page4Hero3: 'PLANO FINANCIERO.',
+    eventTitle: 'MILLIONAIRE MIND HYBRID',
+    eventSubtitle: 'EVENTO EN VIVO ONLINE',
+    bullet1: 'Descubre los 17 principios de riqueza de los millonarios',
+    bullet2: 'Reprograma tu termostato financiero en 3 días',
+    bullet3: 'Únete a miles que están transformando su plano financiero',
+    bullet4: 'Aprende directamente del sistema probado de T. Harv Eker',
+    cta: 'RESERVA TU LUGAR AHORA',
+    closing1: `${userName}, tu plano financiero está esperando ser reescrito.`,
+    closing2: 'El conocimiento que necesitas. La transformación que mereces.',
+    footerBrand: 'MILLIONAIRE MIND  x  SUCCESS RESOURCES',
+    footerCopyright: '(c) 2026 Success Resources. Todos los derechos reservados.',
+    confidential: 'CONFIDENCIAL  |  EVALUACIÓN PERSONAL',
+    coverTitle1: 'PERSONALIDAD DEL DINERO',
+    coverTitle2: 'INFORME DE EVALUACIÓN',
+    preparedFor: 'Preparado exclusivamente para'
+  }
+};
+
+const t = pdfText[normalizedLanguage] || pdfText.en;
+
     const pdfDoc = await PDFDocument.create();
     const width = 595.28;
     const height = 841.89;
@@ -670,15 +767,15 @@ const resolvedStepText =
     });
     drawDivider(page1, width / 2 - 60, height - 116, 120, goldDim);
 
-    drawCentered(page1, 'MONEY PERSONALITY', height - 158, width, {
+    drawCentered(page1, t.coverTitle1, height - 158, width, {
       font: fontBold, size: 28, color: white
     });
-    drawCentered(page1, 'ASSESSMENT REPORT', height - 190, width, {
+    drawCentered(page1, t.coverTitle2, height - 190, width, {
       font: fontBold, size: 28, color: gold
     });
 
     if (userName) {
-      drawCentered(page1, 'Prepared exclusively for', height - 232, width, {
+      drawCentered(page1, t.preparedFor, height - 232, width, {
         font: fontOblique, size: 11, color: softGray
       });
       drawCentered(page1, userName, height - 256, width, {
@@ -720,7 +817,7 @@ const resolvedStepText =
     });
 
     drawDivider(page1, 40, 65, width - 80, goldDim, 0.5);
-    drawCentered(page1, 'CONFIDENTIAL  |  PERSONAL ASSESSMENT', 45, width, {
+    drawCentered(page1, t.confidential, 45, width, {
       font: fontRegular, size: 8, color: softGray
     });
 
@@ -735,7 +832,7 @@ const resolvedStepText =
     page2.drawText('02', {
       x: 40, y: height - 52, size: 36, font: fontBold, color: goldDim
     });
-    page2.drawText('YOUR PERSONALITY BLUEPRINT', {
+    page2.drawText(t.page2Title, {
       x: 92, y: height - 42, size: 13, font: fontBold, color: gold
     });
     drawDivider(page2, 40, height - 62, width - 80, goldDim, 0.5);
@@ -794,7 +891,7 @@ const resolvedStepText =
       x: 40, y: matchCardY, width: 4, height: matchCardH, color: successGreen
     });
 
-    page2.drawText('BEST COMPATIBLE PERSONALITY', {
+    page2.drawText(t.bestCompatible, {
       x: 65, y: matchCardY + matchCardH - 30,
       size: 10, font: fontBold, color: greenLight
     });
@@ -807,10 +904,10 @@ const resolvedStepText =
     });
 
     const quoteY = matchCardY - 80;
-    drawCentered(page2, '"Your relationship with money is a mirror', quoteY, width, {
+    drawCentered(page2, t.quote1, quoteY, width, {
       font: fontOblique, size: 12, color: softGray
     });
-    drawCentered(page2, 'of your relationship with yourself."', quoteY - 18, width, {
+    drawCentered(page2, t.quote1, quoteY, width, {
       font: fontOblique, size: 12, color: softGray
     });
     drawCentered(page2, '- T. Harv Eker', quoteY - 42, width, {
@@ -818,7 +915,7 @@ const resolvedStepText =
     });
 
     drawDivider(page2, 40, 45, width - 80, goldDim, 0.5);
-    page2.drawText('Money Personality Assessment Report', {
+    page2.drawText(t.reportFooter, {
       x: 40, y: 28, size: 8, font: fontRegular, color: softGray
     });
     if (userName) {
@@ -839,7 +936,7 @@ const resolvedStepText =
     page3.drawText('03', {
       x: 40, y: height - 52, size: 36, font: fontBold, color: goldDim
     });
-    page3.drawText('DEEP PERSONALITY INSIGHTS', {
+    page3.drawText(t.page3Title, {
       x: 92, y: height - 42, size: 13, font: fontBold, color: gold
     });
     drawDivider(page3, 40, height - 62, width - 80, goldDim, 0.5);
@@ -877,7 +974,7 @@ const resolvedStepText =
     });
 
     drawDivider(page3, 40, 45, width - 80, goldDim, 0.5);
-    page3.drawText('Money Personality Assessment Report', {
+    page3.drawText(t.reportFooter, {
       x: 40, y: 28, size: 8, font: fontRegular, color: softGray
     });
 
@@ -891,20 +988,20 @@ const resolvedStepText =
     drawDecoCorner(page4, 35, height - 40, 30, gold);
     drawDecoCorner(page4, width - 35, 40, 30, gold, true);
 
-    drawCentered(page4, 'NOW YOU KNOW YOUR', height - 120, width, {
+    drawCentered(page4, t.page4Top1, height - 120, width, {
       font: fontBold, size: 15, color: softGray
     });
-    drawCentered(page4, 'MONEY PERSONALITY.', height - 142, width, {
+    drawCentered(page4, t.page4Top1, height - 120, width, {
       font: fontBold, size: 15, color: softGray
     });
 
-    drawCentered(page4, "IT'S TIME TO", height - 198, width, {
+    drawCentered(page4, t.page4Top2, height - 142, width, {
       font: fontBold, size: 32, color: white
     });
-    drawCentered(page4, 'REWRITE YOUR', height - 236, width, {
+    drawCentered(page4, t.page4Hero1, height - 198, width, {
       font: fontBold, size: 32, color: gold
     });
-    drawCentered(page4, 'MONEY BLUEPRINT.', height - 274, width, {
+    drawCentered(page4, t.page4Hero2, height - 236, width, {
       font: fontBold, size: 32, color: gold
     });
 
@@ -920,17 +1017,17 @@ const resolvedStepText =
     drawCentered(page4, 'MILLIONAIRE MIND HYBRID', evtCardY + evtCardH - 35, width, {
       font: fontBold, size: 19, color: gold
     });
-    drawCentered(page4, 'LIVE ONLINE EVENT', evtCardY + evtCardH - 60, width, {
+    drawCentered(page4, t.eventTitle, evtCardY + evtCardH - 35, width, {
       font: fontBold, size: 12, color: white
     });
 
     drawDivider(page4, evtCardX + 40, evtCardY + evtCardH - 75, evtCardW - 80, goldDim, 0.5);
 
     const bullets = [
-      'Discover the 17 wealth principles of millionaires',
-      'Reset your financial thermostat in 3 days',
-      'Join thousands transforming their money blueprint',
-      "Learn directly from T. Harv Eker's proven system"
+      t.bullet1,
+      t.bullet2,
+      t.bullet3,
+      t.bullet4
     ];
 
     let bulletY = evtCardY + evtCardH - 100;
@@ -954,7 +1051,7 @@ const resolvedStepText =
     drawDivider(page4, ctaX, ctaY + ctaH - 1, ctaW, rgb(1, 0.9, 0.5), 1);
     drawDivider(page4, ctaX, ctaY, ctaW, mutedGold, 1);
 
-    drawCentered(page4, 'CLAIM YOUR SEAT NOW', ctaY + 18, width, {
+    drawCentered(page4, t.cta, ctaY + 18, width, {
       font: fontBold, size: 17, color: midnight
     });
 
@@ -972,11 +1069,11 @@ const resolvedStepText =
       'http://www.millionairemind.online');
 
     if (userName) {
-      drawCentered(page4, `${userName}, your blueprint is waiting to be rewritten.`, ctaY - 78, width, {
+      drawCentered(page4, t.cta, ctaY + 18, width, {
         font: fontOblique, size: 12, color: offWhite
       });
     }
-    drawCentered(page4, 'The knowledge you need. The transformation you deserve.', ctaY - 105, width, {
+    drawCentered(page4, t.closing1, ctaY - 78, width, {
       font: fontOblique, size: 11, color: softGray
     });
 
