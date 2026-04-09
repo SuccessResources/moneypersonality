@@ -1196,22 +1196,284 @@ const translations = {
 
 const localizedQuestions = {
   en: [
-    { text: "You just got a new job. Your salary is $3,000 a month. What is your first thought?", answers: [{ emoji: "🏦", text: "First, I need to see my budget and how much I can save.", type: "saver" }, { emoji: "🎉", text: "Nice. I should buy myself something to celebrate.", type: "spender" }, { emoji: "🙂", text: "As long as I can live comfortably, I'm happy.", type: "monk" }, { emoji: "😅", text: "I know I should make a plan… but maybe later.", type: "avoider" }] },
-    { text: "Your first paycheck comes in. What do you do next?", answers: [{ emoji: "🙈", text: "I tell myself I'll sort it out later and avoid looking too much.", type: "avoider" }, { emoji: "🌿", text: "I leave it there. Money is useful, but I don't get too excited about it.", type: "monk" }, { emoji: "🛍️", text: "I treat myself because payday should feel good.", type: "spender" }, { emoji: "🔐", text: "I move some money to savings right away.", type: "saver" }] },
-    { text: "Your coworkers invite you to a fancy dinner after work. What do you do?", answers: [{ emoji: "🍝", text: "I go and enjoy it. It's good to have fun sometimes.", type: "spender" }, { emoji: "📱", text: "I check the price first before I say yes.", type: "saver" }, { emoji: "🧘", text: "I skip it. A quiet night sounds better.", type: "monk" }, { emoji: "🫥", text: "I say I'll think about it… then never reply properly.", type: "avoider" }] },
-    { text: "You want to buy a few things for your room. What happens?", answers: [{ emoji: "🛒", text: "I add things to cart, then close it, then open it again, then do nothing.", type: "avoider" }, { emoji: "🌱", text: "I decide I already have what I need.", type: "monk" }, { emoji: "✨", text: "I buy the things that make life feel nicer.", type: "spender" }, { emoji: "📊", text: "I compare prices and choose carefully.", type: "saver" }] },
-    { text: "Bills week is here. Rent, phone, and other payments all show up together. What is your reaction?", answers: [{ emoji: "🍃", text: "It's okay. My life is simple, so it's easier to manage.", type: "monk" }, { emoji: "😵", text: "I look at it, feel stressed, and want to lie down.", type: "avoider" }, { emoji: "✅", text: "Not fun, but I was ready for this.", type: "saver" }, { emoji: "💸", text: "I pay them, but it still hurts a little.", type: "spender" }] },
-    { text: "Your laptop breaks, and fixing it costs $800. What do you do?", answers: [{ emoji: "🧯", text: "That hurts, but this is why emergency savings exist.", type: "saver" }, { emoji: "😬", text: "I just stare at the price and feel my soul leave my body.", type: "avoider" }, { emoji: "🪷", text: "I stay calm and look for the easiest solution.", type: "monk" }, { emoji: "🛠️", text: "Annoying, but I'll figure it out and move on.", type: "spender" }] },
-    { text: "A few months later, you get a $1,000 bonus. What do you do with it?", answers: [{ emoji: "🎉", text: "This money already has fun plans.", type: "spender" }, { emoji: "🙂", text: "Nice. I'll use what I need and not think too much about it.", type: "monk" }, { emoji: "🧠", text: "Some of this should go to savings or something smart.", type: "saver" }, { emoji: "😐", text: "I want to make a smart choice, but somehow I make no choice at all.", type: "avoider" }] },
-    { text: "A friend says, 'You should start investing.' What sounds most like you?", answers: [{ emoji: "🙉", text: "I hope they don't ask me more because I have no idea.", type: "avoider" }, { emoji: "📈", text: "Yes, but I want to do it carefully and understand it first.", type: "saver" }, { emoji: "🍹", text: "Maybe later. Right now I want to enjoy life more.", type: "spender" }, { emoji: "🌙", text: "I get it, but growing money is not something I care about that much.", type: "monk" }] },
-    { text: "Think about 10 years from now. Which future sounds best to you?", answers: [{ emoji: "☮️", text: "A peaceful life, simple and comfortable.", type: "monk" }, { emoji: "🌍", text: "Freedom, travel, fun, and enough money to enjoy life.", type: "spender" }, { emoji: "🌫️", text: "Honestly… I don't really like thinking that far ahead.", type: "avoider" }, { emoji: "🏠", text: "A stable life, good savings, and no money stress.", type: "saver" }] },
-    { text: "Final question. Which quote sounds the most like you?", answers: [{ emoji: "📚", text: "Being prepared makes me feel safe.", type: "saver" }, { emoji: "🫠", text: "I was going to fix my finances… then time just disappeared.", type: "avoider" }, { emoji: "🧘", text: "Money is useful, but it's not everything.", type: "monk" }, { emoji: "🛍️", text: "I work hard, so I should enjoy what I earn.", type: "spender" }] }
+    {
+      text: "You just got a new job. Your salary is $3,000 a month. What is your first thought?",
+      answers: [
+        { emoji: "🏦", text: "First, I need to see my budget and how much I can save.", type: "saver" },
+        { emoji: "🎉", text: "Nice. I should buy myself something to celebrate.", type: "spender" },
+        { emoji: "🙂", text: "As long as I can live comfortably, I'm happy.", type: "monk" },
+        { emoji: "😅", text: "I know I should make a plan… but maybe later.", type: "avoider" }
+      ]
+    },
+    {
+      text: "Your first paycheck comes in. What do you do next?",
+      answers: [
+        { emoji: "🙈", text: "I tell myself I'll sort it out later and avoid looking too much.", type: "avoider" },
+        { emoji: "🌿", text: "I leave it there. Money is useful, but I don't get too excited about it.", type: "monk" },
+        { emoji: "🛍️", text: "I treat myself because payday should feel good.", type: "spender" },
+        { emoji: "🔐", text: "I move some money to savings right away.", type: "saver" }
+      ]
+    },
+    {
+      text: "Your coworkers invite you to a fancy dinner after work. What do you do?",
+      answers: [
+        { emoji: "🍝", text: "I go and enjoy it. It's good to have fun sometimes.", type: "spender" },
+        { emoji: "📱", text: "I check the price first before I say yes.", type: "saver" },
+        { emoji: "🧘", text: "I skip it. A quiet night sounds better.", type: "monk" },
+        { emoji: "🫥", text: "I say I'll think about it… then never reply properly.", type: "avoider" }
+      ]
+    },
+    {
+      text: "You want to buy a few things for your room. What happens?",
+      answers: [
+        { emoji: "🛒", text: "I add things to cart, then close it, then open it again, then do nothing.", type: "avoider" },
+        { emoji: "🌱", text: "I decide I already have what I need.", type: "monk" },
+        { emoji: "✨", text: "I buy the things that make life feel nicer.", type: "spender" },
+        { emoji: "📊", text: "I compare prices and choose carefully.", type: "saver" }
+      ]
+    },
+    {
+      text: "Bills week is here. Rent, phone, and other payments all show up together. What is your reaction?",
+      answers: [
+        { emoji: "🍃", text: "It's okay. My life is simple, so it's easier to manage.", type: "monk" },
+        { emoji: "😵", text: "I look at it, feel stressed, and want to lie down.", type: "avoider" },
+        { emoji: "✅", text: "Not fun, but I was ready for this.", type: "saver" },
+        { emoji: "💸", text: "I pay them, but it still hurts a little.", type: "spender" }
+      ]
+    },
+    {
+      text: "Your laptop breaks, and fixing it costs $800. What do you do?",
+      answers: [
+        { emoji: "🧯", text: "That hurts, but this is why emergency savings exist.", type: "saver" },
+        { emoji: "😬", text: "I just stare at the price and feel my soul leave my body.", type: "avoider" },
+        { emoji: "🪷", text: "I stay calm and look for the easiest solution.", type: "monk" },
+        { emoji: "🛠️", text: "Annoying, but I'll figure it out and move on.", type: "spender" }
+      ]
+    },
+    {
+      text: "A few months later, you get a $1,000 bonus. What do you do with it?",
+      answers: [
+        { emoji: "🎉", text: "This money already has fun plans.", type: "spender" },
+        { emoji: "🙂", text: "Nice. I'll use what I need and not think too much about it.", type: "monk" },
+        { emoji: "🧠", text: "Some of this should go to savings or something smart.", type: "saver" },
+        { emoji: "😐", text: "I want to make a smart choice, but somehow I make no choice at all.", type: "avoider" }
+      ]
+    },
+    {
+      text: "A friend says, 'You should start investing.' What sounds most like you?",
+      answers: [
+        { emoji: "🙉", text: "I hope they don't ask me more because I have no idea.", type: "avoider" },
+        { emoji: "📈", text: "Yes, but I want to do it carefully and understand it first.", type: "saver" },
+        { emoji: "🍹", text: "Maybe later. Right now I want to enjoy life more.", type: "spender" },
+        { emoji: "🌙", text: "I get it, but growing money is not something I care about that much.", type: "monk" }
+      ]
+    },
+    {
+      text: "Think about 10 years from now. Which future sounds best to you?",
+      answers: [
+        { emoji: "☮️", text: "A peaceful life, simple and comfortable.", type: "monk" },
+        { emoji: "🌍", text: "Freedom, travel, fun, and enough money to enjoy life.", type: "spender" },
+        { emoji: "🌫️", text: "Honestly… I don't really like thinking that far ahead.", type: "avoider" },
+        { emoji: "🏠", text: "A stable life, good savings, and no money stress.", type: "saver" }
+      ]
+    },
+    {
+      text: "Final question. Which quote sounds the most like you?",
+      answers: [
+        { emoji: "📚", text: "Being prepared makes me feel safe.", type: "saver" },
+        { emoji: "🫠", text: "I was going to fix my finances… then time just disappeared.", type: "avoider" },
+        { emoji: "🧘", text: "Money is useful, but it's not everything.", type: "monk" },
+        { emoji: "🛍️", text: "I work hard, so I should enjoy what I earn.", type: "spender" }
+      ]
+    }
   ],
-  de: [],
-  es: []
+
+  de: [
+    {
+      text: "Du hast gerade einen neuen Job bekommen. Dein Gehalt beträgt 3.000 $ im Monat. Was denkst du zuerst?",
+      answers: [
+        { emoji: "🏦", text: "Zuerst muss ich mein Budget ansehen und schauen, wie viel ich sparen kann.", type: "saver" },
+        { emoji: "🎉", text: "Super. Ich sollte mir etwas zur Feier kaufen.", type: "spender" },
+        { emoji: "🙂", text: "Solange ich bequem leben kann, bin ich zufrieden.", type: "monk" },
+        { emoji: "😅", text: "Ich weiß, ich sollte einen Plan machen … aber vielleicht später.", type: "avoider" }
+      ]
+    },
+    {
+      text: "Dein erstes Gehalt ist da. Was machst du als Nächstes?",
+      answers: [
+        { emoji: "🙈", text: "Ich sage mir, dass ich es später regle, und schaue lieber nicht zu genau hin.", type: "avoider" },
+        { emoji: "🌿", text: "Ich lasse es einfach dort. Geld ist nützlich, aber ich werde nicht besonders aufgeregt.", type: "monk" },
+        { emoji: "🛍️", text: "Ich gönne mir etwas, weil Zahltag sich gut anfühlen sollte.", type: "spender" },
+        { emoji: "🔐", text: "Ich überweise sofort etwas auf mein Sparkonto.", type: "saver" }
+      ]
+    },
+    {
+      text: "Deine Kollegen laden dich nach der Arbeit in ein schickes Restaurant ein. Was machst du?",
+      answers: [
+        { emoji: "🍝", text: "Ich gehe hin und genieße es. Man sollte auch mal Spaß haben.", type: "spender" },
+        { emoji: "📱", text: "Ich prüfe zuerst den Preis, bevor ich ja sage.", type: "saver" },
+        { emoji: "🧘", text: "Ich sage ab. Ein ruhiger Abend klingt besser.", type: "monk" },
+        { emoji: "🫥", text: "Ich sage, ich überlege es mir … und melde mich dann nie richtig zurück.", type: "avoider" }
+      ]
+    },
+    {
+      text: "Du willst ein paar Dinge für dein Zimmer kaufen. Was passiert?",
+      answers: [
+        { emoji: "🛒", text: "Ich lege Dinge in den Warenkorb, schließe ihn, öffne ihn wieder und mache dann nichts.", type: "avoider" },
+        { emoji: "🌱", text: "Ich entscheide, dass ich eigentlich schon habe, was ich brauche.", type: "monk" },
+        { emoji: "✨", text: "Ich kaufe die Dinge, die das Leben schöner machen.", type: "spender" },
+        { emoji: "📊", text: "Ich vergleiche Preise und wähle sorgfältig aus.", type: "saver" }
+      ]
+    },
+    {
+      text: "Rechnungswoche ist da. Miete, Telefon und andere Zahlungen kommen alle zusammen. Wie reagierst du?",
+      answers: [
+        { emoji: "🍃", text: "Schon okay. Mein Leben ist einfach, also ist es leichter zu regeln.", type: "monk" },
+        { emoji: "😵", text: "Ich sehe es und fühle sofort Stress. Ich will mich erst mal hinlegen.", type: "avoider" },
+        { emoji: "✅", text: "Nicht schön, aber ich war vorbereitet.", type: "saver" },
+        { emoji: "💸", text: "Ich bezahle alles, aber es tut trotzdem ein bisschen weh.", type: "spender" }
+      ]
+    },
+    {
+      text: "Dein Laptop geht kaputt und die Reparatur kostet 800 $. Was machst du?",
+      answers: [
+        { emoji: "🧯", text: "Tut weh, aber genau dafür gibt es Notfallersparnisse.", type: "saver" },
+        { emoji: "😬", text: "Ich starre nur auf den Preis und spüre, wie meine Seele kurz den Körper verlässt.", type: "avoider" },
+        { emoji: "🪷", text: "Ich bleibe ruhig und suche die einfachste Lösung.", type: "monk" },
+        { emoji: "🛠️", text: "Nervig, aber ich kümmere mich darum und mache weiter.", type: "spender" }
+      ]
+    },
+    {
+      text: "Ein paar Monate später bekommst du einen Bonus von 1.000 $. Was machst du damit?",
+      answers: [
+        { emoji: "🎉", text: "Dieses Geld hat schon Freizeitpläne.", type: "spender" },
+        { emoji: "🙂", text: "Schön. Ich nutze, was ich brauche, und denke nicht zu viel darüber nach.", type: "monk" },
+        { emoji: "🧠", text: "Ein Teil davon sollte gespart oder klug eingesetzt werden.", type: "saver" },
+        { emoji: "😐", text: "Ich will eine kluge Entscheidung treffen, aber am Ende treffe ich gar keine.", type: "avoider" }
+      ]
+    },
+    {
+      text: "Ein Freund sagt: „Du solltest anfangen zu investieren.“ Was passt am besten zu dir?",
+      answers: [
+        { emoji: "🙉", text: "Ich hoffe nur, dass keine weiteren Fragen kommen, weil ich keine Ahnung habe.", type: "avoider" },
+        { emoji: "📈", text: "Ja, aber ich möchte es vorsichtig machen und zuerst verstehen.", type: "saver" },
+        { emoji: "🍹", text: "Vielleicht später. Im Moment will ich das Leben mehr genießen.", type: "spender" },
+        { emoji: "🌙", text: "Ich verstehe es, aber Geld wachsen zu lassen ist mir nicht so wichtig.", type: "monk" }
+      ]
+    },
+    {
+      text: "Denk an 10 Jahre in der Zukunft. Welche Zukunft klingt am besten für dich?",
+      answers: [
+        { emoji: "☮️", text: "Ein friedliches, einfaches und angenehmes Leben.", type: "monk" },
+        { emoji: "🌍", text: "Freiheit, Reisen, Spaß und genug Geld, um das Leben zu genießen.", type: "spender" },
+        { emoji: "🌫️", text: "Ehrlich gesagt … ich denke nicht gern so weit voraus.", type: "avoider" },
+        { emoji: "🏠", text: "Ein stabiles Leben, gute Ersparnisse und kein Geldstress.", type: "saver" }
+      ]
+    },
+    {
+      text: "Letzte Frage. Welcher Satz klingt am meisten nach dir?",
+      answers: [
+        { emoji: "📚", text: "Vorbereitet zu sein gibt mir Sicherheit.", type: "saver" },
+        { emoji: "🫠", text: "Ich wollte meine Finanzen ordnen … und dann ist die Zeit einfach verschwunden.", type: "avoider" },
+        { emoji: "🧘", text: "Geld ist nützlich, aber nicht alles.", type: "monk" },
+        { emoji: "🛍️", text: "Ich arbeite hart, also sollte ich auch genießen, was ich verdiene.", type: "spender" }
+      ]
+    }
+  ],
+
+  es: [
+    {
+      text: "Acabas de conseguir un nuevo trabajo. Tu salario es de $3,000 al mes. ¿Cuál es tu primer pensamiento?",
+      answers: [
+        { emoji: "🏦", text: "Primero necesito ver mi presupuesto y cuánto puedo ahorrar.", type: "saver" },
+        { emoji: "🎉", text: "Qué bien. Debería comprarme algo para celebrarlo.", type: "spender" },
+        { emoji: "🙂", text: "Mientras pueda vivir cómodamente, estoy feliz.", type: "monk" },
+        { emoji: "😅", text: "Sé que debería hacer un plan… pero tal vez después.", type: "avoider" }
+      ]
+    },
+    {
+      text: "Llega tu primer sueldo. ¿Qué haces después?",
+      answers: [
+        { emoji: "🙈", text: "Me digo que lo arreglaré después y evito mirar demasiado.", type: "avoider" },
+        { emoji: "🌿", text: "Lo dejo ahí. El dinero es útil, pero no me emociona demasiado.", type: "monk" },
+        { emoji: "🛍️", text: "Me doy un gusto porque el día de pago debe sentirse bien.", type: "spender" },
+        { emoji: "🔐", text: "Paso algo de dinero a mis ahorros de inmediato.", type: "saver" }
+      ]
+    },
+    {
+      text: "Tus compañeros te invitan a una cena elegante después del trabajo. ¿Qué haces?",
+      answers: [
+        { emoji: "🍝", text: "Voy y lo disfruto. A veces está bien divertirse.", type: "spender" },
+        { emoji: "📱", text: "Primero reviso el precio antes de decir que sí.", type: "saver" },
+        { emoji: "🧘", text: "No voy. Una noche tranquila suena mejor.", type: "monk" },
+        { emoji: "🫥", text: "Digo que lo pensaré… y luego nunca respondo bien.", type: "avoider" }
+      ]
+    },
+    {
+      text: "Quieres comprar algunas cosas para tu cuarto. ¿Qué pasa?",
+      answers: [
+        { emoji: "🛒", text: "Pongo cosas en el carrito, lo cierro, lo vuelvo a abrir y al final no hago nada.", type: "avoider" },
+        { emoji: "🌱", text: "Decido que ya tengo lo que necesito.", type: "monk" },
+        { emoji: "✨", text: "Compro las cosas que hacen la vida más agradable.", type: "spender" },
+        { emoji: "📊", text: "Comparo precios y elijo con cuidado.", type: "saver" }
+      ]
+    },
+    {
+      text: "Llega la semana de pagar cuentas. Renta, teléfono y otros pagos aparecen todos juntos. ¿Cuál es tu reacción?",
+      answers: [
+        { emoji: "🍃", text: "Está bien. Mi vida es simple, así que es más fácil manejarlo.", type: "monk" },
+        { emoji: "😵", text: "Lo veo, me estreso y solo quiero acostarme un rato.", type: "avoider" },
+        { emoji: "✅", text: "No es divertido, pero estaba preparado.", type: "saver" },
+        { emoji: "💸", text: "Pago todo, pero igual duele un poco.", type: "spender" }
+      ]
+    },
+    {
+      text: "Tu portátil se rompe y arreglarla cuesta $800. ¿Qué haces?",
+      answers: [
+        { emoji: "🧯", text: "Duele, pero para eso existen los ahorros de emergencia.", type: "saver" },
+        { emoji: "😬", text: "Solo miro el precio y siento que mi alma abandona el cuerpo.", type: "avoider" },
+        { emoji: "🪷", text: "Mantengo la calma y busco la solución más sencilla.", type: "monk" },
+        { emoji: "🛠️", text: "Es molesto, pero lo resolveré y seguiré adelante.", type: "spender" }
+      ]
+    },
+    {
+      text: "Unos meses después, recibes un bono de $1,000. ¿Qué haces con él?",
+      answers: [
+        { emoji: "🎉", text: "Este dinero ya tiene planes divertidos.", type: "spender" },
+        { emoji: "🙂", text: "Bien. Usaré lo que necesite y no pensaré demasiado en ello.", type: "monk" },
+        { emoji: "🧠", text: "Una parte de esto debería ir a ahorros o a algo inteligente.", type: "saver" },
+        { emoji: "😐", text: "Quiero tomar una decisión inteligente, pero de alguna forma no tomo ninguna.", type: "avoider" }
+      ]
+    },
+    {
+      text: "Un amigo dice: 'Deberías empezar a invertir.' ¿Qué suena más como tú?",
+      answers: [
+        { emoji: "🙉", text: "Solo espero que no me pregunte más porque no tengo idea.", type: "avoider" },
+        { emoji: "📈", text: "Sí, pero quiero hacerlo con cuidado y entenderlo primero.", type: "saver" },
+        { emoji: "🍹", text: "Tal vez después. Ahora quiero disfrutar más la vida.", type: "spender" },
+        { emoji: "🌙", text: "Lo entiendo, pero hacer crecer el dinero no me importa tanto.", type: "monk" }
+      ]
+    },
+    {
+      text: "Piensa en 10 años en el futuro. ¿Qué futuro te suena mejor?",
+      answers: [
+        { emoji: "☮️", text: "Una vida tranquila, simple y cómoda.", type: "monk" },
+        { emoji: "🌍", text: "Libertad, viajes, diversión y suficiente dinero para disfrutar la vida.", type: "spender" },
+        { emoji: "🌫️", text: "La verdad… no me gusta pensar tan lejos.", type: "avoider" },
+        { emoji: "🏠", text: "Una vida estable, buenos ahorros y nada de estrés por dinero.", type: "saver" }
+      ]
+    },
+    {
+      text: "Última pregunta. ¿Qué frase suena más a ti?",
+      answers: [
+        { emoji: "📚", text: "Estar preparado me hace sentir seguro.", type: "saver" },
+        { emoji: "🫠", text: "Iba a ordenar mis finanzas… y luego el tiempo desapareció.", type: "avoider" },
+        { emoji: "🧘", text: "El dinero es útil, pero no lo es todo.", type: "monk" },
+        { emoji: "🛍️", text: "Trabajo duro, así que debo disfrutar lo que gano.", type: "spender" }
+      ]
+    }
+  ]
 };
-localizedQuestions.de = localizedQuestions.en;
-localizedQuestions.es = localizedQuestions.en;
 
 const countries = [
   { name: '🇦🇫 Afghanistan', code: '+93' }, { name: '🇦🇱 Albania', code: '+355' }, { name: '🇩🇿 Algeria', code: '+213' }, { name: '🇦🇩 Andorra', code: '+376' }, { name: '🇦🇴 Angola', code: '+244' }, { name: '🇦🇷 Argentina', code: '+54' }, { name: '🇦🇺 Australia', code: '+61' }, { name: '🇦🇹 Austria', code: '+43' }, { name: '🇧🇭 Bahrain', code: '+973' }, { name: '🇧🇩 Bangladesh', code: '+880' }, { name: '🇧🇪 Belgium', code: '+32' }, { name: '🇧🇷 Brazil', code: '+55' }, { name: '🇧🇬 Bulgaria', code: '+359' }, { name: '🇰🇭 Cambodia', code: '+855' }, { name: '🇨🇦 Canada', code: '+1' }, { name: '🇨🇱 Chile', code: '+56' }, { name: '🇨🇳 China', code: '+86' }, { name: '🇨🇴 Colombia', code: '+57' }, { name: '🇭🇷 Croatia', code: '+385' }, { name: '🇨🇾 Cyprus', code: '+357' }, { name: '🇨🇿 Czech Republic', code: '+420' }, { name: '🇩🇰 Denmark', code: '+45' }, { name: '🇪🇬 Egypt', code: '+20' }, { name: '🇪🇪 Estonia', code: '+372' }, { name: '🇫🇮 Finland', code: '+358' }, { name: '🇫🇷 France', code: '+33' }, { name: '🇩🇪 Germany', code: '+49' }, { name: '🇬🇷 Greece', code: '+30' }, { name: '🇭🇰 Hong Kong', code: '+852' }, { name: '🇭🇺 Hungary', code: '+36' }, { name: '🇮🇸 Iceland', code: '+354' }, { name: '🇮🇳 India', code: '+91' }, { name: '🇮🇩 Indonesia', code: '+62' }, { name: '🇮🇪 Ireland', code: '+353' }, { name: '🇮🇱 Israel', code: '+972' }, { name: '🇮🇹 Italy', code: '+39' }, { name: '🇯🇵 Japan', code: '+81' }, { name: '🇯🇴 Jordan', code: '+962' }, { name: '🇰🇿 Kazakhstan', code: '+7' }, { name: '🇰🇪 Kenya', code: '+254' }, { name: '🇰🇼 Kuwait', code: '+965' }, { name: '🇱🇻 Latvia', code: '+371' }, { name: '🇱🇧 Lebanon', code: '+961' }, { name: '🇱🇹 Lithuania', code: '+370' }, { name: '🇱🇺 Luxembourg', code: '+352' }, { name: '🇲🇾 Malaysia', code: '+60' }, { name: '🇲🇹 Malta', code: '+356' }, { name: '🇲🇽 Mexico', code: '+52' }, { name: '🇲🇦 Morocco', code: '+212' }, { name: '🇳🇱 Netherlands', code: '+31' }, { name: '🇳🇿 New Zealand', code: '+64' }, { name: '🇳🇬 Nigeria', code: '+234' }, { name: '🇳🇴 Norway', code: '+47' }, { name: '🇴🇲 Oman', code: '+968' }, { name: '🇵🇰 Pakistan', code: '+92' }, { name: '🇵🇭 Philippines', code: '+63' }, { name: '🇵🇱 Poland', code: '+48' }, { name: '🇵🇹 Portugal', code: '+351' }, { name: '🇶🇦 Qatar', code: '+974' }, { name: '🇷🇴 Romania', code: '+40' }, { name: '🇷🇺 Russia', code: '+7' }, { name: '🇸🇦 Saudi Arabia', code: '+966' }, { name: '🇷🇸 Serbia', code: '+381' }, { name: '🇸🇬 Singapore', code: '+65' }, { name: '🇸🇰 Slovakia', code: '+421' }, { name: '🇸🇮 Slovenia', code: '+386' }, { name: '🇿🇦 South Africa', code: '+27' }, { name: '🇰🇷 South Korea', code: '+82' }, { name: '🇪🇸 Spain', code: '+34' }, { name: '🇱🇰 Sri Lanka', code: '+94' }, { name: '🇸🇪 Sweden', code: '+46' }, { name: '🇨🇭 Switzerland', code: '+41' }, { name: '🇹🇼 Taiwan', code: '+886' }, { name: '🇹🇭 Thailand', code: '+66' }, { name: '🇹🇷 Turkey', code: '+90' }, { name: '🇦🇪 United Arab Emirates', code: '+971' }, { name: '🇬🇧 United Kingdom', code: '+44' }, { name: '🇺🇸 United States', code: '+1' }, { name: '🇻🇳 Vietnam', code: '+84' }
