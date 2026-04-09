@@ -595,9 +595,9 @@ export default async function handler(req, res) {
     });
 
     addLinkAnnotation(pdfDoc, page4, ctaX, ctaY, ctaW, ctaH,
-      'http://www.millionairemind.online/special');
+      'http://www.millionairemind.online');
 
-    const urlStr = 'www.millionairemind.online/special';
+    const urlStr = 'www.millionairemind.online';
     drawCentered(page4, urlStr, ctaY - 28, width, {
       font: fontBold, size: 12, color: gold
     });
