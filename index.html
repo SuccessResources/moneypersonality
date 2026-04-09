@@ -1929,6 +1929,7 @@ function getReportPayload() {
   return {
     userName: userName || '',
     language: currentLanguage || 'en',
+    personalityType: dominant,
     personalityName: getPersonalityText(dominant, 'name') || '',
     description: getPersonalityText(dominant, 'desc') || '',
     strengthLabel: getText('strengthLabel') || 'Your Strengths',
