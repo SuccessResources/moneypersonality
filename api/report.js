@@ -726,6 +726,7 @@ const cardMid = rgb(0.12, 0.38, 0.27);
 const accent = rgb(0.13, 0.77, 0.37);
 const accentDim = rgb(0.10, 0.45, 0.24);
 const successGreen = rgb(0.13, 0.77, 0.37);
+const greenLight = rgb(0.24, 0.84, 0.47);
 
 const gold = rgb(1.0, 0.84, 0.0);
 const goldLight = rgb(1.0, 0.91, 0.35);
