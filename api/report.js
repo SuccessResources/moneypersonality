@@ -1,4 +1,96 @@
 import { PDFDocument, StandardFonts, rgb, PDFName, PDFString, PDFArray } from 'pdf-lib';
+import fontkit from '@pdf-lib/fontkit';
+
+// ================================================================
+// LANGUAGE / FONT HELPERS
+// ================================================================
+
+function containsCJK(text = '') {
+  return /[\u3400-\u9FFF\uF900-\uFAFF]/.test(String(text));
+}
+
+function containsNonLatin(text = '') {
+  return /[^\u0000-\u00FF]/.test(String(text));
+}
+
+function sanitizeText(text = '') {
+  return String(text || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+}
+
+function getBaseUrl(req) {
+  const proto =
+    req.headers['x-forwarded-proto'] ||
+    req.headers['X-Forwarded-Proto'] ||
+    'https';
+  const host =
+    req.headers['x-forwarded-host'] ||
+    req.headers['host'];
+
+  return `${proto}://${host}`;
+}
+
+async function fetchArrayBuffer(url) {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch resource: ${url}`);
+  }
+  return await response.arrayBuffer();
+}
+
+async function loadUnicodeFontBytes(req) {
+  const baseUrl = getBaseUrl(req);
+
+  const candidates = [
+    `${baseUrl}/fonts/NotoSansSC-Regular.ttf`,
+    `${baseUrl}/fonts/NotoSansSC-Regular.otf`,
+    // fallback CDN
+    'https://cdn.jsdelivr.net/gh/notofonts/noto-cjk@main/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Regular.otf'
+  ];
+
+  for (const url of candidates) {
+    try {
+      return await fetchArrayBuffer(url);
+    } catch (err) {
+      // try next
+    }
+  }
+
+  throw new Error(
+    'Unicode font could not be loaded. Add /public/fonts/NotoSansSC-Regular.ttf or allow CDN access.'
+  );
+}
+
+/**
+ * Smart font loading: returns Unicode-capable fonts if needed
+ */
+async function getFonts(pdfDoc, req, allText) {
+  const regularLatin = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const boldLatin = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  const obliqueLatin = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
+
+  const needsUnicode = containsNonLatin(allText);
+
+  if (!needsUnicode) {
+    return {
+      regular: regularLatin,
+      bold: boldLatin,
+      oblique: obliqueLatin,
+      unicode: false
+    };
+  }
+
+  // Load Unicode font for CJK + other non-Latin scripts
+  pdfDoc.registerFontkit(fontkit);
+  const unicodeBytes = await loadUnicodeFontBytes(req);
+  const unicodeFont = await pdfDoc.embedFont(unicodeBytes, { subset: true });
+
+  return {
+    regular: unicodeFont,
+    bold: unicodeFont,
+    oblique: unicodeFont,
+    unicode: true
+  };
+}
 
 // ================================================================
 // COLOR HELPERS
@@ -27,49 +119,89 @@ function lerpColor(c1, c2, t) {
 // ================================================================
 
 function wrapTextByWidth(text, font, fontSize, maxWidth) {
-  if (!text) return [''];
-  const words = String(text).split(/\s+/);
+  const safeText = sanitizeText(text);
+  if (!safeText) return [''];
+
+  const paragraphs = safeText.split('\n');
   const lines = [];
-  let current = '';
-  for (const word of words) {
-    const test = current ? `${current} ${word}` : word;
-    if (font.widthOfTextAtSize(test, fontSize) <= maxWidth) {
-      current = test;
-    } else {
-      if (current) lines.push(current);
-      current = word;
+
+  for (const paragraph of paragraphs) {
+    if (!paragraph.trim()) {
+      lines.push('');
+      continue;
     }
+
+    // For CJK text, wrap character-by-character
+    if (containsCJK(paragraph)) {
+      let current = '';
+      for (const char of paragraph) {
+        const test = current + char;
+        if (font.widthOfTextAtSize(test, fontSize) <= maxWidth) {
+          current = test;
+        } else {
+          if (current) lines.push(current);
+          current = char;
+        }
+      }
+      if (current) lines.push(current);
+      continue;
+    }
+
+    // For Latin text, wrap by word
+    const words = paragraph.split(/\s+/);
+    let current = '';
+
+    for (const word of words) {
+      const test = current ? `${current} ${word}` : word;
+      if (font.widthOfTextAtSize(test, fontSize) <= maxWidth) {
+        current = test;
+      } else {
+        if (current) lines.push(current);
+        current = word;
+      }
+    }
+
+    if (current) lines.push(current);
   }
-  if (current) lines.push(current);
-  return lines;
+
+  return lines.length ? lines : [''];
 }
 
 function drawWrappedText(page, text, x, y, width, options = {}) {
   const { font, size = 12, color = rgb(1, 1, 1), lineHeight = 18 } = options;
   const lines = wrapTextByWidth(text, font, size, width);
   let currentY = y;
+
   for (const line of lines) {
-    page.drawText(line, { x, y: currentY, size, font, color });
+    if (line) {
+      page.drawText(line, { x, y: currentY, size, font, color });
+    }
     currentY -= lineHeight;
   }
+
   return currentY;
 }
 
 function drawCentered(page, text, y, pageWidth, options = {}) {
+  const safeText = sanitizeText(text);
   const { font, size = 12, color = rgb(1, 1, 1) } = options;
-  const tw = font.widthOfTextAtSize(text, size);
-  page.drawText(text, { x: (pageWidth - tw) / 2, y, size, font, color });
+  const tw = font.widthOfTextAtSize(safeText, size);
+  page.drawText(safeText, { x: (pageWidth - tw) / 2, y, size, font, color });
 }
 
 function drawCenteredWrapped(page, text, y, pageWidth, maxWidth, options = {}) {
   const { font, size = 12, color = rgb(1, 1, 1), lineHeight = 18 } = options;
   const lines = wrapTextByWidth(text, font, size, maxWidth);
   let cy = y;
+
   for (const line of lines) {
-    const tw = font.widthOfTextAtSize(line, size);
-    page.drawText(line, { x: (pageWidth - tw) / 2, y: cy, size, font, color });
+    if (line) {
+      const tw = font.widthOfTextAtSize(line, size);
+      page.drawText(line, { x: (pageWidth - tw) / 2, y: cy, size, font, color });
+    }
     cy -= lineHeight;
   }
+
   return cy;
 }
 
@@ -82,8 +214,10 @@ function drawGradientV(page, x, y, w, h, colorTop, colorBottom, steps = 24) {
   for (let i = 0; i < steps; i++) {
     const t = i / (steps - 1);
     page.drawRectangle({
-      x, y: y + h - (i + 1) * stepH,
-      width: w, height: stepH + 0.5,
+      x,
+      y: y + h - (i + 1) * stepH,
+      width: w,
+      height: stepH + 0.5,
       color: lerpColor(colorTop, colorBottom, t)
     });
   }
@@ -94,8 +228,10 @@ function drawGradientH(page, x, y, w, h, colorLeft, colorRight, steps = 30) {
   for (let i = 0; i < steps; i++) {
     const t = i / (steps - 1);
     page.drawRectangle({
-      x: x + i * stepW, y,
-      width: stepW + 0.5, height: h,
+      x: x + i * stepW,
+      y,
+      width: stepW + 0.5,
+      height: h,
       color: lerpColor(colorLeft, colorRight, t)
     });
   }
@@ -107,7 +243,10 @@ function drawDivider(page, x, y, w, color, thickness = 1) {
 
 function drawCard(page, x, y, w, h, fillColor, borderColor = null, borderWidth = 1) {
   page.drawRectangle({
-    x, y, width: w, height: h,
+    x,
+    y,
+    width: w,
+    height: h,
     color: fillColor,
     borderColor: borderColor || fillColor,
     borderWidth: borderColor ? borderWidth : 0
@@ -130,20 +269,54 @@ function drawDiamond(page, cx, cy, size, color) {
   }
 }
 
+/**
+ * Sanitize filename for safe filesystem and HTTP header use
+ */
 function safeFilename(name) {
   return String(name || 'Money_Personality_Report')
     .replace(/[^\p{L}\p{N}\s_-]/gu, '')
     .trim()
-    .replace(/\s+/g, '_');
+    .replace(/\s+/g, '_')
+    .substring(0, 100);
+}
+
+/**
+ * Encode filename for RFC 5987 Content-Disposition header
+ * Supports all Unicode characters in both ASCII and non-ASCII filenames
+ */
+function encodeRFC5987Filename(filename) {
+  const ascii = /^[\x20-\x7E]*$/.test(filename);
+  
+  if (ascii) {
+    // For pure ASCII, just quote it
+    return `"${filename}"`;
+  }
+
+  // For non-ASCII, use RFC 5987 encoding: filename*=UTF-8''encoded-name
+  const encoded = Buffer.from(filename, 'utf8')
+    .toString('binary')
+    .split('')
+    .map(char => {
+      const code = char.charCodeAt(0);
+      return code < 128 && /^[\w\-.]$/.test(char) ? char : `%${code.toString(16).toUpperCase().padStart(2, '0')}`;
+    })
+    .join('');
+
+  return {
+    simple: safeFilename(filename),
+    extended: encoded
+  };
 }
 
 async function embedImageFromUrl(pdfDoc, url) {
   if (!url) return null;
+
   try {
     const response = await fetch(url);
     if (!response.ok) return null;
     const bytes = await response.arrayBuffer();
     const contentType = response.headers.get('content-type') || '';
+
     if (contentType.includes('png')) return await pdfDoc.embedPng(bytes);
     return await pdfDoc.embedJpg(bytes);
   } catch (err) {
@@ -216,14 +389,32 @@ export default async function handler(req, res) {
       format = 'pdf'
     } = body || {};
 
+    // Collect all text for language detection
+    const allText = [
+      userName,
+      personalityName,
+      description,
+      strengthLabel,
+      strengthText,
+      shadowLabel,
+      shadowText,
+      stepLabel,
+      stepText,
+      mixLabel,
+      bestMatchName,
+      bestMatchReason,
+      ...percentages.map(p => `${p?.label || ''} ${p?.value || ''}`)
+    ].join(' ');
+
     const pdfDoc = await PDFDocument.create();
     const width = 595.28;
     const height = 841.89;
 
-    // Standard fonts (no external fetch needed)
-    const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
-    const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-    const fontOblique = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
+    // Smart font loading: Unicode fonts if any non-Latin text is detected
+    const fonts = await getFonts(pdfDoc, req, allText);
+    const fontRegular = fonts.regular;
+    const fontBold = fonts.bold;
+    const fontOblique = fonts.oblique;
 
     // Brand palette
     const midnight = rgb(0.051, 0.051, 0.051);
@@ -242,7 +433,9 @@ export default async function handler(req, res) {
     const accentDim = lerpColor(accent, midnight, 0.6);
 
     const displayDate = quizDate || new Date().toLocaleDateString('en-US', {
-      year: 'numeric', month: 'long', day: 'numeric'
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
     });
 
     // ================================================================
@@ -284,12 +477,12 @@ export default async function handler(req, res) {
       font: fontBold, size: 28, color: gold
     });
 
-    // Personalized greeting
+    // Personalized greeting - sanitized for all languages
     if (userName) {
       drawCentered(page1, 'Prepared exclusively for', height - 232, width, {
         font: fontOblique, size: 11, color: softGray
       });
-      drawCentered(page1, userName, height - 256, width, {
+      drawCentered(page1, sanitizeText(userName), height - 256, width, {
         font: fontBold, size: 22, color: offWhite
       });
     }
@@ -321,12 +514,12 @@ export default async function handler(req, res) {
     drawGradientH(page1, badgeX, badgeY, badgeW, badgeH, accentDim, accent, 20);
     drawDivider(page1, badgeX, badgeY + badgeH - 1, badgeW, gold, 1);
     drawDivider(page1, badgeX, badgeY, badgeW, gold, 1);
-    drawCentered(page1, personalityName.toUpperCase(), badgeY + 15, width, {
+    drawCentered(page1, sanitizeText(personalityName).toUpperCase(), badgeY + 15, width, {
       font: fontBold, size: 20, color: white
     });
 
     // Description
-    drawCenteredWrapped(page1, description, badgeY - 28, width, 440, {
+    drawCenteredWrapped(page1, sanitizeText(description), badgeY - 28, width, 440, {
       font: fontRegular, size: 11, color: offWhite, lineHeight: 17
     });
 
@@ -358,7 +551,7 @@ export default async function handler(req, res) {
     const mixCardH = 290;
     drawCard(page2, 40, mixCardY, width - 80, mixCardH, cardDark, cardMid);
 
-    page2.drawText(mixLabel.toUpperCase(), {
+    page2.drawText(sanitizeText(mixLabel).toUpperCase(), {
       x: 65, y: mixCardY + mixCardH - 35, size: 12, font: fontBold, color: gold
     });
     drawDivider(page2, 65, mixCardY + mixCardH - 48, 160, goldDim, 0.5);
@@ -369,7 +562,7 @@ export default async function handler(req, res) {
     const maxVal = Math.max(...percentages.map(p => Number(p?.value || 0)), 1);
 
     percentages.forEach((item) => {
-      const label = String(item?.label || '');
+      const label = sanitizeText(item?.label || '');
       const value = Number(item?.value || 0);
       const isTop = value >= maxVal;
 
@@ -415,11 +608,11 @@ export default async function handler(req, res) {
       x: 65, y: matchCardY + matchCardH - 30,
       size: 10, font: fontBold, color: greenLight
     });
-    page2.drawText(bestMatchName || '-', {
+    page2.drawText(sanitizeText(bestMatchName || '-'), {
       x: 65, y: matchCardY + matchCardH - 58,
       size: 20, font: fontBold, color: white
     });
-    drawWrappedText(page2, bestMatchReason || '', 65, matchCardY + matchCardH - 80, width - 140, {
+    drawWrappedText(page2, sanitizeText(bestMatchReason || ''), 65, matchCardY + matchCardH - 80, width - 140, {
       font: fontRegular, size: 10, color: offWhite, lineHeight: 15
     });
 
@@ -441,8 +634,8 @@ export default async function handler(req, res) {
       x: 40, y: 28, size: 8, font: fontRegular, color: softGray
     });
     if (userName) {
-      const nameW = fontRegular.widthOfTextAtSize(userName, 8);
-      page2.drawText(userName, {
+      const nameW = fontRegular.widthOfTextAtSize(sanitizeText(userName), 8);
+      page2.drawText(sanitizeText(userName), {
         x: width - 40 - nameW, y: 28, size: 8, font: fontRegular, color: softGray
       });
     }
@@ -482,14 +675,14 @@ export default async function handler(req, res) {
         x: 40, y: cy, width: 4, height: cardH, color: section.accentColor
       });
 
-      page3.drawText(section.label.toUpperCase(), {
+      page3.drawText(sanitizeText(section.label).toUpperCase(), {
         x: 65, y: cy + cardH - 32,
         size: 14, font: fontBold, color: gold
       });
 
       drawDivider(page3, 65, cy + cardH - 46, 200, goldDim, 0.5);
 
-      drawWrappedText(page3, section.text || '', 65, cy + cardH - 68, width - 140, {
+      drawWrappedText(page3, sanitizeText(section.text || ''), 65, cy + cardH - 68, width - 140, {
         font: fontRegular, size: 11, color: offWhite, lineHeight: 16
       });
 
@@ -584,7 +777,7 @@ export default async function handler(req, res) {
 
     // Make CTA button clickable
     addLinkAnnotation(pdfDoc, page4, ctaX, ctaY, ctaW, ctaH,
-      'http://www.millionairemind.online');
+      'http://www.millionairemind.online/special');
 
     // URL text below button
     const urlStr = 'www.millionairemind.online';
@@ -593,14 +786,14 @@ export default async function handler(req, res) {
     });
 
     // Make URL text clickable too
-    const urlTextW = fontBold.widthOfTextAtSize(urlStr, 12);
+    const urlTextW = fontRegular.widthOfTextAtSize(urlStr, 12);
     const urlTextX = (width - urlTextW) / 2;
     addLinkAnnotation(pdfDoc, page4, urlTextX - 5, ctaY - 34, urlTextW + 10, 18,
       'http://www.millionairemind.online');
 
     // Personalized closing
     if (userName) {
-      drawCentered(page4, `${userName}, your blueprint is waiting to be rewritten.`, ctaY - 78, width, {
+      drawCentered(page4, `${sanitizeText(userName)}, your blueprint is waiting to be rewritten.`, ctaY - 78, width, {
         font: fontOblique, size: 12, color: offWhite
       });
     }
@@ -618,24 +811,44 @@ export default async function handler(req, res) {
     });
 
     // ================================================================
-    // GENERATE OUTPUT
+    // GENERATE OUTPUT WITH RFC 5987 ENCODING
     // ================================================================
     const pdfBytes = await pdfDoc.save();
-    const fileName = safeFilename(`${userName ? userName + '_' : ''}${personalityName}_Report`);
+    
+    // Build filename with proper multilingual support
+    const baseFilename = `${userName ? sanitizeText(userName) + '_' : ''}${sanitizeText(personalityName)}_Report`;
+    const safeSimpleFilename = safeFilename(baseFilename);
+    const encodingInfo = encodeRFC5987Filename(baseFilename);
 
     // Thumbnail mode: return PDF bytes as base64 JSON (client renders via pdf.js)
     if (format === 'thumbnail') {
       const base64 = Buffer.from(pdfBytes).toString('base64');
       res.setHeader('Content-Type', 'application/json');
+      // Use RFC 5987 encoding even in JSON mode
       return res.status(200).json({
         pdfBase64: base64,
-        fileName: `${fileName}.pdf`,
+        fileName: typeof encodingInfo === 'object' 
+          ? `${encodingInfo.simple}.pdf` 
+          : safeSimpleFilename + '.pdf',
         pageCount: pdfDoc.getPageCount()
       });
     }
 
+    // Set headers with RFC 5987 encoding for multilingual filenames
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="${fileName}.pdf"`);
+    
+    // Use RFC 5987 encoding for the filename (works with all languages)
+    if (typeof encodingInfo === 'object') {
+      // Non-ASCII: use both filename and filename*
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename="${encodingInfo.simple}.pdf"; filename*=UTF-8''${encodingInfo.extended}.pdf`
+      );
+    } else {
+      // Pure ASCII: use simple quoted filename
+      res.setHeader('Content-Disposition', `attachment; filename=${encodingInfo}`);
+    }
+
     return res.status(200).send(Buffer.from(pdfBytes));
 
   } catch (error) {
