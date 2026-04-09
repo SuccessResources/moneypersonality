@@ -572,10 +572,10 @@ export default async function handler(req, res) {
 
     // Make CTA button clickable
     addLinkAnnotation(pdfDoc, page4, ctaX, ctaY, ctaW, ctaH,
-      'http://www.millionairemind.online');
+      'http://www.millionairemind.online/special');
 
     // URL text below button
-    const urlStr = 'www.millionairemind.online';
+    const urlStr = 'www.millionairemind.online/special';
     drawCentered(page4, urlStr, ctaY - 28, width, {
       font: fontBold, size: 12, color: gold
     });
