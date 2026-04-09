@@ -255,14 +255,26 @@ export default async function handler(req, res) {
     drawDecoCorner(page1, 35, height - 40, 30, goldDim);
     drawDecoCorner(page1, width - 35, 40, 30, goldDim, true);
 
-    // Brand header
-    drawCentered(page1, 'MILLIONAIRE MIND', height - 75, width, {
+    // Brand header: SR logo + MILLIONAIRE MIND
+    try {
+      const srLogo = await embedImageFromUrl(pdfDoc, 'https://sr-event.com/sr-logo');
+      if (srLogo) {
+        const logoH = 40;
+        const logoW = logoH * (srLogo.width / srLogo.height);
+        page1.drawImage(srLogo, {
+          x: (width - logoW) / 2,
+          y: height - 80,
+          width: logoW,
+          height: logoH
+        });
+      }
+    } catch (err) {
+      console.error('SR logo failed:', err.message);
+    }
+    drawCentered(page1, 'MILLIONAIRE MIND', height - 100, width, {
       font: fontBold, size: 12, color: gold
     });
-    drawCentered(page1, 'x  SUCCESS RESOURCES', height - 92, width, {
-      font: fontRegular, size: 9, color: softGray
-    });
-    drawDivider(page1, width / 2 - 60, height - 108, 120, goldDim);
+    drawDivider(page1, width / 2 - 60, height - 116, 120, goldDim);
 
     // Report title
     drawCentered(page1, 'MONEY PERSONALITY', height - 158, width, {
@@ -531,7 +543,7 @@ export default async function handler(req, res) {
     drawCentered(page4, 'MILLIONAIRE MIND HYBRID', evtCardY + evtCardH - 35, width, {
       font: fontBold, size: 19, color: gold
     });
-    drawCentered(page4, 'LIVE EVENT  |  1-3 MAY 2026', evtCardY + evtCardH - 60, width, {
+    drawCentered(page4, 'LIVE ONLINE EVENT', evtCardY + evtCardH - 60, width, {
       font: fontBold, size: 12, color: white
     });
 
