@@ -1,5 +1,4 @@
 import { PDFDocument, StandardFonts, rgb, PDFName, PDFString, PDFArray } from 'pdf-lib';
-import fontkit from '@pdf-lib/fontkit';
 
 // ================================================================
 // COLOR HELPERS
@@ -27,7 +26,7 @@ function lerpColor(c1, c2, t) {
 // TEXT HELPERS
 // ================================================================
 
-function wrapText(text, font, fontSize, maxWidth) {
+function wrapTextByWidth(text, font, fontSize, maxWidth) {
   if (!text) return [''];
   const words = String(text).split(/\s+/);
   const lines = [];
@@ -45,26 +44,26 @@ function wrapText(text, font, fontSize, maxWidth) {
   return lines;
 }
 
-function drawWrapped(page, text, x, y, width, opts = {}) {
-  const { font, size = 12, color = rgb(1, 1, 1), lineHeight = 18 } = opts;
-  const lines = wrapText(text, font, size, width);
-  let cy = y;
+function drawWrappedText(page, text, x, y, width, options = {}) {
+  const { font, size = 12, color = rgb(1, 1, 1), lineHeight = 18 } = options;
+  const lines = wrapTextByWidth(text, font, size, width);
+  let currentY = y;
   for (const line of lines) {
-    page.drawText(line, { x, y: cy, size, font, color });
-    cy -= lineHeight;
+    page.drawText(line, { x, y: currentY, size, font, color });
+    currentY -= lineHeight;
   }
-  return cy;
+  return currentY;
 }
 
-function drawCentered(page, text, y, pageWidth, opts = {}) {
-  const { font, size = 12, color = rgb(1, 1, 1) } = opts;
+function drawCentered(page, text, y, pageWidth, options = {}) {
+  const { font, size = 12, color = rgb(1, 1, 1) } = options;
   const tw = font.widthOfTextAtSize(text, size);
   page.drawText(text, { x: (pageWidth - tw) / 2, y, size, font, color });
 }
 
-function drawCenteredWrapped(page, text, y, pageWidth, maxWidth, opts = {}) {
-  const { font, size = 12, color = rgb(1, 1, 1), lineHeight = 18 } = opts;
-  const lines = wrapText(text, font, size, maxWidth);
+function drawCenteredWrapped(page, text, y, pageWidth, maxWidth, options = {}) {
+  const { font, size = 12, color = rgb(1, 1, 1), lineHeight = 18 } = options;
+  const lines = wrapTextByWidth(text, font, size, maxWidth);
   let cy = y;
   for (const line of lines) {
     const tw = font.widthOfTextAtSize(line, size);
@@ -78,26 +77,26 @@ function drawCenteredWrapped(page, text, y, pageWidth, maxWidth, opts = {}) {
 // DRAWING HELPERS
 // ================================================================
 
-function drawGradientRect(page, x, y, w, h, colorTop, colorBottom, steps = 20) {
+function drawGradientV(page, x, y, w, h, colorTop, colorBottom, steps = 24) {
   const stepH = h / steps;
   for (let i = 0; i < steps; i++) {
     const t = i / (steps - 1);
-    const c = lerpColor(colorTop, colorBottom, t);
     page.drawRectangle({
       x, y: y + h - (i + 1) * stepH,
-      width: w, height: stepH + 0.5, color: c
+      width: w, height: stepH + 0.5,
+      color: lerpColor(colorTop, colorBottom, t)
     });
   }
 }
 
-function drawGradientBar(page, x, y, w, h, colorLeft, colorRight, steps = 30) {
+function drawGradientH(page, x, y, w, h, colorLeft, colorRight, steps = 30) {
   const stepW = w / steps;
   for (let i = 0; i < steps; i++) {
     const t = i / (steps - 1);
-    const c = lerpColor(colorLeft, colorRight, t);
     page.drawRectangle({
       x: x + i * stepW, y,
-      width: stepW + 0.5, height: h, color: c
+      width: stepW + 0.5, height: h,
+      color: lerpColor(colorLeft, colorRight, t)
     });
   }
 }
@@ -110,15 +109,15 @@ function drawCard(page, x, y, w, h, fillColor, borderColor = null, borderWidth =
   page.drawRectangle({
     x, y, width: w, height: h,
     color: fillColor,
-    borderColor: borderColor || undefined,
+    borderColor: borderColor || fillColor,
     borderWidth: borderColor ? borderWidth : 0
   });
 }
 
 function drawDecoCorner(page, x, y, size, color, flip = false) {
-  const dir = flip ? -1 : 1;
-  page.drawRectangle({ x, y, width: size * dir, height: 1.5, color });
-  page.drawRectangle({ x, y, width: 1.5, height: size * dir, color });
+  const d = flip ? -1 : 1;
+  page.drawRectangle({ x, y, width: size * d, height: 1.5, color });
+  page.drawRectangle({ x, y, width: 1.5, height: size * d, color });
 }
 
 function drawDiamond(page, cx, cy, size, color) {
@@ -126,33 +125,9 @@ function drawDiamond(page, cx, cy, size, color) {
   for (let i = -s; i <= s; i += 0.5) {
     const hw = s - Math.abs(i);
     if (hw > 0) {
-      page.drawRectangle({
-        x: cx - hw, y: cy + i,
-        width: hw * 2, height: 0.6, color
-      });
+      page.drawRectangle({ x: cx - hw, y: cy + i, width: hw * 2, height: 0.6, color });
     }
   }
-}
-
-async function embedImage(pdfDoc, url) {
-  if (!url) return null;
-  try {
-    const response = await fetch(url);
-    if (!response.ok) return null;
-    const bytes = await response.arrayBuffer();
-    const ct = response.headers.get('content-type') || '';
-    if (ct.includes('png')) return pdfDoc.embedPng(bytes);
-    return pdfDoc.embedJpg(bytes);
-  } catch (err) {
-    console.error('Image embed failed:', err.message);
-    return null;
-  }
-}
-
-async function fetchFontBytes(url) {
-  const response = await fetch(url);
-  if (!response.ok) throw new Error(`Font fetch failed: ${response.status} ${url}`);
-  return await response.arrayBuffer();
 }
 
 function safeFilename(name) {
@@ -162,8 +137,23 @@ function safeFilename(name) {
     .replace(/\s+/g, '_');
 }
 
+async function embedImageFromUrl(pdfDoc, url) {
+  if (!url) return null;
+  try {
+    const response = await fetch(url);
+    if (!response.ok) return null;
+    const bytes = await response.arrayBuffer();
+    const contentType = response.headers.get('content-type') || '';
+    if (contentType.includes('png')) return await pdfDoc.embedPng(bytes);
+    return await pdfDoc.embedJpg(bytes);
+  } catch (err) {
+    console.error('Image embed failed:', err.message);
+    return null;
+  }
+}
+
 // ================================================================
-// CLICKABLE LINK ANNOTATION
+// CLICKABLE LINK ANNOTATION (pdf-lib low-level API)
 // ================================================================
 
 function addLinkAnnotation(pdfDoc, page, x, y, w, h, url) {
@@ -186,61 +176,11 @@ function addLinkAnnotation(pdfDoc, page, x, y, w, h, url) {
 
   const annotRef = context.register(annotDict);
 
-  const existingAnnots = page.node.get(PDFName.of('Annots'));
-  if (existingAnnots instanceof PDFArray) {
-    existingAnnots.push(annotRef);
+  const existing = page.node.get(PDFName.of('Annots'));
+  if (existing instanceof PDFArray) {
+    existing.push(annotRef);
   } else {
     page.node.set(PDFName.of('Annots'), context.obj([annotRef]));
-  }
-}
-
-// ================================================================
-// FONT LOADING - Google Fonts via GitHub raw TTF files
-// ================================================================
-
-const FONT_URLS = {
-  oswaldBold: 'https://github.com/googlefonts/OswaldFont/raw/main/fonts/ttf/Oswald-Bold.ttf',
-  oswaldExtraBold: 'https://github.com/googlefonts/OswaldFont/raw/main/fonts/ttf/Oswald-ExtraBold.ttf',
-  openSansRegular: 'https://github.com/googlefonts/opensans/raw/main/fonts/ttf/OpenSans-Regular.ttf',
-  openSansSemiBold: 'https://github.com/googlefonts/opensans/raw/main/fonts/ttf/OpenSans-SemiBold.ttf',
-  openSansBold: 'https://github.com/googlefonts/opensans/raw/main/fonts/ttf/OpenSans-Bold.ttf',
-  openSansItalic: 'https://github.com/googlefonts/opensans/raw/main/fonts/ttf/OpenSans-Italic.ttf'
-};
-
-async function loadFonts(pdfDoc) {
-  pdfDoc.registerFontkit(fontkit);
-
-  try {
-    const [oswBold, oswExBold, osReg, osSemiBold, osBold, osItalic] =
-      await Promise.all([
-        fetchFontBytes(FONT_URLS.oswaldBold),
-        fetchFontBytes(FONT_URLS.oswaldExtraBold),
-        fetchFontBytes(FONT_URLS.openSansRegular),
-        fetchFontBytes(FONT_URLS.openSansSemiBold),
-        fetchFontBytes(FONT_URLS.openSansBold),
-        fetchFontBytes(FONT_URLS.openSansItalic)
-      ]);
-
-    return {
-      heading: await pdfDoc.embedFont(oswExBold, { subset: true }),
-      headingSm: await pdfDoc.embedFont(oswBold, { subset: true }),
-      body: await pdfDoc.embedFont(osReg, { subset: true }),
-      bodySemiBold: await pdfDoc.embedFont(osSemiBold, { subset: true }),
-      bodyBold: await pdfDoc.embedFont(osBold, { subset: true }),
-      bodyItalic: await pdfDoc.embedFont(osItalic, { subset: true }),
-      isCustom: true
-    };
-  } catch (err) {
-    console.warn('Custom font load failed, using standard fonts:', err.message);
-    return {
-      heading: await pdfDoc.embedFont(StandardFonts.HelveticaBold),
-      headingSm: await pdfDoc.embedFont(StandardFonts.HelveticaBold),
-      body: await pdfDoc.embedFont(StandardFonts.Helvetica),
-      bodySemiBold: await pdfDoc.embedFont(StandardFonts.HelveticaBold),
-      bodyBold: await pdfDoc.embedFont(StandardFonts.HelveticaBold),
-      bodyItalic: await pdfDoc.embedFont(StandardFonts.HelveticaOblique),
-      isCustom: false
-    };
   }
 }
 
@@ -277,10 +217,13 @@ export default async function handler(req, res) {
     } = body || {};
 
     const pdfDoc = await PDFDocument.create();
-    const W = 595.28;
-    const H = 841.89;
+    const width = 595.28;
+    const height = 841.89;
 
-    const fonts = await loadFonts(pdfDoc);
+    // Standard fonts (no external fetch needed)
+    const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+    const fontOblique = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
 
     // Brand palette
     const midnight = rgb(0.051, 0.051, 0.051);
@@ -305,102 +248,108 @@ export default async function handler(req, res) {
     // ================================================================
     // PAGE 1 - COVER
     // ================================================================
-    const p1 = pdfDoc.addPage([W, H]);
+    const page1 = pdfDoc.addPage([width, height]);
 
-    drawGradientRect(p1, 0, 0, W, H, rgb(0.07, 0.07, 0.07), midnight, 30);
-    drawGradientBar(p1, 0, H - 4, W, 4, gold, successGreen, 40);
-    drawDecoCorner(p1, 35, H - 40, 30, goldDim);
-    drawDecoCorner(p1, W - 35, 40, 30, goldDim, true);
+    drawGradientV(page1, 0, 0, width, height, rgb(0.07, 0.07, 0.07), midnight, 30);
+    drawGradientH(page1, 0, height - 4, width, 4, gold, successGreen, 40);
+    drawDecoCorner(page1, 35, height - 40, 30, goldDim);
+    drawDecoCorner(page1, width - 35, 40, 30, goldDim, true);
 
-    drawCentered(p1, 'MILLIONAIRE MIND', H - 75, W, {
-      font: fonts.heading, size: 13, color: gold
+    // Brand header
+    drawCentered(page1, 'MILLIONAIRE MIND', height - 75, width, {
+      font: fontBold, size: 12, color: gold
     });
-    drawCentered(p1, 'x  SUCCESS RESOURCES', H - 92, W, {
-      font: fonts.body, size: 9, color: softGray
+    drawCentered(page1, 'x  SUCCESS RESOURCES', height - 92, width, {
+      font: fontRegular, size: 9, color: softGray
+    });
+    drawDivider(page1, width / 2 - 60, height - 108, 120, goldDim);
+
+    // Report title
+    drawCentered(page1, 'MONEY PERSONALITY', height - 158, width, {
+      font: fontBold, size: 28, color: white
+    });
+    drawCentered(page1, 'ASSESSMENT REPORT', height - 190, width, {
+      font: fontBold, size: 28, color: gold
     });
 
-    drawDivider(p1, W / 2 - 60, H - 108, 120, goldDim);
-
-    drawCentered(p1, 'MONEY PERSONALITY', H - 160, W, {
-      font: fonts.heading, size: 32, color: white
-    });
-    drawCentered(p1, 'ASSESSMENT REPORT', H - 195, W, {
-      font: fonts.heading, size: 32, color: gold
-    });
-
+    // Personalized greeting
     if (userName) {
-      drawCentered(p1, 'Prepared exclusively for', H - 238, W, {
-        font: fonts.bodyItalic, size: 11, color: softGray
+      drawCentered(page1, 'Prepared exclusively for', height - 232, width, {
+        font: fontOblique, size: 11, color: softGray
       });
-      drawCentered(p1, userName, H - 262, W, {
-        font: fonts.heading, size: 24, color: offWhite
+      drawCentered(page1, userName, height - 256, width, {
+        font: fontBold, size: 22, color: offWhite
       });
     }
-
-    drawCentered(p1, displayDate, H - 290, W, {
-      font: fonts.body, size: 10, color: softGray
+    drawCentered(page1, displayDate, height - 284, width, {
+      font: fontRegular, size: 10, color: softGray
     });
 
     // Character image
     try {
-      const img = await embedImage(pdfDoc, characterImage);
+      const img = await embedImageFromUrl(pdfDoc, characterImage);
       if (img) {
         const imgSize = 180;
-        p1.drawImage(img, {
-          x: (W - imgSize) / 2, y: H - 500,
-          width: imgSize, height: imgSize
+        page1.drawImage(img, {
+          x: (width - imgSize) / 2,
+          y: height - 495,
+          width: imgSize,
+          height: imgSize
         });
       }
     } catch (err) {
-      console.error('Character image failed:', err.message);
+      console.error('Character image failed:', err);
     }
 
     // Personality name badge
     const badgeW = 360;
-    const badgeH = 52;
-    const badgeX = (W - badgeW) / 2;
-    const badgeY = H - 555;
-    drawGradientBar(p1, badgeX, badgeY, badgeW, badgeH, accentDim, accent, 20);
-    drawDivider(p1, badgeX, badgeY + badgeH - 1, badgeW, gold, 1);
-    drawDivider(p1, badgeX, badgeY, badgeW, gold, 1);
-    drawCentered(p1, personalityName.toUpperCase(), badgeY + 16, W, {
-      font: fonts.heading, size: 22, color: white
+    const badgeH = 48;
+    const badgeX = (width - badgeW) / 2;
+    const badgeY = height - 548;
+    drawGradientH(page1, badgeX, badgeY, badgeW, badgeH, accentDim, accent, 20);
+    drawDivider(page1, badgeX, badgeY + badgeH - 1, badgeW, gold, 1);
+    drawDivider(page1, badgeX, badgeY, badgeW, gold, 1);
+    drawCentered(page1, personalityName.toUpperCase(), badgeY + 15, width, {
+      font: fontBold, size: 20, color: white
     });
 
     // Description
-    drawCenteredWrapped(p1, description, badgeY - 30, W, 440, {
-      font: fonts.body, size: 11, color: offWhite, lineHeight: 17
+    drawCenteredWrapped(page1, description, badgeY - 28, width, 440, {
+      font: fontRegular, size: 11, color: offWhite, lineHeight: 17
     });
 
     // Footer
-    drawDivider(p1, 40, 65, W - 80, goldDim, 0.5);
-    drawCentered(p1, 'CONFIDENTIAL  |  PERSONAL ASSESSMENT', 45, W, {
-      font: fonts.body, size: 8, color: softGray
+    drawDivider(page1, 40, 65, width - 80, goldDim, 0.5);
+    drawCentered(page1, 'CONFIDENTIAL  |  PERSONAL ASSESSMENT', 45, width, {
+      font: fontRegular, size: 8, color: softGray
     });
 
     // ================================================================
     // PAGE 2 - PERSONALITY MIX + BEST MATCH
     // ================================================================
-    const p2 = pdfDoc.addPage([W, H]);
-    drawGradientRect(p2, 0, 0, W, H, rgb(0.06, 0.06, 0.06), midnight, 30);
-    drawGradientBar(p2, 0, H - 3, W, 3, gold, successGreen, 40);
+    const page2 = pdfDoc.addPage([width, height]);
 
-    p2.drawText('02', { x: 40, y: H - 52, size: 38, font: fonts.heading, color: goldDim });
-    p2.drawText('YOUR PERSONALITY BLUEPRINT', {
-      x: 95, y: H - 42, size: 14, font: fonts.heading, color: gold
+    drawGradientV(page2, 0, 0, width, height, rgb(0.06, 0.06, 0.06), midnight, 30);
+    drawGradientH(page2, 0, height - 3, width, 3, gold, successGreen, 40);
+
+    // Page header
+    page2.drawText('02', {
+      x: 40, y: height - 52, size: 36, font: fontBold, color: goldDim
     });
-    drawDivider(p2, 40, H - 62, W - 80, goldDim, 0.5);
+    page2.drawText('YOUR PERSONALITY BLUEPRINT', {
+      x: 92, y: height - 42, size: 13, font: fontBold, color: gold
+    });
+    drawDivider(page2, 40, height - 62, width - 80, goldDim, 0.5);
 
-    // Mix card
-    const mixCardY = H - 380;
+    // Personality Mix card
+    const mixCardY = height - 380;
     const mixCardH = 290;
-    drawCard(p2, 40, mixCardY, W - 80, mixCardH, cardDark, cardMid);
+    drawCard(page2, 40, mixCardY, width - 80, mixCardH, cardDark, cardMid);
 
-    p2.drawText(mixLabel.toUpperCase(), {
-      x: 65, y: mixCardY + mixCardH - 35,
-      size: 13, font: fonts.headingSm, color: gold
+    page2.drawText(mixLabel.toUpperCase(), {
+      x: 65, y: mixCardY + mixCardH - 35, size: 12, font: fontBold, color: gold
     });
-    drawDivider(p2, 65, mixCardY + mixCardH - 48, 160, goldDim, 0.5);
+    drawDivider(page2, 65, mixCardY + mixCardH - 48, 160, goldDim, 0.5);
 
     let barY = mixCardY + mixCardH - 82;
     const barMaxW = 260;
@@ -412,90 +361,95 @@ export default async function handler(req, res) {
       const value = Number(item?.value || 0);
       const isTop = value >= maxVal;
 
-      p2.drawText(label, {
+      page2.drawText(label, {
         x: 65, y: barY + 3,
-        size: 11, font: isTop ? fonts.bodyBold : fonts.body,
+        size: 11, font: isTop ? fontBold : fontRegular,
         color: isTop ? white : offWhite
       });
 
-      p2.drawRectangle({
+      // Bar track
+      page2.drawRectangle({
         x: 210, y: barY - 2, width: barMaxW, height: barH,
         color: rgb(0.18, 0.18, 0.20)
       });
 
+      // Bar fill with gradient
       const fillW = Math.max(0, Math.min(barMaxW, barMaxW * (value / 100)));
       if (fillW > 2) {
-        drawGradientBar(p2, 210, barY - 2, fillW, barH,
+        drawGradientH(page2, 210, barY - 2, fillW, barH,
           isTop ? accent : goldDim,
           isTop ? gold : mutedGold,
           15
         );
       }
 
-      p2.drawText(`${value}%`, {
+      page2.drawText(`${value}%`, {
         x: 485, y: barY + 3,
-        size: 11, font: fonts.bodyBold, color: isTop ? gold : softGray
+        size: 11, font: fontBold, color: isTop ? gold : softGray
       });
 
       barY -= 44;
     });
 
-    // Best match
+    // Best Match card
     const matchCardY = mixCardY - 180;
     const matchCardH = 150;
-    drawCard(p2, 40, matchCardY, W - 80, matchCardH, cardDark, successGreen, 1.5);
-    p2.drawRectangle({
+    drawCard(page2, 40, matchCardY, width - 80, matchCardH, cardDark, successGreen, 1.5);
+    page2.drawRectangle({
       x: 40, y: matchCardY, width: 4, height: matchCardH, color: successGreen
     });
 
-    p2.drawText('BEST COMPATIBLE PERSONALITY', {
+    page2.drawText('BEST COMPATIBLE PERSONALITY', {
       x: 65, y: matchCardY + matchCardH - 30,
-      size: 10, font: fonts.headingSm, color: greenLight
+      size: 10, font: fontBold, color: greenLight
     });
-    p2.drawText(bestMatchName || '-', {
+    page2.drawText(bestMatchName || '-', {
       x: 65, y: matchCardY + matchCardH - 58,
-      size: 20, font: fonts.heading, color: white
+      size: 20, font: fontBold, color: white
     });
-    drawWrapped(p2, bestMatchReason || '', 65, matchCardY + matchCardH - 80, W - 140, {
-      font: fonts.body, size: 10, color: offWhite, lineHeight: 15
+    drawWrappedText(page2, bestMatchReason || '', 65, matchCardY + matchCardH - 80, width - 140, {
+      font: fontRegular, size: 10, color: offWhite, lineHeight: 15
     });
 
     // Harv Eker quote
     const quoteY = matchCardY - 80;
-    drawCentered(p2, '"Your relationship with money is a mirror', quoteY, W, {
-      font: fonts.bodyItalic, size: 12, color: softGray
+    drawCentered(page2, '"Your relationship with money is a mirror', quoteY, width, {
+      font: fontOblique, size: 12, color: softGray
     });
-    drawCentered(p2, 'of your relationship with yourself."', quoteY - 18, W, {
-      font: fonts.bodyItalic, size: 12, color: softGray
+    drawCentered(page2, 'of your relationship with yourself."', quoteY - 18, width, {
+      font: fontOblique, size: 12, color: softGray
     });
-    drawCentered(p2, '- T. Harv Eker', quoteY - 42, W, {
-      font: fonts.bodyBold, size: 10, color: gold
+    drawCentered(page2, '- T. Harv Eker', quoteY - 42, width, {
+      font: fontBold, size: 10, color: gold
     });
 
     // Footer
-    drawDivider(p2, 40, 45, W - 80, goldDim, 0.5);
-    p2.drawText('Money Personality Assessment Report', {
-      x: 40, y: 28, size: 8, font: fonts.body, color: softGray
+    drawDivider(page2, 40, 45, width - 80, goldDim, 0.5);
+    page2.drawText('Money Personality Assessment Report', {
+      x: 40, y: 28, size: 8, font: fontRegular, color: softGray
     });
     if (userName) {
-      const nameW = fonts.body.widthOfTextAtSize(userName, 8);
-      p2.drawText(userName, {
-        x: W - 40 - nameW, y: 28, size: 8, font: fonts.body, color: softGray
+      const nameW = fontRegular.widthOfTextAtSize(userName, 8);
+      page2.drawText(userName, {
+        x: width - 40 - nameW, y: 28, size: 8, font: fontRegular, color: softGray
       });
     }
 
     // ================================================================
     // PAGE 3 - DEEP PERSONALITY INSIGHTS
     // ================================================================
-    const p3 = pdfDoc.addPage([W, H]);
-    drawGradientRect(p3, 0, 0, W, H, rgb(0.06, 0.06, 0.06), midnight, 30);
-    drawGradientBar(p3, 0, H - 3, W, 3, gold, successGreen, 40);
+    const page3 = pdfDoc.addPage([width, height]);
 
-    p3.drawText('03', { x: 40, y: H - 52, size: 38, font: fonts.heading, color: goldDim });
-    p3.drawText('DEEP PERSONALITY INSIGHTS', {
-      x: 95, y: H - 42, size: 14, font: fonts.heading, color: gold
+    drawGradientV(page3, 0, 0, width, height, rgb(0.06, 0.06, 0.06), midnight, 30);
+    drawGradientH(page3, 0, height - 3, width, 3, gold, successGreen, 40);
+
+    page3.drawText('03', {
+      x: 40, y: height - 52, size: 36, font: fontBold, color: goldDim
     });
-    drawDivider(p3, 40, H - 62, W - 80, goldDim, 0.5);
+    page3.drawText('DEEP PERSONALITY INSIGHTS', {
+      x: 92, y: height - 42, size: 13, font: fontBold, color: gold
+    });
+    drawDivider(page3, 40, height - 62, width - 80, goldDim, 0.5);
 
     const sections = [
       { label: strengthLabel, text: strengthText, accentColor: successGreen },
@@ -503,81 +457,85 @@ export default async function handler(req, res) {
       { label: stepLabel, text: stepText, accentColor: accent }
     ];
 
-    let sectionY = H - 100;
+    let sectionY = height - 100;
 
     sections.forEach((section) => {
       const cardH = 195;
       const cy = sectionY - cardH;
 
-      drawCard(p3, 40, cy, W - 80, cardH, cardDark, cardMid);
-      p3.drawRectangle({
+      drawCard(page3, 40, cy, width - 80, cardH, cardDark, cardMid);
+
+      // Colored accent bar on left
+      page3.drawRectangle({
         x: 40, y: cy, width: 4, height: cardH, color: section.accentColor
       });
 
-      p3.drawText(section.label.toUpperCase(), {
+      page3.drawText(section.label.toUpperCase(), {
         x: 65, y: cy + cardH - 32,
-        size: 14, font: fonts.heading, color: gold
+        size: 14, font: fontBold, color: gold
       });
 
-      drawDivider(p3, 65, cy + cardH - 46, 200, goldDim, 0.5);
+      drawDivider(page3, 65, cy + cardH - 46, 200, goldDim, 0.5);
 
-      drawWrapped(p3, section.text || '', 65, cy + cardH - 68, W - 140, {
-        font: fonts.body, size: 11, color: offWhite, lineHeight: 16
+      drawWrappedText(page3, section.text || '', 65, cy + cardH - 68, width - 140, {
+        font: fontRegular, size: 11, color: offWhite, lineHeight: 16
       });
 
       sectionY = cy - 22;
     });
 
-    drawDivider(p3, 40, 45, W - 80, goldDim, 0.5);
-    p3.drawText('Money Personality Assessment Report', {
-      x: 40, y: 28, size: 8, font: fonts.body, color: softGray
+    // Footer
+    drawDivider(page3, 40, 45, width - 80, goldDim, 0.5);
+    page3.drawText('Money Personality Assessment Report', {
+      x: 40, y: 28, size: 8, font: fontRegular, color: softGray
     });
 
     // ================================================================
     // PAGE 4 - CTA: JOIN MILLIONAIRE MIND HYBRID
     // ================================================================
-    const p4 = pdfDoc.addPage([W, H]);
+    const page4 = pdfDoc.addPage([width, height]);
 
-    drawGradientRect(p4, 0, 0, W, H, rgb(0.06, 0.12, 0.07), midnight, 40);
-    drawGradientBar(p4, 0, H - 4, W, 4, gold, successGreen, 40);
-    drawDecoCorner(p4, 35, H - 40, 30, gold);
-    drawDecoCorner(p4, W - 35, 40, 30, gold, true);
+    drawGradientV(page4, 0, 0, width, height, rgb(0.06, 0.12, 0.07), midnight, 40);
+    drawGradientH(page4, 0, height - 4, width, 4, gold, successGreen, 40);
+    drawDecoCorner(page4, 35, height - 40, 30, gold);
+    drawDecoCorner(page4, width - 35, 40, 30, gold, true);
 
-    drawCentered(p4, 'NOW YOU KNOW YOUR', H - 120, W, {
-      font: fonts.headingSm, size: 15, color: softGray
+    // Headline
+    drawCentered(page4, 'NOW YOU KNOW YOUR', height - 120, width, {
+      font: fontBold, size: 15, color: softGray
     });
-    drawCentered(p4, 'MONEY PERSONALITY.', H - 142, W, {
-      font: fonts.headingSm, size: 15, color: softGray
-    });
-
-    drawCentered(p4, "IT'S TIME TO", H - 195, W, {
-      font: fonts.heading, size: 34, color: white
-    });
-    drawCentered(p4, 'REWRITE YOUR', H - 235, W, {
-      font: fonts.heading, size: 34, color: gold
-    });
-    drawCentered(p4, 'MONEY BLUEPRINT.', H - 275, W, {
-      font: fonts.heading, size: 34, color: gold
+    drawCentered(page4, 'MONEY PERSONALITY.', height - 142, width, {
+      font: fontBold, size: 15, color: softGray
     });
 
-    drawDivider(p4, W / 2 - 80, H - 300, 160, gold, 1.5);
+    drawCentered(page4, "IT'S TIME TO", height - 198, width, {
+      font: fontBold, size: 32, color: white
+    });
+    drawCentered(page4, 'REWRITE YOUR', height - 236, width, {
+      font: fontBold, size: 32, color: gold
+    });
+    drawCentered(page4, 'MONEY BLUEPRINT.', height - 274, width, {
+      font: fontBold, size: 32, color: gold
+    });
 
-    // Event card
+    drawDivider(page4, width / 2 - 80, height - 300, 160, gold, 1.5);
+
+    // Event details card
     const evtCardW = 430;
     const evtCardH = 195;
-    const evtCardX = (W - evtCardW) / 2;
-    const evtCardY = H - 520;
+    const evtCardX = (width - evtCardW) / 2;
+    const evtCardY = height - 520;
 
-    drawCard(p4, evtCardX, evtCardY, evtCardW, evtCardH, cardDark, gold, 1.5);
+    drawCard(page4, evtCardX, evtCardY, evtCardW, evtCardH, cardDark, gold, 1.5);
 
-    drawCentered(p4, 'MILLIONAIRE MIND HYBRID', evtCardY + evtCardH - 35, W, {
-      font: fonts.heading, size: 20, color: gold
+    drawCentered(page4, 'MILLIONAIRE MIND HYBRID', evtCardY + evtCardH - 35, width, {
+      font: fontBold, size: 19, color: gold
     });
-    drawCentered(p4, 'LIVE EVENT  |  1-3 MAY 2026', evtCardY + evtCardH - 60, W, {
-      font: fonts.bodyBold, size: 12, color: white
+    drawCentered(page4, 'LIVE EVENT  |  1-3 MAY 2026', evtCardY + evtCardH - 60, width, {
+      font: fontBold, size: 12, color: white
     });
 
-    drawDivider(p4, evtCardX + 40, evtCardY + evtCardH - 75, evtCardW - 80, goldDim, 0.5);
+    drawDivider(page4, evtCardX + 40, evtCardY + evtCardH - 75, evtCardW - 80, goldDim, 0.5);
 
     const bullets = [
       'Discover the 17 wealth principles of millionaires',
@@ -589,94 +547,80 @@ export default async function handler(req, res) {
     let bulletY = evtCardY + evtCardH - 100;
     bullets.forEach((b) => {
       const textStr = '    ' + b;
-      const tw = fonts.body.widthOfTextAtSize(textStr, 10);
-      const textX = (W - tw) / 2;
-      drawDiamond(p4, textX + 4, bulletY + 3, 5, gold);
-      drawCentered(p4, textStr, bulletY, W, {
-        font: fonts.body, size: 10, color: offWhite
+      const tw = fontRegular.widthOfTextAtSize(textStr, 10);
+      const textX = (width - tw) / 2;
+      drawDiamond(page4, textX + 4, bulletY + 3, 5, gold);
+      drawCentered(page4, textStr, bulletY, width, {
+        font: fontRegular, size: 10, color: offWhite
       });
       bulletY -= 22;
     });
 
     // CTA button
     const ctaW = 340;
-    const ctaH = 56;
-    const ctaX = (W - ctaW) / 2;
-    const ctaY = evtCardY - 80;
+    const ctaH = 54;
+    const ctaX = (width - ctaW) / 2;
+    const ctaY = evtCardY - 78;
 
-    drawGradientBar(p4, ctaX, ctaY, ctaW, ctaH, gold, goldLight, 20);
-    drawDivider(p4, ctaX, ctaY + ctaH - 1, ctaW, rgb(1, 0.9, 0.5), 1);
-    drawDivider(p4, ctaX, ctaY, ctaW, mutedGold, 1);
+    drawGradientH(page4, ctaX, ctaY, ctaW, ctaH, gold, goldLight, 20);
+    drawDivider(page4, ctaX, ctaY + ctaH - 1, ctaW, rgb(1, 0.9, 0.5), 1);
+    drawDivider(page4, ctaX, ctaY, ctaW, mutedGold, 1);
 
-    drawCentered(p4, 'CLAIM YOUR SEAT NOW', ctaY + 19, W, {
-      font: fonts.heading, size: 18, color: midnight
+    drawCentered(page4, 'CLAIM YOUR SEAT NOW', ctaY + 18, width, {
+      font: fontBold, size: 17, color: midnight
     });
 
     // Make CTA button clickable
-    addLinkAnnotation(pdfDoc, p4, ctaX, ctaY, ctaW, ctaH, 'http://www.millionairemind.online');
+    addLinkAnnotation(pdfDoc, page4, ctaX, ctaY, ctaW, ctaH,
+      'http://www.millionairemind.online');
 
-    // URL text below button (also clickable)
+    // URL text below button
     const urlStr = 'www.millionairemind.online';
-    drawCentered(p4, urlStr, ctaY - 28, W, {
-      font: fonts.bodyBold, size: 12, color: gold
+    drawCentered(page4, urlStr, ctaY - 28, width, {
+      font: fontBold, size: 12, color: gold
     });
-    const urlTextW = fonts.bodyBold.widthOfTextAtSize(urlStr, 12);
-    const urlTextX = (W - urlTextW) / 2;
-    addLinkAnnotation(pdfDoc, p4, urlTextX - 5, ctaY - 34, urlTextW + 10, 18, 'http://www.millionairemind.online');
+
+    // Make URL text clickable too
+    const urlTextW = fontBold.widthOfTextAtSize(urlStr, 12);
+    const urlTextX = (width - urlTextW) / 2;
+    addLinkAnnotation(pdfDoc, page4, urlTextX - 5, ctaY - 34, urlTextW + 10, 18,
+      'http://www.millionairemind.online');
 
     // Personalized closing
     if (userName) {
-      drawCentered(p4, `${userName}, your blueprint is waiting to be rewritten.`, ctaY - 80, W, {
-        font: fonts.bodyItalic, size: 12, color: offWhite
+      drawCentered(page4, `${userName}, your blueprint is waiting to be rewritten.`, ctaY - 78, width, {
+        font: fontOblique, size: 12, color: offWhite
       });
     }
-
-    drawCentered(p4, 'The knowledge you need. The transformation you deserve.', ctaY - 108, W, {
-      font: fonts.bodyItalic, size: 11, color: softGray
+    drawCentered(page4, 'The knowledge you need. The transformation you deserve.', ctaY - 105, width, {
+      font: fontOblique, size: 11, color: softGray
     });
 
     // Footer
-    drawDivider(p4, 40, 65, W - 80, goldDim, 0.5);
-    drawCentered(p4, 'MILLIONAIRE MIND  x  SUCCESS RESOURCES', 45, W, {
-      font: fonts.headingSm, size: 9, color: gold
+    drawDivider(page4, 40, 65, width - 80, goldDim, 0.5);
+    drawCentered(page4, 'MILLIONAIRE MIND  x  SUCCESS RESOURCES', 45, width, {
+      font: fontBold, size: 9, color: gold
     });
-    drawCentered(p4, '(c) 2026 Success Resources. All rights reserved.', 28, W, {
-      font: fonts.body, size: 7, color: softGray
+    drawCentered(page4, '(c) 2026 Success Resources. All rights reserved.', 28, width, {
+      font: fontRegular, size: 7, color: softGray
     });
 
     // ================================================================
     // GENERATE OUTPUT
     // ================================================================
     const pdfBytes = await pdfDoc.save();
-
-    // Thumbnail mode: render page 1 as PNG
-    if (format === 'thumbnail') {
-      try {
-        const { getDocument } = await import('pdfjs-dist/legacy/build/pdf.mjs');
-        const loadingTask = getDocument({ data: pdfBytes });
-        const pdfJsDoc = await loadingTask.promise;
-        const pg = await pdfJsDoc.getPage(1);
-
-        const scale = 1.5;
-        const viewport = pg.getViewport({ scale });
-
-        const { createCanvas } = await import('canvas');
-        const canvas = createCanvas(viewport.width, viewport.height);
-        const context = canvas.getContext('2d');
-
-        await pg.render({ canvasContext: context, viewport }).promise;
-
-        const pngBuffer = canvas.toBuffer('image/png');
-        res.setHeader('Content-Type', 'image/png');
-        res.setHeader('Cache-Control', 'public, max-age=3600');
-        return res.status(200).send(pngBuffer);
-      } catch (thumbErr) {
-        console.warn('Thumbnail generation failed, returning PDF:', thumbErr.message);
-        // Fall through to PDF
-      }
-    }
-
     const fileName = safeFilename(`${userName ? userName + '_' : ''}${personalityName}_Report`);
+
+    // Thumbnail mode: return PDF bytes as base64 JSON (client renders via pdf.js)
+    if (format === 'thumbnail') {
+      const base64 = Buffer.from(pdfBytes).toString('base64');
+      res.setHeader('Content-Type', 'application/json');
+      return res.status(200).json({
+        pdfBase64: base64,
+        fileName: `${fileName}.pdf`,
+        pageCount: pdfDoc.getPageCount()
+      });
+    }
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="${fileName}.pdf"`);
