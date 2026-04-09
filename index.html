@@ -1126,10 +1126,13 @@ footer a:hover { color: var(--gold); }
 }
 
 @media (max-width: 640px) {
+  body {
+    padding-top: 118px;
+  }
   .top-bar {
     flex-direction: column;
     align-items: stretch;
-    padding: 12px 14px;
+    padding: 10px 12px;
   }
   .logo-container,
   .top-bar-center,
@@ -1144,19 +1147,19 @@ footer a:hover { color: var(--gold); }
     gap: 6px;
   }
   .lang-btn {
-    min-width: 56px;
-    padding: 8px 10px;
+    min-width: 50px;
+    padding: 7px 8px;
     font-size: 11px;
   }
   #quiz,
   #form-screen,
   #result {
-    padding-top: 132px;
+    padding-top: 18px;
   }
   #intro {
-    padding-top: 142px !important;
+    padding-top: 18px !important;
     min-height: auto !important;
-    padding-bottom: 30px;
+    padding-bottom: 24px;
   }
   .intro-title,
   #intro-headline {
@@ -1170,7 +1173,11 @@ footer a:hover { color: var(--gold); }
   }
   .intro-value-props {
     gap: 12px;
-    margin-bottom: 28px;
+    margin-bottom: 24px;
+  }
+  #intro img {
+    max-width: 280px !important;
+    margin-bottom: 12px !important;
   }
   .intro-value-item {
     padding: 15px 16px;
@@ -1189,16 +1196,23 @@ footer a:hover { color: var(--gold); }
     line-height: 1.2;
   }
   .hud {
-    flex-wrap: wrap;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: stretch;
+    gap: 10px;
+  }
+  .hud-xp,
+  .hud-stars,
+  .progress-info {
+    order: unset;
+    width: 100%;
   }
   .hud-xp,
   .hud-stars {
-    order: 2;
+    justify-content: center;
   }
-  .progress-info {
-    order: 1;
-    width: 100%;
+  .hud-stars {
+    text-align: center;
   }
   .quiz-nav {
     margin-bottom: 16px;
@@ -1269,10 +1283,10 @@ footer a:hover { color: var(--gold); }
     margin-bottom: 28px;
   }
   .result-character {
-    max-width: 220px;
-    height: 220px;
-    border-radius: 22px;
-    margin: 20px auto;
+    max-width: 200px;
+    height: 200px;
+    border-radius: 20px;
+    margin: 16px auto;
   }
   .result-name {
     font-size: clamp(34px, 11vw, 52px);
@@ -1343,8 +1357,8 @@ footer a:hover { color: var(--gold); }
     line-height: 1.7;
   }
   .hybrid-cta-section {
-    padding: 30px 18px;
-    margin-bottom: 28px;
+    padding: 26px 16px;
+    margin-bottom: 24px;
   }
   .hybrid-badge {
     font-size: 10px;
@@ -1406,19 +1420,22 @@ footer a:hover { color: var(--gold); }
 }
 
 @media (max-width: 390px) {
+  body {
+    padding-top: 112px;
+  }
   .page {
     padding: 0 10px 64px;
   }
   .top-bar {
-    padding: 10px 10px 12px;
+    padding: 8px 8px 10px;
   }
   #quiz,
   #form-screen,
   #result {
-    padding-top: 136px;
+    padding-top: 14px;
   }
   #intro {
-    padding-top: 146px !important;
+    padding-top: 14px !important;
   }
   .q-card,
   .form-wrap,
@@ -1461,7 +1478,7 @@ footer a:hover { color: var(--gold); }
     <img src="https://sr-event.com/sr-logo" alt="Success Resources" class="sr-logo">
   </div>
   <div class="top-bar-center">
-    <span class="top-bar-logo">💰 Money Personality 💰</span>
+    <span class="top-bar-logo">💰Discover Your Money Personality💰</span>
   </div>
   <div class="language-selector">
     <button class="lang-btn active" onclick="setLanguage(event, 'en')">EN</button>
@@ -1625,7 +1642,7 @@ footer a:hover { color: var(--gold); }
         <div class="hybrid-feature"><span>✓</span> Live + online hybrid experience</div>
         <div class="hybrid-feature"><span>✓</span> Deep-dive wealth blueprint sessions</div>
       </div>
-      <a href="https://www.millionairemind.online" target="_blank" class="btn-hybrid" onclick="playSound('click',800)" id="btn-hybrid">
+      <a href="https://www.millionairemind.online/promotion" target="_blank" class="btn-hybrid" onclick="playSound('click',800)" id="btn-hybrid">
         🔥 LEARN MORE ABOUT HYBRID
       </a>
     </div>
