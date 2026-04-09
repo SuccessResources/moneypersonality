@@ -991,17 +991,17 @@ const t = pdfText[normalizedLanguage] || pdfText.en;
     drawCentered(page4, t.page4Top1, height - 120, width, {
       font: fontBold, size: 15, color: softGray
     });
-    drawCentered(page4, t.page4Top1, height - 120, width, {
+    drawCentered(page4, t.page4Top2, height - 142, width, {
       font: fontBold, size: 15, color: softGray
     });
 
-    drawCentered(page4, t.page4Top2, height - 142, width, {
+    drawCentered(page4, t.page4Hero1, height - 198, width, {
       font: fontBold, size: 32, color: white
     });
-    drawCentered(page4, t.page4Hero1, height - 198, width, {
+    drawCentered(page4, t.page4Hero2, height - 236, width, {
       font: fontBold, size: 32, color: gold
     });
-    drawCentered(page4, t.page4Hero2, height - 236, width, {
+    drawCentered(page4, t.page4Hero3, height - 274, width, {
       font: fontBold, size: 32, color: gold
     });
 
@@ -1014,10 +1014,10 @@ const t = pdfText[normalizedLanguage] || pdfText.en;
 
     drawCard(page4, evtCardX, evtCardY, evtCardW, evtCardH, cardDark, gold, 1.5);
 
-    drawCentered(page4, 'MILLIONAIRE MIND HYBRID', evtCardY + evtCardH - 35, width, {
+    drawCentered(page4, t.eventTitle, evtCardY + evtCardH - 35, width, {
       font: fontBold, size: 19, color: gold
     });
-    drawCentered(page4, t.eventTitle, evtCardY + evtCardH - 35, width, {
+    drawCentered(page4, t.eventSubtitle, evtCardY + evtCardH - 60, width, {
       font: fontBold, size: 12, color: white
     });
 
@@ -1055,8 +1055,15 @@ const t = pdfText[normalizedLanguage] || pdfText.en;
       font: fontBold, size: 17, color: midnight
     });
 
-    addLinkAnnotation(pdfDoc, page4, ctaX, ctaY, ctaW, ctaH,
-      'http://www.millionairemind.online');
+    addLinkAnnotation(
+      pdfDoc,
+      page4,
+      ctaX,
+      ctaY,
+      ctaW,
+      ctaH,
+      'https://www.millionairemind.online/'
+    );
 
     const urlStr = 'www.millionairemind.online';
     drawCentered(page4, urlStr, ctaY - 28, width, {
@@ -1065,23 +1072,31 @@ const t = pdfText[normalizedLanguage] || pdfText.en;
 
     const urlTextW = fontRegular.widthOfTextAtSize(urlStr, 12);
     const urlTextX = (width - urlTextW) / 2;
-    addLinkAnnotation(pdfDoc, page4, urlTextX - 5, ctaY - 34, urlTextW + 10, 18,
-      'http://www.millionairemind.online');
+    addLinkAnnotation(
+      pdfDoc,
+      page4,
+      urlTextX - 5,
+      ctaY - 34,
+      urlTextW + 10,
+      18,
+      'https://www.millionairemind.online/'
+    );
 
     if (userName) {
-      drawCentered(page4, t.cta, ctaY + 18, width, {
+      drawCentered(page4, t.closing1, ctaY - 78, width, {
         font: fontOblique, size: 12, color: offWhite
       });
     }
-    drawCentered(page4, t.closing1, ctaY - 78, width, {
+
+    drawCentered(page4, t.closing2, ctaY - 105, width, {
       font: fontOblique, size: 11, color: softGray
     });
 
     drawDivider(page4, 40, 65, width - 80, goldDim, 0.5);
-    drawCentered(page4, 'MILLIONAIRE MIND  x  SUCCESS RESOURCES', 45, width, {
+    drawCentered(page4, t.footerBrand, 45, width, {
       font: fontBold, size: 9, color: gold
     });
-    drawCentered(page4, '(c) 2026 Success Resources. All rights reserved.', 28, width, {
+    drawCentered(page4, t.footerCopyright, 28, width, {
       font: fontRegular, size: 7, color: softGray
     });
 
