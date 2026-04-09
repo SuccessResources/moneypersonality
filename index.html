@@ -1488,56 +1488,49 @@ footer a:hover { color: var(--gold); }
 </header>
 <div class="page">
   <!-- ===================== INTRO SCREEN ===================== -->
-<section id="intro" class="screen active">
-  <img
-    class="hero-img"
-    src="https://cch-files.edge.live.ds25.io/cch/v/a4e3489d-6bf3-48c8-affb-c268ba45a538/files/69d4d31b32391_money-personality-edited.png"
-    alt="Money Personality"
-  >
-
-  <h1 class="intro-title">Discover Your Money Personality</h1>
-  <p class="intro-tag">Free Personalized PDF Report</p>
-  <p class="intro-sub">
-    Find out what's secretly controlling your financial success in just 2 minutes.
-    The real reason money feels easy for some people and frustrating for others often
-    starts with a hidden pattern you've never been shown how to see.
-  </p>
-
-  <div class="intro-value-props">
-    <div class="intro-value-item">
-      <span class="intro-value-icon">💸</span>
-      <span class="intro-value-text"><strong>Why you earn what you earn</strong> — and why your current pattern keeps repeating.</span>
+  <div id="intro" class="screen active" style="padding-top:100px;text-align:center;min-height:100vh;justify-content:center;">
+    <img
+      src="https://cch-files.edge.live.ds25.io/cch/v/a4e3489d-6bf3-48c8-affb-c268ba45a538/files/69d4d31b32391_money-personality-edited.png"
+      alt="Money Personality"
+      style="
+        width:100%;
+        max-width:420px;
+        height:auto;
+        margin:8px auto 12px;
+        display:block;
+        filter:drop-shadow(0 16px 40px rgba(0,0,0,.4));
+      "
+    >
+    <h1 class="intro-title" style="font-family:'Playfair Display',serif;font-size:clamp(36px,9vw,60px);margin-bottom:16px;font-weight:900;background:linear-gradient(135deg,var(--gold),#FFA500);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;" id="intro-headline">
+      Discover Your Money Personality
+    </h1>
+    <p style="font-size:13px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--neon);margin-bottom:24px;" id="intro-tag">
+      FREE PERSONALIZED PDF REPORT
+    </p>
+    <p style="font-size:17px;color:rgba(255,255,255,.85);margin-bottom:32px;line-height:1.8;max-width:600px;margin-left:auto;margin-right:auto;" id="intro-sub">
+      The way you think about money shapes every financial decision you make — and how you relate to the people around you. This short assessment reveals your unique Money Personality and delivers a personalized PDF report to help you understand your strengths, improve your habits, and communicate better about money with those who matter most.
+    </p>
+    <div class="intro-value-props" id="intro-value-props">
+      <div class="intro-value-item">
+        <span class="intro-value-icon">🧠</span>
+        <span class="intro-value-text" id="intro-vp1"><strong>Understand your money patterns</strong> — why you save, spend, avoid, or detach — and how those patterns shape your financial future.</span>
+      </div>
+      <div class="intro-value-item">
+        <span class="intro-value-icon">💬</span>
+        <span class="intro-value-text" id="intro-vp2"><strong>Improve money conversations</strong> — discover how your personality interacts with partners, family, and colleagues when it comes to finances.</span>
+      </div>
+      <div class="intro-value-item">
+        <span class="intro-value-icon">📄</span>
+        <span class="intro-value-text" id="intro-vp3"><strong>Get your personalized PDF</strong> — receive a detailed report with your personality profile, compatibility match, strengths, blind spots, and your #1 next step.</span>
+      </div>
     </div>
-    <div class="intro-value-item">
-      <span class="intro-value-icon">🕳️</span>
-      <span class="intro-value-text"><strong>Why money slips away</strong> — feels stressful, or never seems to stay with you for long.</span>
-    </div>
-    <div class="intro-value-item">
-      <span class="intro-value-icon">🎯</span>
-      <span class="intro-value-text"><strong>Your biggest financial blind spot</strong> — the one silently shaping your decisions.</span>
-    </div>
-    <div class="intro-value-item">
-      <span class="intro-value-icon">🚀</span>
-      <span class="intro-value-text"><strong>The next step to break the cycle</strong> — and start thinking like wealthier people do.</span>
-    </div>
-    <div class="intro-value-item">
-      <span class="intro-value-icon">📄</span>
-      <span class="intro-value-text"><strong>Get your personalized detailed report</strong> — with your personality profile, compatibility match, strengths, blind spots, and your #1 next step.</span>
-    </div>
-  </div>
-
-  <div class="quiz-tip">
-    <p class="quiz-tip-title">💡 Important Tip for Accurate Results</p>
-    <p class="quiz-tip-text">
-      Don't overthink your answers. Go with what comes to mind <strong>instantly</strong> —
-      your first instinct is always the most accurate.
+    <button class="btn-start" style="background:linear-gradient(135deg,var(--accent-red),#FF5A5F,#E63946);color:#FFF;border:none;padding:24px 64px;border-radius:100px;font-family:'Playfair Display',serif;font-size:24px;font-weight:800;letter-spacing:.08em;cursor:pointer;transition:all .3s;box-shadow:0 10px 40px rgba(230,57,70,.3);text-transform:uppercase;" onclick="startQuiz()" id="btn-start">
+      ⚡ START MY ASSESSMENT
+    </button>
+    <p style="font-size:13px;color:var(--muted);margin-top:28px;" id="intro-note">
+      Takes 2-3 minutes • Your personalized PDF is delivered instantly • 100% private
     </p>
   </div>
-
-  <button id="btn-start" class="btn-start" type="button">⚡ Start My Assessment</button>
-
-  <p class="intro-note">Takes 2–3 minutes • Your personalized PDF is delivered instantly • 100% private</p>
-</section>
 
   <!-- ===================== QUIZ SCREEN ===================== -->
   <div id="quiz" class="screen" style="padding-top:88px">
