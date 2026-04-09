@@ -718,20 +718,22 @@ const t = pdfText[normalizedLanguage] || pdfText.en;
     const fontOblique = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
 
     // Brand palette
-    const midnight = rgb(0.051, 0.051, 0.051);
-    const cardDark = rgb(0.11, 0.11, 0.13);
-    const cardMid = rgb(0.14, 0.14, 0.16);
-    const gold = rgb(0.788, 0.635, 0.153);
-    const goldLight = rgb(0.878, 0.745, 0.302);
-    const goldDim = rgb(0.55, 0.45, 0.15);
-    const successGreen = rgb(0.173, 0.373, 0.180);
-    const greenLight = rgb(0.22, 0.48, 0.23);
+    const midnight = rgb(0.04, 0.18, 0.12);      // dark green
+    const forestDeep = rgb(0.06, 0.24, 0.16);    // deeper green
+    const cardDark = rgb(0.10, 0.32, 0.22);      // card green
+    const cardMid = rgb(0.12, 0.38, 0.27);       // lighter card green
+
+    const accent = rgb(0.13, 0.77, 0.37);        // bright green
+    const successGreen = rgb(0.13, 0.77, 0.37);  // same bright green
+
+    const gold = rgb(1.0, 0.84, 0.0);            // gold
+    const goldLight = rgb(1.0, 0.91, 0.35);
+    const goldDim = rgb(0.62, 0.50, 0.12);
+    const mutedGold = rgb(0.78, 0.66, 0.18);
+
     const white = rgb(1, 1, 1);
-    const offWhite = rgb(0.96, 0.96, 0.94);
-    const softGray = rgb(0.65, 0.65, 0.62);
-    const mutedGold = rgb(0.45, 0.38, 0.14);
-    const accent = hexToRgb(personalityColor);
-    const accentDim = lerpColor(accent, midnight, 0.6);
+    const offWhite = rgb(0.95, 0.97, 0.95);
+    const softGray = rgb(0.72, 0.78, 0.74);
 
     const displayDate = quizDate || new Date().toLocaleDateString('en-US', {
       year: 'numeric', month: 'long', day: 'numeric'
@@ -742,7 +744,7 @@ const t = pdfText[normalizedLanguage] || pdfText.en;
     // ================================================================
     const page1 = pdfDoc.addPage([width, height]);
 
-    drawGradientV(page1, 0, 0, width, height, rgb(0.07, 0.07, 0.07), midnight, 30);
+    drawGradientV(page1, 0, 0, width, height, midnight, forestDeep, 30);
     drawGradientH(page1, 0, height - 4, width, 4, gold, successGreen, 40);
     drawDecoCorner(page1, 35, height - 40, 30, goldDim);
     drawDecoCorner(page1, width - 35, 40, 30, goldDim, true);
@@ -1012,7 +1014,7 @@ const t = pdfText[normalizedLanguage] || pdfText.en;
     const evtCardX = (width - evtCardW) / 2;
     const evtCardY = height - 520;
 
-    drawCard(page4, evtCardX, evtCardY, evtCardW, evtCardH, cardDark, gold, 1.5);
+    drawCard(page4, evtCardX, evtCardY, evtCardW, evtCardH, cardDark, accent, 1.5);
 
     drawCentered(page4, t.eventTitle, evtCardY + evtCardH - 35, width, {
       font: fontBold, size: 19, color: gold
