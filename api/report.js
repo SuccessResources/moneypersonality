@@ -718,22 +718,26 @@ const t = pdfText[normalizedLanguage] || pdfText.en;
     const fontOblique = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
 
     // Brand palette
-    const midnight = rgb(0.04, 0.18, 0.12);      // dark green
-    const forestDeep = rgb(0.06, 0.24, 0.16);    // deeper green
-    const cardDark = rgb(0.10, 0.32, 0.22);      // card green
-    const cardMid = rgb(0.12, 0.38, 0.27);       // lighter card green
+const midnight = rgb(0.04, 0.18, 0.12);
+const forestDeep = rgb(0.06, 0.24, 0.16);
+const cardDark = rgb(0.10, 0.32, 0.22);
+const cardMid = rgb(0.12, 0.38, 0.27);
 
-    const accent = rgb(0.13, 0.77, 0.37);        // bright green
-    const successGreen = rgb(0.13, 0.77, 0.37);  // same bright green
+const accent = rgb(0.13, 0.77, 0.37);
+const accentDim = rgb(0.10, 0.45, 0.24);
+const successGreen = rgb(0.13, 0.77, 0.37);
 
-    const gold = rgb(1.0, 0.84, 0.0);            // gold
-    const goldLight = rgb(1.0, 0.91, 0.35);
-    const goldDim = rgb(0.62, 0.50, 0.12);
-    const mutedGold = rgb(0.78, 0.66, 0.18);
+const gold = rgb(1.0, 0.84, 0.0);
+const goldLight = rgb(1.0, 0.91, 0.35);
+const goldDim = rgb(0.62, 0.50, 0.12);
+const mutedGold = rgb(0.78, 0.66, 0.18);
 
-    const white = rgb(1, 1, 1);
-    const offWhite = rgb(0.95, 0.97, 0.95);
-    const softGray = rgb(0.72, 0.78, 0.74);
+const white = rgb(1, 1, 1);
+const offWhite = rgb(0.95, 0.97, 0.95);
+const softGray = rgb(0.72, 0.78, 0.74);
+
+const barTrack = rgb(0.16, 0.24, 0.20);
+const barFillDefault = accent;
 
     const displayDate = quizDate || new Date().toLocaleDateString('en-US', {
       year: 'numeric', month: 'long', day: 'numeric'
