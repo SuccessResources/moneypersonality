@@ -794,8 +794,38 @@ footer a {
 }
 
 @media (max-width: 640px) {
-  body { padding-top: 110px; }
-  #intro, #quiz, #form-screen, #result { padding-top: 18px; }
+  /* Hide header on intro screen only */
+  #intro .top-bar {
+    display: none;
+  }
+  
+  /* Show header on quiz/form/result */
+  #quiz .top-bar,
+  #form-screen .top-bar,
+  #result .top-bar {
+    display: flex !important;
+  }
+
+  body { padding-top: 0; }
+  
+  /* No padding on intro (header is hidden) */
+  #intro { 
+    padding-top: 16px !important;
+  }
+  
+  /* Add padding on quiz/form/result screens (header is visible) */
+  #quiz, #form-screen, #result { 
+    padding-top: 90px !important;
+  }
+  
+  /* Make hero image bigger */
+  .hero-img {
+    max-width: 90vw;
+    height: auto;
+    margin: 12px auto 16px;
+  }
+  
+  /* Rest of your existing mobile CSS */
   .top-bar {
     flex-direction: column;
     align-items: stretch;
