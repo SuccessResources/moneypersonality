@@ -870,8 +870,6 @@ footer a {
   </div>
   <div class="language-selector">
     <button class="lang-btn active" onclick="setLanguage(event, 'en')">EN</button>
-    <button class="lang-btn" onclick="setLanguage(event, 'de')">DE</button>
-    <button class="lang-btn" onclick="setLanguage(event, 'es')">ES</button>
   </div>
 </header>
 
@@ -1045,10 +1043,10 @@ const characterImages = {
 const characterIcons = { saver: '🔒', spender: '🛍️', monk: '🧘', avoider: '😐' };
 const characterColors = { saver: '#22C55E', spender: '#E63946', monk: '#16A34A', avoider: '#FFD700' };
 const bestMatches = {
-  saver: { personality: 'spender', reason: { en: 'You balance each other well. Your discipline keeps things stable, and their spontaneity helps you enjoy life more.', de: 'Ihr gleicht euch gut aus. Deine Disziplin bringt Stabilität, und ihre Spontanität hilft dir, das Leben mehr zu genießen.', es: 'Se equilibran muy bien. Tu disciplina aporta estabilidad y su espontaneidad te ayuda a disfrutar más la vida.' } },
-  spender: { personality: 'saver', reason: { en: 'Your opposite becomes your strength. They help with structure, while you bring joy and energy.', de: 'Dein Gegenteil wird zu deiner Stärke. Sie bringen Struktur, während du Freude und Energie mitbringst.', es: 'Tu opuesto se convierte en tu fortaleza. Ellos aportan estructura y tú traes alegría y energía.' } },
-  monk: { personality: 'avoider', reason: { en: 'You both prefer low drama. Together you can create a calm, low-pressure space around money.', de: 'Ihr mögt beide wenig Drama. Zusammen könnt ihr einen ruhigen, druckfreien Umgang mit Geld schaffen.', es: 'Ambos prefieren poca presión. Juntos pueden crear un espacio tranquilo y sin mucho estrés alrededor del dinero.' } },
-  avoider: { personality: 'spender', reason: { en: 'They bring action and energy. You bring thoughtfulness. Together, you help each other move forward.', de: 'Sie bringen Energie und Handlung mit. Du bringst Nachdenklichkeit mit. Zusammen helft ihr euch gegenseitig voranzukommen.', es: 'Ellos traen acción y energía. Tú aportas reflexión. Juntos se ayudan a avanzar.' } }
+  saver: { personality: 'spender', reason: { en: 'You balance each other well. Your discipline keeps things stable, and their spontaneity helps you enjoy life more.' } },
+  spender: { personality: 'saver', reason: { en: 'Your opposite becomes your strength. They help with structure, while you bring joy and energy.' } },
+  monk: { personality: 'avoider', reason: { en: 'You both prefer low drama. Together you can create a calm, low-pressure space around money.' } },
+  avoider: { personality: 'spender', reason: { en: 'They bring action and energy. You bring thoughtfulness. Together, you help each other move forward.' } }
 };
 
 const translations = {
@@ -1108,121 +1106,8 @@ const translations = {
       monk: { name: 'The Monk', desc: "You live simply and don't let money control your identity. You care more about peace than status.", strength: 'You are grounded, calm, and less driven by greed or pressure than most people.', shadow: 'Being detached from money can stop you from building more freedom and impact.', step: 'See wealth as a tool, not a threat. Money can support your values when you use it well.' },
       avoider: { name: 'The Avoider', desc: 'Money feels stressful, so you often put it off. The good news: noticing that is already a breakthrough.', strength: 'You are more aware than you think. Once you start, you can change quickly.', shadow: 'Avoiding money problems makes them grow. Delay adds pressure.', step: 'Do one small thing this week. Check one account, pay one bill, or set one goal.' }
     }
-  },
-  de: {
-    headline: 'Entdecke deine Geldpersönlichkeit',
-    introTag: 'KOSTENLOSER PERSONALISIERTER PDF-BERICHT',
-    subheadline: 'Finde in nur 2 Minuten heraus, was heimlich deinen finanziellen Erfolg steuert. Der wahre Grund, warum Geld für manche Menschen leicht und für andere frustrierend ist, beginnt oft mit einem verborgenen Muster, das du bisher nie richtig erkennen konntest.',
-    introVP1: '<strong>Warum du verdienst, was du verdienst</strong> — und warum sich dein aktuelles Muster immer wiederholt.',
-    introVP2: '<strong>Warum Geld verschwindet</strong> — sich stressig anfühlt oder nie lange bei dir bleibt.',
-    introVP3: '<strong>Dein größter finanzieller blinder Fleck</strong> — der deine Entscheidungen still und heimlich prägt.',
-    introVP4: '<strong>Der nächste Schritt, um den Kreislauf zu durchbrechen</strong> — und zu denken wie wohlhabendere Menschen.',
-    introVP5: '<strong>Erhalte deinen persönlichen ausführlichen Bericht</strong> — mit deinem Persönlichkeitsprofil, Kompatibilität, Stärken, blinden Flecken und deinem wichtigsten nächsten Schritt.',
-    quizTipTitle: '💡 Wichtiger Tipp für genaue Ergebnisse',
-    quizTipText: 'Denke nicht zu lange nach. Nimm das, was dir <strong>sofort</strong> in den Sinn kommt — dein erster Impuls ist meistens der genaueste.',
-    btnStart: '⚡ STARTE MEINE AUSWERTUNG',
-    noteTime: 'Dauert 2–3 Minuten • Dein persönlicher PDF-Bericht wird sofort geliefert • 100 % privat',
-    formTitle: '🎉 Du bist fast fertig!',
-    formSub: 'Gib deine Daten ein, um dein persönliches Geldpersönlichkeits-Ergebnis freizuschalten und deinen kostenlosen PDF-Bericht zu erhalten.',
-    labelName: 'Dein Vorname',
-    labelEmail: 'E-Mail-Adresse',
-    labelPhone: 'WhatsApp / Telefonnummer',
-    btnReveal: '🔓 ZEIGE MEINE PERSÖNLICHKEIT',
-    privacyNote: '🔒 Deine Privatsphäre ist geschützt. Dein persönlicher PDF-Bericht wird sofort geliefert.',
-    btnShare: '📤 Ergebnis teilen',
-    btnCopy: '📣 Jetzt Test teilen',
-    btnDownloadPdf: '📄 PDF herunterladen',
-    btnRetry: '↺ Noch einmal spielen',
-    matchLabel: 'Beste passende Persönlichkeit',
-    resultEyebrow: 'DEINE GELDPERSÖNLICHKEIT',
-    mixLabel: 'Dein Persönlichkeitsmix',
-    strengthLabel: 'Deine Stärken',
-    shadowLabel: 'Achte darauf',
-    stepLabel: 'Dein nächster Schritt',
-    backBtn: '← ZURÜCK',
-    urgencyBadge: '⏳ Zeitlich begrenzte Gelegenheit',
-    urgencyHeadline: 'Du kennst das Muster jetzt. Geh nicht zurück und lebe weiter darin.',
-    urgencyBody: 'Gerade jetzt hast du einen seltenen Moment der Klarheit. In diesem Moment handeln Menschen — oder lassen die Erkenntnis verblassen und fallen in denselben Kreislauf zurück.',
-    btnUrgency: '🔥 Jetzt Millionaire Mind Intensive Online beitreten',
-    offerBridge: 'Deine Geldpersönlichkeit ist nicht dein Schicksal … Aber wenn du sie nicht verstehst, wird sie deine finanzielle Zukunft kontrollieren.',
-    offerHeadline: 'Genau dafür wurde Millionaire Mind Intensive entwickelt',
-    offerSubheadline: 'Das ist nicht einfach nur ein weiterer Kurs. Es ist ein Transformationssystem für das Muster, das dein finanzielles Leben steuert.',
-    offerBodyP1: 'Wenn dein Ergebnis die verborgenen Kräfte aufgedeckt hat, die deine Geldentscheidungen formen, ist Millionaire Mind Intensive Online der Ort, an dem du lernst, sie zu verändern.',
-    offerLi1: '<strong>Wobei es dir hilft:</strong> stärkeres finanzielles Selbstbewusstsein, sicherere Entscheidungen und ein praktischer Weg zu vermögensaufbauendem Verhalten.',
-    offerLi2: '<strong>Warum es funktioniert:</strong> es geht unter die Oberfläche von Taktiken und behandelt Denkweise, emotionale Muster und unbewusste Geschichten hinter deinen Ergebnissen.',
-    offerLi3: '<strong>Warum es zu deinem Testergebnis passt:</strong> deine Geldpersönlichkeit zeigt, wo du feststeckst; dies ist der nächste Schritt, der dir hilft, das zu verändern.',
-    closeHeadline: 'Du hast jetzt zwei Möglichkeiten.',
-    closeBody: 'Du kannst diese Seite schließen und weiterhin dieselben finanziellen Muster wiederholen, die dich hierher gebracht haben. Oder du nutzt diesen Moment als Wendepunkt.',
-    choiceLeftTitle: 'Stecken bleiben',
-    choiceLeftBody: 'Reagiere weiter auf dieselbe Weise. Spüre weiter denselben Stress. Frage dich weiter, warum sich nie langfristig etwas verändert.',
-    choiceRightTitle: 'Verändern',
-    choiceRightBody: 'Verstehe dein Muster, programmiere dein Geld-Mindset neu und trete in eine bewusstere finanzielle Zukunft ein.',
-    btnFinalCta: '🚀 Jetzt meinen Platz sichern!',
-    alerts: { name: 'Bitte gib deinen Namen ein', email: 'Bitte gib eine gültige E-Mail-Adresse ein', phone: 'Bitte gib deine Telefonnummer ein', copied: 'Share-Text kopiert! Teile ihn mit deinen Freunden 🎉' },
-    personalities: {
-      saver: { name: 'Der Sparer', desc: 'Du gehst sehr diszipliniert mit Geld um. Stabilität gibt dir Sicherheit, und du magst es, vorbereitet zu sein.', strength: 'Du planst voraus, vermeidest unnötige Ausgaben und baust Schritt für Schritt Sicherheit auf.', shadow: 'Deine Vorsicht kann zu einem Käfig werden. Manchmal schützt du Geld so sehr, dass du das Leben vergisst.', step: 'Erlaube dir ein schuldfreies Spaß-Budget. Geld soll nicht nur schützen, sondern auch dein Leben unterstützen.' },
-      spender: { name: 'Der Spender', desc: 'Du lebst gern im Moment und weißt, wie man das Leben spannend macht. Geld fühlt sich wie ein Werkzeug für Erlebnisse an.', strength: 'Du bringst Freude, Großzügigkeit und Energie mit. Du weißt, wie man lebt und nicht nur funktioniert.', shadow: 'Ohne Struktur verschwindet Geld schnell. Dein Zukunfts-Ich wird deinem jetzigen Ich vielleicht nicht danken.', step: 'Richte zuerst automatisches Sparen ein und genieße dann bewusst. Behalte den Spaß, aber schütze deine Zukunft.' },
-      monk: { name: 'Der Mönch', desc: 'Du lebst einfach und lässt Geld nicht über deine Identität bestimmen. Frieden ist dir wichtiger als Status.', strength: 'Du bist geerdet, ruhig und weniger von Gier oder äußerem Druck getrieben als die meisten.', shadow: 'Zu viel Distanz zu Geld kann dich von mehr Freiheit und Wirkung abhalten.', step: 'Sieh Wohlstand als Werkzeug, nicht als Bedrohung. Richtig eingesetzt kann Geld deine Werte unterstützen.' },
-      avoider: { name: 'Der Vermeider', desc: 'Geld fühlt sich stressig an, deshalb schiebst du es oft weg. Die gute Nachricht: Das zu erkennen ist schon ein Durchbruch.', strength: 'Du bist bewusster, als du denkst. Wenn du anfängst, kannst du dich schnell verändern.', shadow: 'Geldprobleme zu vermeiden macht sie größer. Aufschieben erhöht den Druck.', step: 'Mach diese Woche nur eine kleine Sache. Prüfe ein Konto, bezahle eine Rechnung oder setze ein Ziel.' }
-    }
-  },
-  es: {
-    headline: 'Descubre tu personalidad con el dinero',
-    introTag: 'INFORME PDF PERSONALIZADO GRATIS',
-    subheadline: 'Descubre en solo 2 minutos qué está controlando en secreto tu éxito financiero. La razón real por la que el dinero se siente fácil para algunas personas y frustrante para otras suele empezar con un patrón oculto que nunca te enseñaron a detectar.',
-    introVP1: '<strong>Por qué ganas lo que ganas</strong> — y por qué tu patrón actual sigue repitiéndose.',
-    introVP2: '<strong>Por qué el dinero se te escapa</strong> — se siente estresante o nunca parece quedarse contigo por mucho tiempo.',
-    introVP3: '<strong>Tu mayor punto ciego financiero</strong> — el que está moldeando silenciosamente tus decisiones.',
-    introVP4: '<strong>El siguiente paso para romper el ciclo</strong> — y comenzar a pensar como las personas más ricas.',
-    introVP5: '<strong>Recibe tu informe detallado personalizado</strong> — con tu perfil de personalidad, compatibilidad, fortalezas, puntos ciegos y tu siguiente paso #1.',
-    quizTipTitle: '💡 Consejo importante para resultados precisos',
-    quizTipText: 'No pienses demasiado tus respuestas. Elige lo que te venga a la mente <strong>al instante</strong> — tu primer instinto suele ser el más preciso.',
-    btnStart: '⚡ COMIENZA MI EVALUACIÓN',
-    noteTime: 'Toma 2–3 minutos • Tu PDF personalizado se entrega al instante • 100 % privado',
-    formTitle: '🎉 ¡Ya casi terminas!',
-    formSub: 'Ingresa tus datos para desbloquear tu resultado personalizado de personalidad del dinero y recibir tu informe PDF gratuito.',
-    labelName: 'Tu nombre',
-    labelEmail: 'Correo electrónico',
-    labelPhone: 'WhatsApp / Número de teléfono',
-    btnReveal: '🔓 REVELAR MI PERSONALIDAD',
-    privacyNote: '🔒 Tu privacidad está protegida. Tu informe PDF personalizado se entrega al instante.',
-    btnShare: '📤 Compartir resultado',
-    btnCopy: '📣 Comparte este test',
-    btnDownloadPdf: '📄 Descargar PDF',
-    btnRetry: '↺ Jugar otra vez',
-    matchLabel: 'Personalidad más compatible',
-    resultEyebrow: 'TU PERSONALIDAD DEL DINERO',
-    mixLabel: 'Tu mezcla de personalidad',
-    strengthLabel: 'Tus fortalezas',
-    shadowLabel: 'Cuidado con',
-    stepLabel: 'Tu siguiente paso',
-    backBtn: '← VOLVER',
-    urgencyBadge: '⏳ Oportunidad por tiempo limitado',
-    urgencyHeadline: 'Ya conoces el patrón. No vuelvas a vivir dentro de él.',
-    urgencyBody: 'Ahora mismo tienes un momento raro de claridad. Aquí es cuando las personas actúan — o dejan que la idea se desvanezca y vuelven al mismo ciclo.',
-    btnUrgency: '🔥 Únete ahora a Millionaire Mind Intensive Online',
-    offerBridge: 'Tu personalidad con el dinero no es tu destino… Pero si no la entiendes, controlará tu futuro financiero.',
-    offerHeadline: 'Esto es exactamente lo que Millionaire Mind Intensive está diseñado para corregir',
-    offerSubheadline: 'Esto no es solo otro curso. Es un sistema de transformación para el patrón que está dirigiendo tu vida financiera.',
-    offerBodyP1: 'Si tu resultado reveló las fuerzas ocultas que están moldeando tus decisiones con el dinero, Millionaire Mind Intensive Online es donde aprendes a cambiarlas.',
-    offerLi1: '<strong>Lo que te ayuda a lograr:</strong> mayor autoconciencia financiera, decisiones más seguras y un camino práctico hacia conductas que construyen riqueza.',
-    offerLi2: '<strong>Por qué funciona:</strong> va más allá de las tácticas y aborda la mentalidad, los patrones emocionales y las historias inconscientes detrás de tus resultados.',
-    offerLi3: '<strong>Por qué encaja con tu resultado:</strong> tu personalidad del dinero muestra dónde te quedas atascado; este es el siguiente paso para ayudarte a cambiarlo.',
-    closeHeadline: 'Ahora tienes dos opciones.',
-    closeBody: 'Puedes cerrar esta página y seguir repitiendo los mismos patrones financieros que te trajeron aquí. O puedes usar este momento como tu punto de inflexión.',
-    choiceLeftTitle: 'Seguir igual',
-    choiceLeftBody: 'Seguir reaccionando de la misma manera. Seguir sintiendo el mismo estrés. Seguir preguntándote por qué nada cambia por mucho tiempo.',
-    choiceRightTitle: 'Transformarte',
-    choiceRightBody: 'Entiende tu patrón, reprograma tu mentalidad sobre el dinero y da un paso hacia un futuro financiero más intencional.',
-    btnFinalCta: '🚀 ¡Asegura mi lugar ahora!',
-    alerts: { name: 'Por favor ingresa tu nombre', email: 'Por favor ingresa un correo válido', phone: 'Por favor ingresa tu número de teléfono', copied: '¡Texto para compartir copiado! Envíalo a tus amigos 🎉' },
-    personalities: {
-      saver: { name: 'El Ahorrador', desc: 'Eres muy disciplinado con el dinero. La estabilidad te da seguridad y te gusta saber que estás preparado.', strength: 'Planificas con tiempo, evitas gastos descuidados y construyes seguridad paso a paso.', shadow: 'Tu cautela puede volverse una jaula. A veces proteges tanto el dinero que olvidas disfrutar la vida.', step: 'Date un presupuesto para disfrutar sin culpa. El dinero no solo debe protegerte, también debe apoyarte.' },
-      spender: { name: 'El Gastador', desc: 'Te gusta vivir el presente y sabes cómo hacer la vida más divertida. El dinero se siente como una herramienta para disfrutar.', strength: 'Traes alegría, generosidad y energía. Sabes vivir, no solo sobrevivir.', shadow: 'Sin estructura, el dinero puede desaparecer rápido. Tu yo del futuro quizá no agradezca las decisiones de hoy.', step: 'Configura primero un ahorro automático y luego disfruta. Mantén la diversión, pero protege tu futuro.' },
-      monk: { name: 'El Monje', desc: 'Vives de forma simple y no dejas que el dinero defina quién eres. La paz te importa más que el estatus.', strength: 'Eres tranquilo, centrado y menos guiado por la codicia o la presión que la mayoría.', shadow: 'Alejarte demasiado del dinero puede limitar tu libertad y tu impacto.', step: 'Mira la riqueza como una herramienta, no como una amenaza. Bien usada, puede apoyar tus valores.' },
-      avoider: { name: 'El Evasor', desc: 'El dinero te genera estrés, así que muchas veces lo postergas. La buena noticia: darte cuenta ya es un gran paso.', strength: 'Tienes más conciencia de la que crees. Cuando empiezas, puedes cambiar rápido.', shadow: 'Evitar los problemas de dinero hace que crezcan. Retrasar añade presión.', step: 'Haz una sola cosa pequeña esta semana. Revisa una cuenta, paga una factura o fija una meta.' }
-    }
-  }
+
+}
 };
 
 const localizedQuestions = {
@@ -1319,191 +1204,7 @@ const localizedQuestions = {
     }
   ],
 
-  de: [
-    {
-      text: "Du hast gerade einen neuen Job bekommen. Dein Gehalt beträgt 3.000 $ im Monat. Was denkst du zuerst?",
-      answers: [
-        { emoji: "🏦", text: "Zuerst muss ich mein Budget ansehen und schauen, wie viel ich sparen kann.", type: "saver" },
-        { emoji: "🎉", text: "Super. Ich sollte mir etwas zur Feier kaufen.", type: "spender" },
-        { emoji: "🙂", text: "Solange ich bequem leben kann, bin ich zufrieden.", type: "monk" },
-        { emoji: "😅", text: "Ich weiß, ich sollte einen Plan machen … aber vielleicht später.", type: "avoider" }
-      ]
-    },
-    {
-      text: "Dein erstes Gehalt ist da. Was machst du als Nächstes?",
-      answers: [
-        { emoji: "🙈", text: "Ich sage mir, dass ich es später regle, und schaue lieber nicht zu genau hin.", type: "avoider" },
-        { emoji: "🌿", text: "Ich lasse es einfach dort. Geld ist nützlich, aber ich werde nicht besonders aufgeregt.", type: "monk" },
-        { emoji: "🛍️", text: "Ich gönne mir etwas, weil Zahltag sich gut anfühlen sollte.", type: "spender" },
-        { emoji: "🔐", text: "Ich überweise sofort etwas auf mein Sparkonto.", type: "saver" }
-      ]
-    },
-    {
-      text: "Deine Kollegen laden dich nach der Arbeit in ein schickes Restaurant ein. Was machst du?",
-      answers: [
-        { emoji: "🍝", text: "Ich gehe hin und genieße es. Man sollte auch mal Spaß haben.", type: "spender" },
-        { emoji: "📱", text: "Ich prüfe zuerst den Preis, bevor ich ja sage.", type: "saver" },
-        { emoji: "🧘", text: "Ich sage ab. Ein ruhiger Abend klingt besser.", type: "monk" },
-        { emoji: "🫥", text: "Ich sage, ich überlege es mir … und melde mich dann nie richtig zurück.", type: "avoider" }
-      ]
-    },
-    {
-      text: "Du willst ein paar Dinge für dein Zimmer kaufen. Was passiert?",
-      answers: [
-        { emoji: "🛒", text: "Ich lege Dinge in den Warenkorb, schließe ihn, öffne ihn wieder und mache dann nichts.", type: "avoider" },
-        { emoji: "🌱", text: "Ich entscheide, dass ich eigentlich schon habe, was ich brauche.", type: "monk" },
-        { emoji: "✨", text: "Ich kaufe die Dinge, die das Leben schöner machen.", type: "spender" },
-        { emoji: "📊", text: "Ich vergleiche Preise und wähle sorgfältig aus.", type: "saver" }
-      ]
-    },
-    {
-      text: "Rechnungswoche ist da. Miete, Telefon und andere Zahlungen kommen alle zusammen. Wie reagierst du?",
-      answers: [
-        { emoji: "🍃", text: "Schon okay. Mein Leben ist einfach, also ist es leichter zu regeln.", type: "monk" },
-        { emoji: "😵", text: "Ich sehe es und fühle sofort Stress. Ich will mich erst mal hinlegen.", type: "avoider" },
-        { emoji: "✅", text: "Nicht schön, aber ich war vorbereitet.", type: "saver" },
-        { emoji: "💸", text: "Ich bezahle alles, aber es tut trotzdem ein bisschen weh.", type: "spender" }
-      ]
-    },
-    {
-      text: "Dein Laptop geht kaputt und die Reparatur kostet 800 $. Was machst du?",
-      answers: [
-        { emoji: "🧯", text: "Tut weh, aber genau dafür gibt es Notfallersparnisse.", type: "saver" },
-        { emoji: "😬", text: "Ich starre nur auf den Preis und spüre, wie meine Seele kurz den Körper verlässt.", type: "avoider" },
-        { emoji: "🪷", text: "Ich bleibe ruhig und suche die einfachste Lösung.", type: "monk" },
-        { emoji: "🛠️", text: "Nervig, aber ich kümmere mich darum und mache weiter.", type: "spender" }
-      ]
-    },
-    {
-      text: "Ein paar Monate später bekommst du einen Bonus von 1.000 $. Was machst du damit?",
-      answers: [
-        { emoji: "🎉", text: "Dieses Geld hat schon Freizeitpläne.", type: "spender" },
-        { emoji: "🙂", text: "Schön. Ich nutze, was ich brauche, und denke nicht zu viel darüber nach.", type: "monk" },
-        { emoji: "🧠", text: "Ein Teil davon sollte gespart oder klug eingesetzt werden.", type: "saver" },
-        { emoji: "😐", text: "Ich will eine kluge Entscheidung treffen, aber am Ende treffe ich gar keine.", type: "avoider" }
-      ]
-    },
-    {
-      text: "Ein Freund sagt: „Du solltest anfangen zu investieren.“ Was passt am besten zu dir?",
-      answers: [
-        { emoji: "🙉", text: "Ich hoffe nur, dass keine weiteren Fragen kommen, weil ich keine Ahnung habe.", type: "avoider" },
-        { emoji: "📈", text: "Ja, aber ich möchte es vorsichtig machen und zuerst verstehen.", type: "saver" },
-        { emoji: "🍹", text: "Vielleicht später. Im Moment will ich das Leben mehr genießen.", type: "spender" },
-        { emoji: "🌙", text: "Ich verstehe es, aber Geld wachsen zu lassen ist mir nicht so wichtig.", type: "monk" }
-      ]
-    },
-    {
-      text: "Denk an 10 Jahre in der Zukunft. Welche Zukunft klingt am besten für dich?",
-      answers: [
-        { emoji: "☮️", text: "Ein friedliches, einfaches und angenehmes Leben.", type: "monk" },
-        { emoji: "🌍", text: "Freiheit, Reisen, Spaß und genug Geld, um das Leben zu genießen.", type: "spender" },
-        { emoji: "🌫️", text: "Ehrlich gesagt … ich denke nicht gern so weit voraus.", type: "avoider" },
-        { emoji: "🏠", text: "Ein stabiles Leben, gute Ersparnisse und kein Geldstress.", type: "saver" }
-      ]
-    },
-    {
-      text: "Letzte Frage. Welcher Satz klingt am meisten nach dir?",
-      answers: [
-        { emoji: "📚", text: "Vorbereitet zu sein gibt mir Sicherheit.", type: "saver" },
-        { emoji: "🫠", text: "Ich wollte meine Finanzen ordnen … und dann ist die Zeit einfach verschwunden.", type: "avoider" },
-        { emoji: "🧘", text: "Geld ist nützlich, aber nicht alles.", type: "monk" },
-        { emoji: "🛍️", text: "Ich arbeite hart, also sollte ich auch genießen, was ich verdiene.", type: "spender" }
-      ]
-    }
-  ],
 
-  es: [
-    {
-      text: "Acabas de conseguir un nuevo trabajo. Tu salario es de $3,000 al mes. ¿Cuál es tu primer pensamiento?",
-      answers: [
-        { emoji: "🏦", text: "Primero necesito ver mi presupuesto y cuánto puedo ahorrar.", type: "saver" },
-        { emoji: "🎉", text: "Qué bien. Debería comprarme algo para celebrarlo.", type: "spender" },
-        { emoji: "🙂", text: "Mientras pueda vivir cómodamente, estoy feliz.", type: "monk" },
-        { emoji: "😅", text: "Sé que debería hacer un plan… pero tal vez después.", type: "avoider" }
-      ]
-    },
-    {
-      text: "Llega tu primer sueldo. ¿Qué haces después?",
-      answers: [
-        { emoji: "🙈", text: "Me digo que lo arreglaré después y evito mirar demasiado.", type: "avoider" },
-        { emoji: "🌿", text: "Lo dejo ahí. El dinero es útil, pero no me emociona demasiado.", type: "monk" },
-        { emoji: "🛍️", text: "Me doy un gusto porque el día de pago debe sentirse bien.", type: "spender" },
-        { emoji: "🔐", text: "Paso algo de dinero a mis ahorros de inmediato.", type: "saver" }
-      ]
-    },
-    {
-      text: "Tus compañeros te invitan a una cena elegante después del trabajo. ¿Qué haces?",
-      answers: [
-        { emoji: "🍝", text: "Voy y lo disfruto. A veces está bien divertirse.", type: "spender" },
-        { emoji: "📱", text: "Primero reviso el precio antes de decir que sí.", type: "saver" },
-        { emoji: "🧘", text: "No voy. Una noche tranquila suena mejor.", type: "monk" },
-        { emoji: "🫥", text: "Digo que lo pensaré… y luego nunca respondo bien.", type: "avoider" }
-      ]
-    },
-    {
-      text: "Quieres comprar algunas cosas para tu cuarto. ¿Qué pasa?",
-      answers: [
-        { emoji: "🛒", text: "Pongo cosas en el carrito, lo cierro, lo vuelvo a abrir y al final no hago nada.", type: "avoider" },
-        { emoji: "🌱", text: "Decido que ya tengo lo que necesito.", type: "monk" },
-        { emoji: "✨", text: "Compro las cosas que hacen la vida más agradable.", type: "spender" },
-        { emoji: "📊", text: "Comparo precios y elijo con cuidado.", type: "saver" }
-      ]
-    },
-    {
-      text: "Llega la semana de pagar cuentas. Renta, teléfono y otros pagos aparecen todos juntos. ¿Cuál es tu reacción?",
-      answers: [
-        { emoji: "🍃", text: "Está bien. Mi vida es simple, así que es más fácil manejarlo.", type: "monk" },
-        { emoji: "😵", text: "Lo veo, me estreso y solo quiero acostarme un rato.", type: "avoider" },
-        { emoji: "✅", text: "No es divertido, pero estaba preparado.", type: "saver" },
-        { emoji: "💸", text: "Pago todo, pero igual duele un poco.", type: "spender" }
-      ]
-    },
-    {
-      text: "Tu portátil se rompe y arreglarla cuesta $800. ¿Qué haces?",
-      answers: [
-        { emoji: "🧯", text: "Duele, pero para eso existen los ahorros de emergencia.", type: "saver" },
-        { emoji: "😬", text: "Solo miro el precio y siento que mi alma abandona el cuerpo.", type: "avoider" },
-        { emoji: "🪷", text: "Mantengo la calma y busco la solución más sencilla.", type: "monk" },
-        { emoji: "🛠️", text: "Es molesto, pero lo resolveré y seguiré adelante.", type: "spender" }
-      ]
-    },
-    {
-      text: "Unos meses después, recibes un bono de $1,000. ¿Qué haces con él?",
-      answers: [
-        { emoji: "🎉", text: "Este dinero ya tiene planes divertidos.", type: "spender" },
-        { emoji: "🙂", text: "Bien. Usaré lo que necesite y no pensaré demasiado en ello.", type: "monk" },
-        { emoji: "🧠", text: "Una parte de esto debería ir a ahorros o a algo inteligente.", type: "saver" },
-        { emoji: "😐", text: "Quiero tomar una decisión inteligente, pero de alguna forma no tomo ninguna.", type: "avoider" }
-      ]
-    },
-    {
-      text: "Un amigo dice: 'Deberías empezar a invertir.' ¿Qué suena más como tú?",
-      answers: [
-        { emoji: "🙉", text: "Solo espero que no me pregunte más porque no tengo idea.", type: "avoider" },
-        { emoji: "📈", text: "Sí, pero quiero hacerlo con cuidado y entenderlo primero.", type: "saver" },
-        { emoji: "🍹", text: "Tal vez después. Ahora quiero disfrutar más la vida.", type: "spender" },
-        { emoji: "🌙", text: "Lo entiendo, pero hacer crecer el dinero no me importa tanto.", type: "monk" }
-      ]
-    },
-    {
-      text: "Piensa en 10 años en el futuro. ¿Qué futuro te suena mejor?",
-      answers: [
-        { emoji: "☮️", text: "Una vida tranquila, simple y cómoda.", type: "monk" },
-        { emoji: "🌍", text: "Libertad, viajes, diversión y suficiente dinero para disfrutar la vida.", type: "spender" },
-        { emoji: "🌫️", text: "La verdad… no me gusta pensar tan lejos.", type: "avoider" },
-        { emoji: "🏠", text: "Una vida estable, buenos ahorros y nada de estrés por dinero.", type: "saver" }
-      ]
-    },
-    {
-      text: "Última pregunta. ¿Qué frase suena más a ti?",
-      answers: [
-        { emoji: "📚", text: "Estar preparado me hace sentir seguro.", type: "saver" },
-        { emoji: "🫠", text: "Iba a ordenar mis finanzas… y luego el tiempo desapareció.", type: "avoider" },
-        { emoji: "🧘", text: "El dinero es útil, pero no lo es todo.", type: "monk" },
-        { emoji: "🛍️", text: "Trabajo duro, así que debo disfrutar lo que gano.", type: "spender" }
-      ]
-    }
-  ]
 };
 
 const countries = [
@@ -1920,9 +1621,7 @@ function sendToWebhook() {
 function shareTest() {
   playSound('click', 700);
   const shareTextByLang = {
-    en: "I've discovered my money personality. Test your money personality now:",
-    de: 'Ich habe meine Geldpersönlichkeit entdeckt. Teste jetzt deine Geldpersönlichkeit:',
-    es: 'He descubierto mi personalidad con el dinero. Pon a prueba tu personalidad con el dinero ahora:'
+    en: "I've discovered my money personality. Test your money personality now:"
   };
   const text = `${shareTextByLang[currentLanguage] || shareTextByLang.en}
 ${window.location.href}`;
