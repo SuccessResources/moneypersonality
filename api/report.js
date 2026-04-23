@@ -1,4 +1,4 @@
-  import { PDFDocument, StandardFonts, rgb, PDFName, PDFString, PDFArray } from 'pdf-lib';
+const { PDFDocument, StandardFonts, rgb, PDFName, PDFString, PDFArray }= require('pdf-lib');
 
 // ================================================================
 // CRITICAL FIX: RFC 5987 ENCODING FOR HEADERS
@@ -219,7 +219,7 @@ function addLinkAnnotation(pdfDoc, page, x, y, w, h, url) {
 // MAIN HANDLER
 // ================================================================
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   try {
     if (req.method !== 'POST') {
       return res.status(405).json({ error: 'Method not allowed' });
