@@ -794,12 +794,10 @@ footer a {
 }
 
 @media (max-width: 640px) {
-  /* Hide header on intro screen only */
   #intro .top-bar {
     display: none;
   }
   
-  /* Show header on quiz/form/result */
   #quiz .top-bar,
   #form-screen .top-bar,
   #result .top-bar {
@@ -808,24 +806,20 @@ footer a {
 
   body { padding-top: 130px; }
   
-  /* No padding on intro (header is hidden) */
   #intro { 
     padding-top: 16px !important;
   }
   
-  /* Add padding on quiz/form/result screens (header is visible) */
   #quiz, #form-screen, #result { 
     padding-top: 90px !important;
   }
   
-  /* Make hero image bigger */
   .hero-img {
     max-width: 90vw;
     height: auto;
     margin: 12px auto 16px;
   }
   
-  /* Rest of your existing mobile CSS */
   .top-bar {
     flex-direction: column;
     align-items: stretch;
@@ -941,6 +935,13 @@ footer a {
         </div>
       </div>
 
+      <!-- UTM TRACKING HIDDEN FIELDS -->
+      <input type="hidden" id="utm-source" value="">
+      <input type="hidden" id="utm-campaign" value="">
+      <input type="hidden" id="utm-medium" value="">
+      <input type="hidden" id="utm-content" value="">
+      <!-- END UTM FIELDS -->
+
       <button class="btn-reveal" onclick="revealResult()" id="btn-reveal">🔓 REVEAL MY PERSONALITY</button>
       <p class="privacy-line" id="privacy-note">🔒 Your privacy is protected. Your personalized PDF report is delivered instantly.</p>
     </div>
@@ -986,7 +987,7 @@ footer a {
 
     <div class="urgency-cta-section">
       <div class="urgency-badge" id="urgency-badge">⏳ Limited-Time Opportunity</div>
-      <h3 class="urgency-headline" id="urgency-headline">You already know the pattern. Don’t go back to living inside it.</h3>
+      <h3 class="urgency-headline" id="urgency-headline">You already know the pattern. Don't go back to living inside it.</h3>
       <p class="urgency-body" id="urgency-body">Right now, you have a rare moment of clarity. This is when people either take action — or let the insight fade and fall back into the same cycle.</p>
       <a class="btn-urgency" href="https://www.millionairemind.online/" target="_blank" rel="noopener" id="btn-urgency">🔥 Join Millionaire Mind Intensive Online Now</a>
     </div>
@@ -1082,7 +1083,7 @@ const translations = {
     stepLabel: 'Your Next Step',
     backBtn: '← BACK',
     urgencyBadge: '⏳ Limited-Time Opportunity',
-    urgencyHeadline: "You already know the pattern. Don’t go back to living inside it.",
+    urgencyHeadline: "You already know the pattern. Don't go back to living inside it.",
     urgencyBody: 'Right now, you have a rare moment of clarity. This is when people either take action — or let the insight fade and fall back into the same cycle.',
     btnUrgency: '🔥 Join Millionaire Mind Intensive Online Now',
     offerBridge: "Your money personality is not your destiny… But if you don't understand it, it will control your financial future.",
@@ -1500,6 +1501,30 @@ function prevQuestion() {
   }
 }
 
+// ================================================================
+// UTM PARAMETER CAPTURE
+// ================================================================
+function captureUTMParameters() {
+  const params = new URLSearchParams(window.location.search);
+  
+  const utm_source = params.get('utm_source') || '';
+  const utm_campaign = params.get('utm_campaign') || '';
+  const utm_medium = params.get('utm_medium') || '';
+  const utm_content = params.get('utm_content') || '';
+  
+  document.getElementById('utm-source').value = utm_source;
+  document.getElementById('utm-campaign').value = utm_campaign;
+  document.getElementById('utm-medium').value = utm_medium;
+  document.getElementById('utm-content').value = utm_content;
+  
+  console.log('UTM Parameters captured:', {
+    utm_source,
+    utm_campaign,
+    utm_medium,
+    utm_content
+  });
+}
+
 async function autoDetectCountry() {
   const providers = ['https://ipapi.co/json/', 'https://ipwho.is/'];
   for (const url of providers) {
@@ -1596,6 +1621,10 @@ function sendToWebhook() {
     ip_address: userIp,
     detected_country: userCountryName,
     detected_country_calling_code: userCountryCodeDetected,
+    utm_source: document.getElementById('utm-source').value || '',
+    utm_campaign: document.getElementById('utm-campaign').value || '',
+    utm_medium: document.getElementById('utm-medium').value || '',
+    utm_content: document.getElementById('utm-content').value || '',
     personality_type: dominant,
     personality_name: getPersonalityText(dominant, 'name'),
     best_match: getPersonalityText(bestMatches[dominant].personality, 'name'),
@@ -1752,6 +1781,7 @@ function restartQuiz() {
 
 updateUI();
 autoDetectCountry();
+captureUTMParameters();
 </script>
 </body>
 </html>
