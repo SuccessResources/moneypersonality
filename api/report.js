@@ -794,7 +794,18 @@ const barFillDefault = accent;
     });
 
     try {
-      const img = await embedImageFromUrl(pdfDoc, characterImage);
+      const characterImageMap = {
+        saver: 'https://cch-files.edge.live.ds25.io/cch/v/a4e3489d-6bf3-48c8-affb-c268ba45a538/files/69d3c6fe60dcf_saver.png',
+        spender: 'https://cch-files.edge.live.ds25.io/cch/v/a4e3489d-6bf3-48c8-affb-c268ba45a538/files/69d3c6fe611cd_spender.png',
+        monk: 'https://cch-files.edge.live.ds25.io/cch/v/a4e3489d-6bf3-48c8-affb-c268ba45a538/files/69d3c6fe6114c_monk.png',
+        avoider: 'https://cch-files.edge.live.ds25.io/cch/v/a4e3489d-6bf3-48c8-affb-c268ba45a538/files/69d3c6fe610a0_avoider.png'
+      };
+
+      const selectedCharacterImage =
+        characterImageMap[String(personalityType || '').toLowerCase()] || characterImage;
+
+      const img = await embedImageFromUrl(pdfDoc, selectedCharacterImage);
+
       if (img) {
         const imgSize = 180;
         page1.drawImage(img, {
